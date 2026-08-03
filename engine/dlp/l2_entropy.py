@@ -22,8 +22,11 @@ _LOCKFILE_INTEGRITY = re.compile(r"sha(?:256|512)-|integrity[\"']?\s*[:=]")
 
 # 密钥/赋值语境词(必须出现在 token 附近才判)
 _CTX = re.compile(
-    r"(password|passwd|pwd|secret|token|api[_\-]?key|apikey|access[_\-]?key|"
-    r"private[_\-]?key|credential|auth|bearer)",
+    # 词边界加固:真机误报根因之一——无边界时 auth 匹配 authorization/authenticated、
+    # credential 匹配 credentials 等散文词,英文工具描述/历史消息大面积假阳。
+    # 显式收录 authorization/credentials(真语境词),排除 authenticated/authorize 等动词形态。
+    r"\b(password|passwd|pwd|secret|token|api[_\-]?key|apikey|access[_\-]?key|"
+    r"private[_\-]?key|credentials?|authorization|auth|bearer)\b",
     re.IGNORECASE,
 )
 

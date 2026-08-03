@@ -74,6 +74,9 @@ PRESIDIO_LANGS = tuple(
 )
 # L3 不可达 / 覆盖不完整时的动作：block=fail-closed(默认，安全) | keep=保留引擎原判(危险，仅调试)
 L3_UNAVAILABLE_ACTION = os.environ.get("DLP_L3_UNAVAILABLE_ACTION", "block").lower()
+# ---- L3 大 body 性能补丁(去重+省扫+并发;默认省扫仅 raw/normalized、并发 16)----
+RUN_L3_ON_ALL = os.environ.get("DLP_RUN_L3_ON_ALL_VARIANTS", "false").lower() in ("1", "true", "yes")
+L3_CONCURRENCY = int(os.environ.get("DLP_L3_CONCURRENCY", "16"))
 
 log = logging.getLogger("dlp-http")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
@@ -88,6 +91,8 @@ _CFG = EngineConfig(
     presidio_languages=PRESIDIO_LANGS,
     l3_timeout=L3_TIMEOUT_S,
     use_bedrock_l4=False,
+    run_l3_on_all_variants=RUN_L3_ON_ALL,
+    l3_concurrency=L3_CONCURRENCY,
 )
 _pool: "queue.Queue[DLPEngine]" = queue.Queue()
 for _ in range(max(1, POOL_N)):
