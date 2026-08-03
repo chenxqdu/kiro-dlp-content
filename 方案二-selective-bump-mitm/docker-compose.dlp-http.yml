@@ -1,0 +1,53 @@
+# Kiro DLP 判定薄 HTTP 服务 —— 复用现有镜像 kiro-dlp-engine:latest（load+up，不 pull/push）
+#
+# 部署位置：DLP 主机 <TEST_INSTANCE_ID> (us-west-2, 172.31.27.174) 的
+#           /home/ec2-user/kiro-dlp/docker-compose.dlp-http.yml
+# 启动：cd /home/ec2-user/kiro-dlp && docker compose -f docker-compose.dlp-http.yml up -d
+#
+# ★ 已核实事实（勿改）：
+#   - 镜像 WORKDIR=/app，Env 内建 PYTHONPATH=/app、PRESIDIO_ANALYZER_URL=http://presidio-analyzer:5002/analyze
+#   - 镜像 Entrypoint=null（已核实）、Cmd=["python","-m","tests.run_offline","--no-color"]。
+#     ★ ENTRYPOINT 为 null 时 command 就是完整 argv：必须自带 "python"，否则 exec "-m" 直接失败。
+#     -> command 覆盖为 ["python","-m","dlp_http.server"]，从包根以模块方式启动（规格 D10，避开 sys.path[0] 陷阱）。
+#   - presidio-analyzer 容器挂在网络 docker_default（bridge），本服务必须同网才能按服务名解析（规格 D9）。
+#   - import dlp / DLPEngine / EngineConfig / InjectionPoint 已在容器内 import-OK。
+services:
+  dlp-http:
+    image: kiro-dlp-engine:latest          # 复用现有镜像，零重建、零新依赖
+    container_name: kiro-dlp-http
+    restart: unless-stopped
+    command: ["python", "-m", "dlp_http.server"]  # ENTRYPOINT=null，command 即完整 argv，必须自带 python
+    environment:
+      PYTHONPATH: /app                      # 规格 D10：显式指向引擎包根（镜像已内建，这里双保险）
+      PRESIDIO_ANALYZER_URL: http://presidio-analyzer:5002/analyze   # L3 走容器内网服务名
+      DLP_HTTP_BIND: 0.0.0.0                # 容器命名空间内 0.0.0.0；对外收敛靠 host 私网映射 + SG
+      DLP_HTTP_PORT: "9000"
+      DLP_SCAN_INJECTION_POINT: PROMPT      # 只在请求腿（prompt 出向）同步裁决
+      DLP_MAX_BODY_BYTES: "16777216"        # 16 MiB
+      DLP_ENGINE_POOL_SIZE: "4"             # 规格 D8：对象池并发上限，天然背压
+      DLP_ENGINE_POOL_WAIT: "10.0"          # 池空最长等待秒，超则 503 -> addon fail-closed
+      DLP_PRESIDIO_TIMEOUT_MS: "2000"       # L3 单次调用超时（引擎 EngineConfig.l3_timeout）
+      DLP_PRESIDIO_LANGS: "en,zh"           # 与现有 presidio-analyzer-zh 对齐
+      DLP_L3_UNAVAILABLE_ACTION: block      # 规格 D4：L3 不可达 -> 强制 BLOCK（fail-closed 打底）
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      # 把判定服务代码以只读方式挂进镜像的包根旁（dlp_http 与 dlp 同在 /app，命名空间包可 import）。
+      - ./http_service/server.py:/app/dlp_http/server.py:ro
+    networks:
+      - dlpnet
+    ports:
+      # ★ 绑私网 IP，绝不 0.0.0.0：EC2 公网是 IGW 1:1 NAT，本机接口只有私网 IP。
+      #   同 VPC 的 proxy 节点经 172.31.27.174:9000 直达；SG 再收敛来源。
+      - "172.31.27.174:9000:9000"
+    healthcheck:
+      test: ["CMD", "python3", "-c",
+             "import urllib.request,sys; sys.exit(0) if urllib.request.urlopen('http://127.0.0.1:9000/health',timeout=2).status==200 else sys.exit(1)"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 8s
+
+networks:
+  dlpnet:
+    external: true          # 规格 D9：引用已存在的外部网，与 presidio 同网
+    name: docker_default    # 已 docker inspect 核实 presidio-analyzer 归属此网

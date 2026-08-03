@@ -1,0 +1,31 @@
+# DLP 引擎镜像(SPEC §9)。
+# 构建:在 jumphost(x86_64,与 kiro-dlp 同架构)上
+#   docker build -f docker/Dockerfile.engine -t kiro-dlp-engine:latest .
+# 传输:docker save kiro-dlp-engine:latest | ssh kiro-dlp docker load
+# 运行:在 kiro-dlp 上 docker compose up
+FROM python:3.11-slim
+
+# 非 root 运行
+RUN useradd --create-home --uid 10001 dlp
+
+WORKDIR /app
+
+# 先装依赖(利用层缓存)。核心 L0–L3.5 仅需 stdlib;此处装可选增强/标定依赖。
+COPY engine/requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt || \
+    echo "可选依赖安装失败不阻塞:核心链路仅用 stdlib"
+
+# 拷入引擎源码与测试
+COPY engine/dlp /app/dlp
+COPY engine/tests /app/tests
+COPY engine/SPEC.md /app/SPEC.md
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    PRESIDIO_ANALYZER_URL=http://presidio-analyzer:5002/analyze
+
+USER dlp
+
+# 默认:跑离线单测矩阵(套件2 基线 → 套件1 金标准 → 3/4/5/6)。
+# 若 fixtures 尚未挂载则 harness 会优雅报告缺文件。
+CMD ["python", "-m", "tests.run_offline", "--no-color"]

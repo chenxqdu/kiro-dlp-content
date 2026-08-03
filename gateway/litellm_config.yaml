@@ -1,0 +1,32 @@
+# LiteLLM 网关配置(方案一,03 文档 §1/§6 阶段2)。
+# 上游:Bedrock us-west-2(经实例 IAM 角色,不落长期凭证)。
+# guardrails:CorpDLPGuardrail 两个 hook(pre_call + pre_mcp_call)。
+model_list:
+  # 主上游:开发者经网关访问的模型(演练用 Qwen3-32B,us-west-2 直连 ID 已验证)
+  - model_name: qwen3-32b
+    litellm_params:
+      model: bedrock/qwen.qwen3-32b-v1:0
+      aws_region_name: us-west-2
+  - model_name: llama-3.1-8b
+    litellm_params:
+      model: bedrock/meta.llama3-1-8b-instruct-v1:0
+      aws_region_name: us-west-2
+
+guardrails:
+  - guardrail_name: corp-dlp-pre
+    litellm_params:
+      guardrail: dlp_guardrail.CorpDLPGuardrail
+      mode: "pre_call"          # → async_pre_call_hook(prompt + flowback)
+      default_on: true
+  - guardrail_name: corp-dlp-mcp
+    litellm_params:
+      guardrail: dlp_guardrail.CorpDLPGuardrail
+      mode: "pre_mcp_call"      # → apply_guardrail(MCP 工具参数)
+      default_on: true
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false

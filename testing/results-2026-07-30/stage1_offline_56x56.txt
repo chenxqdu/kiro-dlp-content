@@ -1,0 +1,72 @@
+### FULL 56 RUN ###
+====================================================================================================
+ID       St  期望      实际      ✓  top         ms  命中规则
+----------------------------------------------------------------------------------------------------
+S2-01    2   pass    pass    ✓  -        28.85  -
+S2-02    2   pass    pass    ✓  -        21.33  -
+S2-03    2   pass    pass    ✓  -        21.76  -
+S2-04    2   pass    pass    ✓  -        24.71  -
+S2-05    2   pass    pass    ✓  -        47.27  -
+S2-06    2   pass    pass    ✓  -        24.41  -
+S2-07    2   pass    pass    ✓  -        19.82  -
+S2-08    2   pass    pass    ✓  -        44.54  -
+S2-09    2   pass    pass    ✓  -        21.13  -
+S2-10    2   pass    pass    ✓  -        33.13  -
+S2-11    2   pass    pass    ✓  -        29.62  -
+S2-12    2   pass    pass    ✓  -        19.93  -
+S2-13    2   pass    pass    ✓  -        18.51  -
+S2-14    2   pass    pass    ✓  -         9.95  -
+S2-15    2   pass    pass    ✓  -        20.29  -
+S2-16    2   pass    pass    ✓  -        30.74  -
+S1-01    1   block   block   ✓  L0       21.89  aws_access_key
+S1-02    1   block   block   ✓  L0       21.75  aws_access_key
+S1-03    1   block   block   ✓  L0       23.18  gcp_api_key
+S1-04    1   block   block   ✓  L0       33.55  aws_secret_key,high_entropy_secret
+S1-05    1   block   block   ✓  L1       44.54  high_entropy_secret,pem_private_key
+S1-06    1   block   block   ✓  L2       36.06  high_entropy_secret
+S1-07    1   block   block   ✓  L3.5     30.29  glossary:Project Nightingale
+S1-08    1   block   block   ✓  L3.5     29.08  corp_domain
+S1-09    1   redact  redact  ✓  L0        9.62  cn_id_card
+S1-10    1   redact  redact  ✓  L0       10.50  cn_id_card,cn_phone
+S1-11    1   redact  redact  ✓  L3.5     19.99  ticket_id
+S3-01    3   block   block   ✓  L0       46.85  aws_access_key
+S3-02    3   block   block   ✓  L0       40.19  aws_access_key
+S3-03    3   block   block   ✓  L0       96.26  aws_access_key
+S3-04    3   block   block   ✓  L0       45.61  gcp_api_key
+S3-05    3   block   block   ✓  L0       32.53  gcp_api_key
+S3-06    3   block   block   ✓  L0       31.06  aws_access_key
+S3-07    3   block   block   ✓  L0       29.68  aws_access_key
+S3-08    3   block   block   ✓  L0       31.43  gcp_api_key
+S3-09    3   redact  redact  ✓  L0       19.80  cn_id_card
+S3-10    3   block   block   ✓  L0       33.28  aws_access_key
+S4-01    4   block   block   ✓  L0       54.91  aws_access_key
+S4-02    4   block   block   ✓  L0       36.91  gcp_api_key
+S4-03    4   redact  redact  ✓  L0       44.63  email,presidio:email_address
+S4-04    4   block   block   ✓  L1       85.28  high_entropy_secret,pem_private_key
+S4-05    4   pass    pass    ✓  -        52.58  -
+S4-06    4   block   block   ✓  L3.5     44.72  corp_domain
+S5-01    5   block   block   ✓  L0       21.38  aws_access_key
+S5-02    5   block   block   ✓  L1       44.00  high_entropy_secret,pem_private_key
+S5-03    5   redact  redact  ✓  L0        9.88  cn_id_card
+S5-04    5   block   block   ✓  L0       26.98  aws_access_key
+S5-05    5   redact  redact  ✓  L0       18.46  cn_id_card
+S5-06    5   block   block   ✓  L0       26.72  gcp_api_key
+S5-07    5   pass    pass    ✓  -        21.21  -
+S5-08    5   pass    pass    ✓  -        28.97  -
+S5-09    5   block   block   ✓  L3.5     31.77  glossary:Project Nightingale
+S6-01    6   pass    pass    ✓  -        21.32  -
+S6-02    6   pass    pass    ✓  -        20.60  -
+S6-03    6   pass    pass    ✓  -        21.05  -
+S6-04    6   pass    pass    ✓  -        21.12  -
+====================================================================================================
+套件汇总(顺序:套件2 基线 → 套件1 金标准 → 3/4/5/6):
+  套件2: 16/16 通过 (100%)  fail=0 skip=0  误报数=0(须 0)
+  套件1: 11/11 通过 (100%)  fail=0 skip=0  漏拦数=0(须 0)
+  套件3: 10/10 通过 (100%)  fail=0 skip=0
+  套件4: 6/6 通过 (100%)  fail=0 skip=0
+  套件5: 9/9 通过 (100%)  fail=0 skip=0
+  套件6: 4/4 通过 (100%)  fail=0 skip=0
+----------------------------------------------------------------------------------------------------
+  合计: 56/56 (100%)  fail=0 skip(L3缺席)=0
+FULL_EXIT=0
+

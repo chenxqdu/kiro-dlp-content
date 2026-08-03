@@ -1,0 +1,35 @@
+=== docker stats(负载中,采样8次)===
+litellm	0.45%	650.6MiB / 30.82GiB
+presidio-analyzer	100.17%	1.038GiB / 30.82GiB
+litellm-nodlp	0.12%	1.039GiB / 30.82GiB
+---
+litellm	2.01%	650.5MiB / 30.82GiB
+presidio-analyzer	101.30%	1.038GiB / 30.82GiB
+litellm-nodlp	0.13%	1.039GiB / 30.82GiB
+---
+litellm	0.55%	650.5MiB / 30.82GiB
+presidio-analyzer	99.74%	1.038GiB / 30.82GiB
+litellm-nodlp	0.13%	1.039GiB / 30.82GiB
+---
+litellm	2.73%	650.6MiB / 30.82GiB
+presidio-analyzer	100.77%	1.038GiB / 30.82GiB
+litellm-nodlp	0.13%	1.039GiB / 30.82GiB
+---
+litellm	1.60%	650.6MiB / 30.82GiB
+presidio-analyzer	101.13%	1.038GiB / 30.82GiB
+litellm-nodlp	0.13%	1.039GiB / 30.82GiB
+---
+litellm	1.18%	650.9MiB / 30.82GiB
+presidio-analyzer	100.80%	1.038GiB / 30.82GiB
+litellm-nodlp	0.14%	1.039GiB / 30.82GiB
+---
+litellm	6.28%	651MiB / 30.82GiB
+presidio-analyzer	100.13%	1.038GiB / 30.82GiB
+litellm-nodlp	0.13%	1.039GiB / 30.82GiB
+---
+litellm	7.69%	651MiB / 30.82GiB
+presidio-analyzer	100.39%	1.038GiB / 30.82GiB
+litellm-nodlp	0.13%	1.039GiB / 30.82GiB
+---
+Read from remote host <REDACTED_IP>: Can't assign requested address
+client_loop: send disconnect: Broken pipe

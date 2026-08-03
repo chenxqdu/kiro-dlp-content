@@ -1,0 +1,18 @@
+# 阶段4 L4 端到端(经 LiteLLM 网关,DLP_L4_BEDROCK=1)
+# 远程执行（SSM），2026-07-30, <TEST_INSTANCE_ID>
+# 验证点:①套件6 同步全 200(L4 不阻断);②异步告警秒级落盘 metrics + litellm 日志;③S6-04 阴性对照无告警
+# 测毕已还原 DLP_L4_BEDROCK=0(后续确认输出 "DLP_L4_BEDROCK=0")
+
+=== 套件6 经网关(同步须 200) ===
+S6-01 HTTP 200 rtt_ms 551.6
+S6-02 HTTP 200 rtt_ms 129.3
+S6-03 HTTP 200 rtt_ms 181.6
+S6-04 HTTP 200 rtt_ms 183.6
+=== 指标中 l4_alert 记录 ===
+{"ts": 1785368920.8508523, "kind": "l4_alert", "verdict": "business_strategy", "top_layer": "L4", "latency_ms": {}}
+{"ts": 1785368920.8979273, "kind": "l4_alert", "verdict": "financial_nonpublic", "top_layer": "L4", "latency_ms": {}}
+{"ts": 1785368921.0377629, "kind": "l4_alert", "verdict": "proprietary_tech", "top_layer": "L4", "latency_ms": {}}
+=== litellm 日志中 L4 告警行 ===
+23:48:40 - LiteLLM Proxy:WARNING: dlp_guardrail.py:66 - DLP L4 异步告警 category=business_strategy conf=0.85 model=bedrock:main:qwen.qwen3-32b-v1:0 rationale=The content refers to non-public plans regarding reducing customer acquisition costs and restructuring channel strategies in the East China region, which falls under business_strategy as it involves i
+23:48:40 - LiteLLM Proxy:WARNING: dlp_guardrail.py:66 - DLP L4 异步告警 category=financial_nonpublic conf=0.95 model=bedrock:main:qwen.qwen3-32b-v1:0 rationale=The content refers to an unpublished financial forecast and its comparison with the previous quarter's actual results, which constitutes nonpublic financial information.
+23:48:41 - LiteLLM Proxy:WARNING: dlp_guardrail.py:66 - DLP L4 异步告警 category=proprietary_tech conf=0.85 model=bedrock:main:qwen.qwen3-32b-v1:0 rationale=The request asks for a detailed description of a self-developed recommendation engine's two-stage retrieval and ranking system, which could expose internal architecture and algorithm details of a prop

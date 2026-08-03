@@ -1,0 +1,18 @@
+# DLP-OFF 对照配置(阶段3):与主配置同上游,但不挂任何 guardrail。
+# 用于分离"上游 Bedrock 延迟"与"DLP hook 成本"。
+model_list:
+  - model_name: qwen3-32b
+    litellm_params:
+      model: bedrock/qwen.qwen3-32b-v1:0
+      aws_region_name: us-west-2
+  - model_name: llama-3.1-8b
+    litellm_params:
+      model: bedrock/meta.llama3-1-8b-instruct-v1:0
+      aws_region_name: us-west-2
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false

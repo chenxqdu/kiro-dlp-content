@@ -1,0 +1,31 @@
+# 阶段2 网关叠加层:在 kiro-dlp 上与 docker-compose.yml 合用 ——
+#   docker compose -f docker-compose.yml -f docker-compose.gateway.yml up -d presidio-analyzer litellm
+# litellm 容器挂 CorpDLPGuardrail;DLP 引擎源码直接挂进容器(纯 stdlib,无需安装)。
+# Bedrock 凭证:实例 IAM 角色经 IMDS(hop-limit 已设 2,容器内可取)。
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: litellm
+    depends_on:
+      presidio-analyzer:
+        condition: service_healthy
+    ports:
+      - "4000:4000"          # 仅实例内/SSH 隧道访问;安全组不对公网开 4000
+    environment:
+      # 启动前必须自备:export LITELLM_MASTER_KEY="sk-$(openssl rand -hex 24)"
+      # 刻意用 :? 而非 :-,不留默认值 —— 默认值会静默成为网关 admin key(可签发虚拟 key、读日志/开销)。
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:?请先 export LITELLM_MASTER_KEY(勿用固定值)}
+      - AWS_REGION=us-west-2
+      - PRESIDIO_ANALYZER_URL=http://presidio-analyzer:5002/analyze
+      - DLP_L4_BEDROCK=${DLP_L4_BEDROCK:-0}   # 阶段4 置 1 开 Bedrock 标定
+      - DLP_METRICS_PATH=/metrics/dlp_gateway_metrics.jsonl
+    volumes:
+      - ../gateway/litellm_config.yaml:/app/config.yaml:ro
+      - ../gateway/dlp_guardrail.py:/app/dlp_guardrail.py:ro
+      - ../engine/dlp:/app/dlp:ro              # 引擎源码包
+      - dlp-metrics:/metrics
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    restart: unless-stopped
+
+volumes:
+  dlp-metrics:

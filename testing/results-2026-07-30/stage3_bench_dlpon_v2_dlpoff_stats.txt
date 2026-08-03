@@ -1,0 +1,89 @@
+### DLP-ON (修复后引擎) ###
+{"n_ok": 30, "errs": 0, "conc": 1, "p50_ms": 152.2, "p95_ms": 168.8, "mean_ms": 151.7, "qps": 6.58, "case": "clean_short", "label": "dlp-on-v2"}
+{"n_ok": 30, "errs": 0, "conc": 1, "p50_ms": 1060.7, "p95_ms": 1116.9, "mean_ms": 1063.7, "qps": 0.94, "case": "clean_long", "label": "dlp-on-v2"}
+{"n_ok": 30, "errs": 0, "conc": 1, "p50_ms": 156.2, "p95_ms": 174.4, "mean_ms": 162.9, "qps": 6.13, "case": "redact_pii", "label": "dlp-on-v2"}
+{"n_ok": 30, "errs": 0, "conc": 4, "p50_ms": 181.0, "p95_ms": 224.7, "mean_ms": 186.7, "qps": 20.33, "case": "clean_short", "label": "dlp-on-v2"}
+{"n_ok": 30, "errs": 0, "conc": 4, "p50_ms": 3677.3, "p95_ms": 3815.9, "mean_ms": 3601.4, "qps": 1.07, "case": "clean_long", "label": "dlp-on-v2"}
+{"n_ok": 30, "errs": 0, "conc": 4, "p50_ms": 209.1, "p95_ms": 275.5, "mean_ms": 208.8, "qps": 18.61, "case": "redact_pii", "label": "dlp-on-v2"}
+{"n_ok": 30, "errs": 0, "conc": 8, "p50_ms": 265.6, "p95_ms": 336.1, "mean_ms": 258.5, "qps": 28.31, "case": "clean_short", "label": "dlp-on-v2"}
+{"n_ok": 30, "errs": 0, "conc": 8, "p50_ms": 7370.8, "p95_ms": 7466.3, "mean_ms": 6982.8, "qps": 1.08, "case": "clean_long", "label": "dlp-on-v2"}
+{"n_ok": 30, "errs": 0, "conc": 8, "p50_ms": 333.4, "p95_ms": 405.9, "mean_ms": 325.5, "qps": 22.55, "case": "redact_pii", "label": "dlp-on-v2"}
+{"n_ok": 30, "errs": 0, "conc": 16, "p50_ms": 422.1, "p95_ms": 544.9, "mean_ms": 445.5, "qps": 31.89, "case": "clean_short", "label": "dlp-on-v2"}
+{"n_ok": 30, "errs": 0, "conc": 16, "p50_ms": 7633.1, "p95_ms": 13815.6, "mean_ms": 9122.3, "qps": 1.42, "case": "clean_long", "label": "dlp-on-v2"}
+{"n_ok": 30, "errs": 0, "conc": 16, "p50_ms": 551.1, "p95_ms": 979.8, "mean_ms": 592.1, "qps": 23.77, "case": "redact_pii", "label": "dlp-on-v2"}
+### DLP-OFF ###
+{"n_ok": 30, "errs": 0, "conc": 1, "p50_ms": 106.9, "p95_ms": 121.1, "mean_ms": 105.8, "qps": 9.43, "case": "clean_short", "label": "dlp-off"}
+{"n_ok": 30, "errs": 0, "conc": 1, "p50_ms": 105.1, "p95_ms": 123.7, "mean_ms": 103.8, "qps": 9.62, "case": "clean_long", "label": "dlp-off"}
+{"n_ok": 30, "errs": 0, "conc": 1, "p50_ms": 102.8, "p95_ms": 123.6, "mean_ms": 102.1, "qps": 9.78, "case": "redact_pii", "label": "dlp-off"}
+{"n_ok": 30, "errs": 0, "conc": 4, "p50_ms": 105.9, "p95_ms": 123.7, "mean_ms": 99.9, "qps": 37.51, "case": "clean_short", "label": "dlp-off"}
+{"n_ok": 30, "errs": 0, "conc": 4, "p50_ms": 109.8, "p95_ms": 124.9, "mean_ms": 106.2, "qps": 34.9, "case": "clean_long", "label": "dlp-off"}
+{"n_ok": 30, "errs": 0, "conc": 4, "p50_ms": 107.5, "p95_ms": 133.3, "mean_ms": 111.7, "qps": 33.76, "case": "redact_pii", "label": "dlp-off"}
+{"n_ok": 30, "errs": 0, "conc": 8, "p50_ms": 109.8, "p95_ms": 131.1, "mean_ms": 109.3, "qps": 65.42, "case": "clean_short", "label": "dlp-off"}
+{"n_ok": 30, "errs": 0, "conc": 8, "p50_ms": 120.5, "p95_ms": 145.2, "mean_ms": 122.9, "qps": 56.32, "case": "clean_long", "label": "dlp-off"}
+{"n_ok": 30, "errs": 0, "conc": 8, "p50_ms": 112.3, "p95_ms": 147.7, "mean_ms": 111.5, "qps": 61.62, "case": "redact_pii", "label": "dlp-off"}
+{"n_ok": 30, "errs": 0, "conc": 16, "p50_ms": 123.2, "p95_ms": 164.6, "mean_ms": 123.0, "qps": 109.93, "case": "clean_short", "label": "dlp-off"}
+{"n_ok": 30, "errs": 0, "conc": 16, "p50_ms": 116.2, "p95_ms": 174.0, "mean_ms": 122.7, "qps": 96.78, "case": "clean_long", "label": "dlp-off"}
+{"n_ok": 30, "errs": 0, "conc": 16, "p50_ms": 130.1, "p95_ms": 178.3, "mean_ms": 131.1, "qps": 100.17, "case": "redact_pii", "label": "dlp-off"}
+### STATS 采样(前后各6段) ###
+litellm-nodlp	0.10%	1.039GiB / 30.82GiB
+litellm	8.22%	648MiB / 30.82GiB
+presidio-analyzer	21.15%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	0.11%	1.039GiB / 30.82GiB
+litellm	2.90%	648MiB / 30.82GiB
+presidio-analyzer	98.81%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	0.12%	1.039GiB / 30.82GiB
+litellm	2.88%	648.4MiB / 30.82GiB
+presidio-analyzer	86.31%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	0.12%	1.039GiB / 30.82GiB
+litellm	2.84%	648.5MiB / 30.82GiB
+presidio-analyzer	84.44%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	0.11%	1.039GiB / 30.82GiB
+litellm	2.88%	648.4MiB / 30.82GiB
+presidio-analyzer	86.33%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	0.10%	1.039GiB / 30.82GiB
+litellm	7.47%	648.4MiB / 30.82GiB
+presidio-analyzer	35.45%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	0.11%	1.039GiB / 30.82GiB
+litellm	2.20%	649.6MiB / 30.82GiB
+presidio-analyzer	100.79%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	0.10%	1.039GiB / 30.82GiB
+litellm	1.98%	650MiB / 30.82GiB
+......
+presidio-analyzer	99.68%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	0.14%	1.039GiB / 30.82GiB
+litellm	2.84%	651.9MiB / 30.82GiB
+presidio-analyzer	99.51%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	0.12%	1.039GiB / 30.82GiB
+litellm	5.52%	651.9MiB / 30.82GiB
+presidio-analyzer	100.76%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	0.14%	1.039GiB / 30.82GiB
+litellm	1.50%	653.2MiB / 30.82GiB
+presidio-analyzer	100.20%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	0.12%	1.039GiB / 30.82GiB
+litellm	1.13%	653.4MiB / 30.82GiB
+presidio-analyzer	106.60%	1.048GiB / 30.82GiB
+---
+litellm-nodlp	0.13%	1.039GiB / 30.82GiB
+litellm	2.61%	653.2MiB / 30.82GiB
+presidio-analyzer	99.57%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	7.16%	1.039GiB / 30.82GiB
+litellm	0.12%	653.2MiB / 30.82GiB
+presidio-analyzer	0.01%	1.038GiB / 30.82GiB
+---
+litellm-nodlp	26.51%	1.039GiB / 30.82GiB
+litellm	0.11%	653.2MiB / 30.82GiB
+presidio-analyzer	0.01%	1.038GiB / 30.82GiB
+---
+

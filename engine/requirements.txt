@@ -1,0 +1,13 @@
+# DLP 引擎运行依赖。
+#
+# 同步链路 L0–L3.5 的核心逻辑只用 Python 标准库:
+#   - L3 走 urllib 调**独立** presidio-analyzer 官方容器(:5002),引擎侧不装 presidio。
+# 因此套件1/2 的离线单测零第三方依赖即可跑。
+#
+# 以下为可选增强/标定依赖:
+
+# L3.5 术语表 Aho-Corasick 加速(无则自动回退到正则联合,语义等价)
+pyahocorasick==2.1.0 ; python_version < "3.13"
+
+# L4 语义 DLP 标定后端(Bedrock;功能验证用,非生产。生产 L4 须自托管/VPC-only)
+boto3>=1.34.0

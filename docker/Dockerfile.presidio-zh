@@ -1,0 +1,10 @@
+# presidio-analyzer + 中文 spaCy 模型(SPEC §5-L3"加载中文识别器")。
+# jumphost(x86_64)构建:docker build -f docker/Dockerfile.presidio-zh -t presidio-analyzer-zh:latest docker/
+# 传输:docker save presidio-analyzer-zh:latest | ssh kiro-dlp docker load
+FROM mcr.microsoft.com/presidio-analyzer:latest
+
+# zh_core_web_sm(先 sm 起步:EVA-11 两字中文名 NER 足够;若召回差再换 lg)
+RUN python -m spacy download zh_core_web_sm
+
+COPY presidio-nlp-conf.yaml /usr/bin/presidio-analyzer/presidio_analyzer/conf/nlp-zh.yaml
+ENV NLP_CONF_FILE=/usr/bin/presidio-analyzer/presidio_analyzer/conf/nlp-zh.yaml

@@ -1,0 +1,150 @@
+#!/usr/bin/env python3
+"""阶段2 网关集成测(03 文档 §6):经 LiteLLM :4000 验证两个 hook + flowback。
+
+用法(在 kiro-dlp 上、或经 SSH 隧道本机跑):
+  python3 test_gateway.py --base-url http://localhost:4000 --key $LITELLM_MASTER_KEY \
+      --fixtures ../engine/tests/fixtures --model llama-3.1-8b
+
+- prompt/flowback 类 fixture → POST /chat/completions(flowback 构造 tool role 消息)。
+- mcp 类 fixture → 经 apply_guardrail 语义:此处直接调 /chat/completions 把 MCP JSON
+  作为 prompt 是不对的;正确路径是 MCP 网关。为在阶段2 可控验证,mcp 类经
+  «直连引擎容器»(scan_mcp_call)验证 field_path,经网关验证只覆盖 prompt/flowback。
+- 期望:block → HTTP 400 且 detail.error=blocked_by_corp_dlp;
+        redact → 200 且上游收到的 prompt 已脱敏(用 echo 模型不可行,改验响应正常 +
+                 网关指标文件 verdict=redact);
+        pass  → 200。
+输出矩阵 + 汇总,不手写数字。
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+import time
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+
+def call_gateway(base_url: str, key: str, model: str, messages: list, timeout=60,
+                 tools: list | None = None):
+    body = {"model": model, "messages": messages, "max_tokens": 32}
+    if tools:
+        body["tools"] = tools
+    payload = json.dumps(body).encode()
+    req = urllib.request.Request(
+        f"{base_url}/chat/completions", data=payload, method="POST",
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
+    )
+    t0 = time.perf_counter()
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = json.loads(resp.read().decode())
+            return resp.status, body, (time.perf_counter() - t0) * 1000
+    except urllib.error.HTTPError as e:
+        try:
+            body = json.loads(e.read().decode())
+        except Exception:
+            body = {}
+        return e.code, body, (time.perf_counter() - t0) * 1000
+
+
+# flowback 序列里 assistant.tool_calls 引用的工具:Bedrock Converse 要求请求同时带
+# tools= 定义,否则 LiteLLM 直接 UnsupportedParamsError 400(与 DLP 无关,实测踩坑)。
+_FLOWBACK_TOOLS = [{
+    "type": "function",
+    "function": {
+        "name": "read_file",
+        "description": "读取本地文件内容",
+        "parameters": {"type": "object",
+                       "properties": {"path": {"type": "string"}},
+                       "required": ["path"]},
+    },
+}]
+
+
+def build_messages(case: dict) -> tuple[list, list | None]:
+    """返回 (messages, tools)。
+    prompt → user 消息(session_window 条目作为前置消息,复现同请求滑窗拼接);
+    flowback → 合法 tool-use 序列:assistant.tool_calls → tool 返回值 → user 追问,
+    并带 tools 定义(缺任一都会被 LiteLLM/Bedrock 按非法请求 400,与 DLP 无关——
+    S5-03/S5-07 前两轮实测分别栽在缺 tool_calls、缺 tools=)。"""
+    content = case["content"]
+    if case.get("injection_point") == "flowback":
+        # tool 返回值须是最后一条:Bedrock(llama Converse)不允许 tool result 与
+        # user content 同轮("cannot be provided in the same turn",实测 400)。
+        # 模型直接基于工具结果续答,亦更贴近真实回流。
+        return [
+            {"role": "user", "content": "请读取该文件并总结要点"},
+            {"role": "assistant", "content": None, "tool_calls": [{
+                "id": "call_test_1", "type": "function",
+                "function": {"name": "read_file",
+                             "arguments": "{\"path\": \"/tmp/notes.txt\"}"},
+            }]},
+            {"role": "tool", "tool_call_id": "call_test_1", "content": content},
+        ], _FLOWBACK_TOOLS
+    msgs = [{"role": "user", "content": w} for w in (case.get("session_window") or [])]
+    msgs.append({"role": "user", "content": content})
+    return msgs, None
+
+
+def is_blocked(status: int, body: dict) -> bool:
+    if status == 200:
+        return False
+    s = json.dumps(body, ensure_ascii=False)
+    return "blocked_by_corp_dlp" in s
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--base-url", default="http://localhost:4000")
+    ap.add_argument("--key", required=True)
+    ap.add_argument("--fixtures", default="../engine/tests/fixtures")
+    ap.add_argument("--model", default="llama-3.1-8b")
+    ap.add_argument("--suites", default="1,2,3,5", help="经网关跑的套件(mcp 类跳过)")
+    args = ap.parse_args()
+
+    fdir = Path(args.fixtures)
+    suites = [int(s) for s in args.suites.split(",")]
+    rows, agg = [], {"pass": 0, "fail": 0, "skip": 0}
+
+    for s in suites:
+        fp = fdir / f"suite{s}.json"
+        if not fp.exists():
+            print(f"⚠ 缺 {fp.name}", file=sys.stderr)
+            continue
+        for case in json.loads(fp.read_text(encoding="utf-8")):
+            ip = case.get("injection_point", "prompt")
+            if ip in ("mcp", "egress"):
+                rows.append((case["id"], s, "SKIP(mcp→直连引擎验证)", "-", "~", 0.0))
+                agg["skip"] += 1
+                continue
+            exp = case["expected"]["verdict"]
+            messages, tools = build_messages(case)
+            status, body, ms = call_gateway(
+                args.base_url, args.key, args.model, messages, tools=tools)
+            blocked = is_blocked(status, body)
+            if exp == "block":
+                ok = blocked
+            elif exp in ("redact", "pass"):
+                # redact/pass 都应 200 放行;redact 的"确已脱敏"由网关指标 jsonl 复核
+                ok = (status == 200)
+            else:
+                ok = False
+            st = "pass" if ok else "fail"
+            agg[st] += 1
+            rows.append((case["id"], s, exp, f"{status}{'/blocked' if blocked else ''}",
+                         "✓" if ok else "✗", ms))
+
+    print("=" * 88)
+    print(f"{'ID':<10}{'套件':<4}{'期望':<26}{'HTTP':<14}{'✓':<3}{'RTT ms':>9}")
+    print("-" * 88)
+    for cid, s, exp, http, mark, ms in rows:
+        print(f"{cid:<10}{s:<4}{exp:<26}{http:<14}{mark:<3}{ms:>9.1f}")
+    print("=" * 88)
+    print(f"经网关: pass={agg['pass']} fail={agg['fail']} skip(mcp)={agg['skip']}")
+    sys.exit(0 if agg["fail"] == 0 else 1)
+
+
+if __name__ == "__main__":
+    main()

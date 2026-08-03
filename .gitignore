@@ -1,0 +1,64 @@
+# ===== OS junk =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+# ===== Editor / IDE =====
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ===== Virtualenvs =====
+.venv/
+venv/
+ENV/
+
+# ===== Node =====
+node_modules/
+
+# ===== 临时 / 备份 =====
+*.tmp
+*.bak
+*.bak.*
+
+# ===== 部署配置与运行时状态（机器相关，含真实基础设施 ID）=====
+# config.env 携带真实 VPC / subnet / SG / instance ID —— 只提交 config.env.example。
+config.env
+!config.env.example
+# deploy.sh 写入的本次资源清单，供 cleanup.sh 使用
+.deploy-state.env
+# 生成的客户端 hosts 片段
+client-hosts.txt
+
+# ===== CA 私钥 / 证书材料：绝不进 git =====
+# 正常只在 EC2 /etc/mitm 下生成，此处兜底防误提交。
+# 注意：不要用裸 *.crt —— root-ca-for-clients.crt 是需要分发给客户端的公开根证书，必须保留。
+*.key
+*.pem
+!root-ca-for-clients.crt
+mitmproxy-ca.pem
+root.key
+inter.key
+*.csr
+*.srl
+certs/

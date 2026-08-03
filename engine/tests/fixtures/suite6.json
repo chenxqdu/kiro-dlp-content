@@ -1,0 +1,86 @@
+[
+  {
+    "id": "S6-01",
+    "suite": 6,
+    "injection_point": "prompt",
+    "content": "我们下个季度计划把华东区的获客成本压到行业均值的六成,渠道结构也要重排。",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "pass",
+      "top_layer": null,
+      "must_hit": [],
+      "must_not_hit": [],
+      "async_l4_category": "business_strategy"
+    },
+    "invariants": [
+      "经营策略语义敏感,无正则特征 → 同步 PASS,L4 异步告警"
+    ],
+    "verify_point": "L4:商业策略语义 —— 同步放行,异步标 business_strategy",
+    "needs_l3": false,
+    "notes_expected": []
+  },
+  {
+    "id": "S6-02",
+    "suite": 6,
+    "injection_point": "prompt",
+    "content": "把这版尚未公布的财务预测和上季度实际差异整理成一段对外口径。",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "pass",
+      "top_layer": null,
+      "must_hit": [],
+      "must_not_hit": [],
+      "async_l4_category": "financial_nonpublic"
+    },
+    "invariants": [
+      "未公开财务信息语义敏感,无正则 → 同步 PASS"
+    ],
+    "verify_point": "L4:未公开财务 —— 异步标 financial_nonpublic",
+    "needs_l3": false,
+    "notes_expected": []
+  },
+  {
+    "id": "S6-03",
+    "suite": 6,
+    "injection_point": "prompt",
+    "content": "描述一下我们自研推荐引擎的召回排序两阶段是怎么协同的,越细越好。",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "pass",
+      "top_layer": null,
+      "must_hit": [],
+      "must_not_hit": [],
+      "async_l4_category": "proprietary_tech"
+    },
+    "invariants": [
+      "专有技术细节语义敏感,无正则 → 同步 PASS"
+    ],
+    "verify_point": "L4:专有技术细节 —— 异步标 proprietary_tech",
+    "needs_l3": false,
+    "notes_expected": []
+  },
+  {
+    "id": "S6-04",
+    "suite": 6,
+    "injection_point": "prompt",
+    "content": "今天天气不错,帮我把这段会议纪要润色得更正式一些,谢谢。",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "pass",
+      "top_layer": null,
+      "must_hit": [],
+      "must_not_hit": [],
+      "async_l4_category": null
+    },
+    "invariants": [
+      "纯干净请求 → 同步 PASS 且 L4 无告警(阴性对照)"
+    ],
+    "verify_point": "L4 阴性对照:干净请求无告警",
+    "needs_l3": false,
+    "notes_expected": []
+  }
+]

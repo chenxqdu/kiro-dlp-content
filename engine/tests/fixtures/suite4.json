@@ -1,0 +1,192 @@
+[
+  {
+    "id": "S4-01",
+    "suite": 4,
+    "injection_point": "mcp",
+    "content": {
+      "tool": "deploy",
+      "arguments": {
+        "aws_key": "AKIATESTKEY1234567XY",
+        "region": "cn-north-1"
+      }
+    },
+    "content_kind": "mcp_call",
+    "session_window": null,
+    "expected": {
+      "verdict": "block",
+      "top_layer": "L0",
+      "must_hit": [
+        {
+          "entity": "AWS_ACCESS_KEY",
+          "action": "block"
+        }
+      ],
+      "must_not_hit": [],
+      "async_l4_category": null
+    },
+    "invariants": [
+      "MCP 平铺参数 aws_key 内含 AKIA → BLOCK,field_path=aws_key"
+    ],
+    "verify_point": "MCP 平铺参数命中 AWS AK,field_path=键名",
+    "needs_l3": false,
+    "notes_expected": []
+  },
+  {
+    "id": "S4-02",
+    "suite": 4,
+    "injection_point": "mcp",
+    "content": {
+      "tool": "call_api",
+      "arguments": {
+        "outer": {
+          "inner": {
+            "key": "AIzaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+          }
+        }
+      }
+    },
+    "content_kind": "mcp_call",
+    "session_window": null,
+    "expected": {
+      "verdict": "block",
+      "top_layer": "L0",
+      "must_hit": [
+        {
+          "entity": "GCP_API_KEY",
+          "action": "block"
+        }
+      ],
+      "must_not_hit": [],
+      "async_l4_category": null
+    },
+    "invariants": [
+      "MCP 嵌套参数 outer.inner.key 内含 GCP key → BLOCK,field_path 点分路径"
+    ],
+    "verify_point": "MCP 嵌套参数命中,field_path=outer.inner.key",
+    "needs_l3": false,
+    "notes_expected": []
+  },
+  {
+    "id": "S4-03",
+    "suite": 4,
+    "injection_point": "mcp",
+    "content": {
+      "tool": "send_mail",
+      "arguments": {
+        "to": "user@corpmail.cn",
+        "body": "请回复"
+      }
+    },
+    "content_kind": "mcp_call",
+    "session_window": null,
+    "expected": {
+      "verdict": "redact",
+      "top_layer": "L0",
+      "must_hit": [
+        {
+          "entity": "EMAIL",
+          "action": "redact"
+        }
+      ],
+      "must_not_hit": [],
+      "async_l4_category": null
+    },
+    "invariants": [
+      "MCP 参数含非保留域邮箱 → REDACT,生成 redacted_text",
+      "L0 邮箱 entity 命名为 EMAIL(EMAIL_ADDRESS 是 L3/Presidio 命名)"
+    ],
+    "verify_point": "MCP 参数邮箱 REDACT,arguments 就地脱敏",
+    "needs_l3": false,
+    "notes_expected": []
+  },
+  {
+    "id": "S4-04",
+    "suite": 4,
+    "injection_point": "mcp",
+    "content": {
+      "tool": "write_secret",
+      "arguments": {
+        "pem": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEArandomBase64Body123456789abcdefGHIJKLMNOP\n-----END RSA PRIVATE KEY-----",
+        "path": "/etc/tls/key.pem"
+      }
+    },
+    "content_kind": "mcp_call",
+    "session_window": null,
+    "expected": {
+      "verdict": "block",
+      "top_layer": "L1",
+      "must_hit": [
+        {
+          "entity": "PRIVATE_KEY",
+          "action": "block"
+        }
+      ],
+      "must_not_hit": [],
+      "async_l4_category": null
+    },
+    "invariants": [
+      "MCP 参数含 PEM 私钥 → L1 BLOCK"
+    ],
+    "verify_point": "MCP 参数命中 PEM 私钥 BLOCK",
+    "needs_l3": false,
+    "notes_expected": []
+  },
+  {
+    "id": "S4-05",
+    "suite": 4,
+    "injection_point": "mcp",
+    "content": {
+      "tool": "notify",
+      "arguments": {
+        "channel": "ops",
+        "text": "构建完成,版本 v2.14.3"
+      }
+    },
+    "content_kind": "mcp_call",
+    "session_window": null,
+    "expected": {
+      "verdict": "pass",
+      "top_layer": null,
+      "must_hit": [],
+      "must_not_hit": [],
+      "async_l4_category": null
+    },
+    "invariants": [
+      "MCP 干净参数 → PASS,不误拦"
+    ],
+    "verify_point": "MCP 干净参数放行",
+    "needs_l3": false,
+    "notes_expected": []
+  },
+  {
+    "id": "S4-06",
+    "suite": 4,
+    "injection_point": "egress",
+    "content": {
+      "tool": "http_get",
+      "arguments": {
+        "url": "https://api.corp.example.net/v1/data"
+      }
+    },
+    "content_kind": "mcp_call",
+    "session_window": null,
+    "expected": {
+      "verdict": "block",
+      "top_layer": "L3.5",
+      "must_hit": [
+        {
+          "entity": "INTERNAL_DOMAIN",
+          "action": "block"
+        }
+      ],
+      "must_not_hit": [],
+      "async_l4_category": null
+    },
+    "invariants": [
+      "egress 注入点:出网 URL 含内部域名 → L3.5 BLOCK"
+    ],
+    "verify_point": "egress 通道内部域名 BLOCK",
+    "needs_l3": false,
+    "notes_expected": []
+  }
+]

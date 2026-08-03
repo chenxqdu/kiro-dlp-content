@@ -1,0 +1,122 @@
+### S6 HIT-SOURCE PROBE ###
+==== S6-01 verdict= redact
+  hit: L3 presidio:person PERSON redact src= raw conf= 0.85 frag= '我们下个季度计划把华东区的获客成本压到行业均值的六成'
+  hit: L3 presidio:person PERSON redact src= raw conf= 0.85 frag= '渠道结构也要重排'
+  hit: L3 presidio:location LOCATION redact src= raw conf= 0.85 frag= '华东区'
+==== S6-04 verdict= redact
+  hit: L3 presidio:person PERSON redact src= normalized conf= 0.85 frag= '帮我把这段会议纪要润色得更正式1些'
+### SUITE 1 ###
+====================================================================================================
+ID       St  期望      实际      ✓  top         ms  命中规则
+----------------------------------------------------------------------------------------------------
+S1-01    1   block   block   ✓  L0       30.14  aws_access_key,presidio:person
+S1-02    1   block   block   ✓  L0       23.93  aws_access_key
+S1-03    1   block   block   ✓  L0       25.33  gcp_api_key
+S1-04    1   block   block   ✓  L0       34.80  aws_secret_key,high_entropy_secret
+S1-05    1   block   block   ✓  L1       45.08  high_entropy_secret,pem_private_key
+S1-06    1   block   block   ✓  L2       35.35  high_entropy_secret
+S1-07    1   block   block   ✓  L3.5     30.46  glossary:Project Nightingale
+S1-08    1   block   block   ✓  L3.5     29.32  corp_domain,presidio:location,presidio:p
+S1-09    1   redact  redact  ✓  L0       10.27  cn_id_card
+S1-10    1   redact  redact  ✓  L0       11.39  cn_id_card,cn_phone
+S1-11    1   redact  redact  ✓  L3.5     20.36  ticket_id
+====================================================================================================
+套件汇总(顺序:套件2 基线 → 套件1 金标准 → 3/4/5/6):
+  套件1: 11/11 通过 (100%)  fail=0 skip=0  漏拦数=0(须 0)
+----------------------------------------------------------------------------------------------------
+  合计: 11/11 (100%)  fail=0 skip(L3缺席)=0
+SUITE1_EXIT=0
+### SUITE 2 ###
+====================================================================================================
+ID       St  期望      实际      ✓  top         ms  命中规则
+----------------------------------------------------------------------------------------------------
+S2-01    2   pass    pass    ✓  -        28.24  -
+S2-02    2   pass    redact  ✗  L3       23.04  presidio:location
+           · verdict 期望 pass 实际 redact
+           · top_layer 期望 None 实际 L3
+             hit: L3 presidio:location LOCATION redact src=raw fp=None
+S2-03    2   pass    redact  ✗  L3       22.67  presidio:person
+           · verdict 期望 pass 实际 redact
+           · top_layer 期望 None 实际 L3
+             hit: L3 presidio:person PERSON redact src=raw fp=None
+S2-04    2   pass    pass    ✓  -        24.45  -
+S2-05    2   pass    redact  ✗  L3       47.18  presidio:location
+           · verdict 期望 pass 实际 redact
+           · top_layer 期望 None 实际 L3
+             hit: L3 presidio:location LOCATION redact src=normalized fp=None
+             hit: L3 presidio:location LOCATION redact src=stripped-sep fp=None
+S2-06    2   pass    redact  ✗  L3       25.35  presidio:person
+           · verdict 期望 pass 实际 redact
+           · top_layer 期望 None 实际 L3
+             hit: L3 presidio:person PERSON redact src=raw fp=None
+S2-07    2   pass    pass    ✓  -        19.95  -
+S2-08    2   pass    redact  ✗  L3       43.34  presidio:person
+           · verdict 期望 pass 实际 redact
+           · top_layer 期望 None 实际 L3
+             hit: L3 presidio:person PERSON redact src=raw fp=None
+             hit: L3 presidio:person PERSON redact src=decoded:base64 fp=None
+S2-09    2   pass    pass    ✓  -        22.03  -
+S2-10    2   pass    pass    ✓  -        32.11  -
+S2-11    2   pass    pass    ✓  -        30.92  -
+S2-12    2   pass    pass    ✓  -        20.38  -
+S2-13    2   pass    pass    ✓  -        18.71  -
+S2-14    2   pass    redact  ✗  L3        9.66  presidio:credit_card
+           · verdict 期望 pass 实际 redact
+           · top_layer 期望 None 实际 L3
+           · 命中了 must_not_hit {'entity': 'CREDIT_CARD', 'action': 'redact'}(误报)
+             hit: L3 presidio:credit_card CREDIT_CARD redact src=raw fp=None
+S2-15    2   pass    redact  ✗  L3       18.54  presidio:person
+           · verdict 期望 pass 实际 redact
+           · top_layer 期望 None 实际 L3
+             hit: L3 presidio:person PERSON redact src=raw fp=None
+S2-16    2   pass    redact  ✗  L3       28.79  presidio:location
+           · verdict 期望 pass 实际 redact
+           · top_layer 期望 None 实际 L3
+             hit: L3 presidio:location LOCATION redact src=raw fp=None
+             hit: L3 presidio:location LOCATION redact src=stripped-sep fp=None
+====================================================================================================
+套件汇总(顺序:套件2 基线 → 套件1 金标准 → 3/4/5/6):
+  套件2: 8/16 通过 (50%)  fail=8 skip=0  误报数=8(须 0)
+----------------------------------------------------------------------------------------------------
+  合计: 8/16 (50%)  fail=8 skip(L3缺席)=0
+SUITE2_EXIT=1
+### SUITE 3 ###
+====================================================================================================
+ID       St  期望      实际      ✓  top         ms  命中规则
+----------------------------------------------------------------------------------------------------
+S3-01    3   block   block   ✓  L0       56.01  aws_access_key
+S3-02    3   block   block   ✓  L0       42.80  aws_access_key
+S3-03    3   block   block   ✓  L0       32.10  aws_access_key
+S3-04    3   block   block   ✓  L0       47.46  gcp_api_key
+S3-05    3   block   block   ✓  L0       32.34  gcp_api_key
+S3-06    3   block   block   ✓  L0       32.05  aws_access_key
+S3-07    3   block   block   ✓  L0       31.67  aws_access_key,presidio:person
+S3-08    3   block   block   ✓  L0       32.10  gcp_api_key
+S3-09    3   redact  redact  ✓  L0       20.14  cn_id_card
+S3-10    3   block   block   ✓  L0       32.83  aws_access_key
+====================================================================================================
+套件汇总(顺序:套件2 基线 → 套件1 金标准 → 3/4/5/6):
+  套件3: 10/10 通过 (100%)  fail=0 skip=0
+----------------------------------------------------------------------------------------------------
+  合计: 10/10 (100%)  fail=0 skip(L3缺席)=0
+SUITE3_EXIT=0
+### SUITE 5 ###
+====================================================================================================
+ID       St  期望      实际      ✓  top         ms  命中规则
+----------------------------------------------------------------------------------------------------
+S5-01    5   block   block   ✓  L0       28.46  aws_access_key,presidio:person
+S5-02    5   block   block   ✓  L1       43.45  high_entropy_secret,pem_private_key
+S5-03    5   redact  redact  ✓  L0       10.50  cn_id_card,presidio:person
+S5-04    5   block   block   ✓  L0       27.98  aws_access_key,presidio:person
+S5-05    5   redact  redact  ✓  L0       20.43  cn_id_card
+S5-06    5   block   block   ✓  L0       27.95  gcp_api_key
+S5-07    5   pass    pass    ✓  -        21.70  -
+S5-08    5   pass    pass    ✓  -        30.23  -
+S5-09    5   block   block   ✓  L3.5     32.71  glossary:Project Nightingale
+====================================================================================================
+套件汇总(顺序:套件2 基线 → 套件1 金标准 → 3/4/5/6):
+  套件5: 9/9 通过 (100%)  fail=0 skip=0
+----------------------------------------------------------------------------------------------------
+  合计: 9/9 (100%)  fail=0 skip(L3缺席)=0
+SUITE5_EXIT=0
+

@@ -1,0 +1,21 @@
+# 阶段4 L4 Bedrock 双模型标定(直连,容器内跑 tests/l4_calibration.py)
+# 远程执行（SSM），2026-07-30, <TEST_INSTANCE_ID>
+# ⚠ 数据出 VPC,仅功能验证,非生产配置
+
+### L4 CALIBRATION(Bedrock,数据出VPC,仅功能验证) ###
+==============================================================================================================
+ID      期望类别                    模型       实际类别                          conf          ms  后端
+--------------------------------------------------------------------------------------------------------------
+S6-01   business_strategy       main     business_strategy             0.85       509.2  ✓ bedrock:main:qwen.qwen3-32b-v1:0
+S6-01   business_strategy       control  business_strategy             0.8        398.3  ✓ bedrock:control:meta.llama3-1-8b-instruct-v1:0
+S6-02   financial_nonpublic     main     financial_nonpublic           0.95       402.5  ✓ bedrock:main:qwen.qwen3-32b-v1:0
+S6-02   financial_nonpublic     control  financial_nonpublic           0.8        193.2  ✓ bedrock:control:meta.llama3-1-8b-instruct-v1:0
+S6-03   proprietary_tech        main     proprietary_tech              0.85       564.0  ✓ bedrock:main:qwen.qwen3-32b-v1:0
+S6-03   proprietary_tech        control  None                          None       286.6  ✗ no-alert
+S6-04   None                    main     None                          None       449.9  ✓ no-alert
+S6-04   None                    control  None                          None       265.6  ✓ no-alert
+==============================================================================================================
+类别精确对齐: main=4/4  control=3/4  主/对照一致=3/4
+同步 verdict 污染: 0(须 0)
+⚠ 本标定经 Bedrock us-west-2,数据出 VPC —— 仅功能验证,非生产配置。
+L4_EXIT=0

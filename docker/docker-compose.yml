@@ -1,0 +1,41 @@
+# DLP 运行形态(SPEC §9)——在 kiro-dlp 上 `docker compose up`。
+# 两服务:presidio-analyzer(官方镜像)+ dlp-engine(本工程,Py3.11)。
+#
+# 合规约定:镜像在 jumphost(x86_64)构建后 docker save | ssh kiro-dlp docker load;
+# kiro-dlp 只做 load + compose up,不 login/push/pull。
+# presidio-analyzer 官方镜像若需在 kiro-dlp 拉取,应改为离线 load 同样流程。
+services:
+  presidio-analyzer:
+    # zh 增强镜像(Dockerfile.presidio-zh):官方镜像 + zh_core_web_sm + en/zh 双语 NLP 配置
+    image: presidio-analyzer-zh:latest
+    container_name: presidio-analyzer
+    # 官方镜像默认监听 3000;设 PORT=5002 让其在网络内直接对齐 SPEC 的 :5002。
+    environment:
+      - PORT=5002
+    expose:
+      - "5002"
+    # 仅内网互通,不对宿主暴露(减小暴露面);如需本地调试可临时加 ports。
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request,sys; urllib.request.urlopen('http://localhost:5002/health',timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+
+  dlp-engine:
+    image: kiro-dlp-engine:latest
+    container_name: dlp-engine
+    depends_on:
+      presidio-analyzer:
+        condition: service_healthy
+    environment:
+      - PRESIDIO_ANALYZER_URL=http://presidio-analyzer:5002/analyze
+      - PYTHONPATH=/app
+    # fixtures 挂载进来(后台 agent 生成后即可复跑,无需重建镜像)。
+    volumes:
+      - ../engine/tests/fixtures:/app/tests/fixtures:ro
+    # 默认跑离线单测矩阵;跑完退出(单测语义)。改交互调试可覆盖 command。
+    command: ["python", "-m", "tests.run_offline", "--no-color"]
+    restart: "no"
