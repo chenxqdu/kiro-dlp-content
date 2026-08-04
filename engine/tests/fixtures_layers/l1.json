@@ -1,0 +1,99 @@
+[
+  {
+    "id": "L1-PEM-POS",
+    "layer": "L1",
+    "note": "pem_private_key 私钥头 → BLOCK",
+    "requires": null,
+    "text": "-----BEGIN RSA PRIVATE KEY-----\nMIIabc\n-----END RSA PRIVATE KEY-----",
+    "must_hit": [{"rule": "pem_private_key", "entity": "PRIVATE_KEY", "action": "block"}]
+  },
+  {
+    "id": "L1-PEM-CERT",
+    "layer": "L1",
+    "note": "FP-11 CERTIFICATE 头非私钥 → 零命中",
+    "requires": null,
+    "text": "-----BEGIN CERTIFICATE-----\nMIIabc\n-----END CERTIFICATE-----",
+    "exact_none": true
+  },
+  {
+    "id": "L1-STRIPE-LIVE",
+    "layer": "L1",
+    "note": "stripe_live sk_live_ → BLOCK",
+    "requires": null,
+    "text": "key sk_live_4eC39HqLyjWDarjtT1zdp7dc active",
+    "must_hit": [{"rule": "stripe_live", "entity": "STRIPE_KEY", "action": "block"}]
+  },
+  {
+    "id": "L1-STRIPE-TEST",
+    "layer": "L1",
+    "note": "stripe_test sk_test_ 仍属密钥 → BLOCK(独立规则名)",
+    "requires": null,
+    "text": "key sk_test_4eC39HqLyjWDarjtT1zdp7dc test",
+    "must_hit": [{"rule": "stripe_test", "entity": "STRIPE_KEY", "action": "block"}],
+    "must_not_hit": [{"rule": "openai_key"}]
+  },
+  {
+    "id": "L1-GHPAT-POS",
+    "layer": "L1",
+    "note": "github_pat ghp_+36 → BLOCK",
+    "requires": null,
+    "text": "token ghp_1234567890abcdefghijklmnopqrstuvwxyz set",
+    "must_hit": [{"rule": "github_pat", "entity": "GITHUB_PAT", "action": "block"}]
+  },
+  {
+    "id": "L1-GHOTHER-POS",
+    "layer": "L1",
+    "note": "github_token gho/ghu/ghs/ghr_+36 → BLOCK(规则名 github_token)",
+    "requires": null,
+    "text": "auth gho_1234567890abcdefghijklmnopqrstuvwxyz used",
+    "must_hit": [{"rule": "github_token", "entity": "GITHUB_PAT", "action": "block"}]
+  },
+  {
+    "id": "L1-OPENAI-POS",
+    "layer": "L1",
+    "note": "openai_key sk-proj-… → BLOCK",
+    "requires": null,
+    "text": "OPENAI_API_KEY=sk-proj-abcdefghijklmnopqrstuvwxyz12345",
+    "must_hit": [{"rule": "openai_key", "entity": "OPENAI_KEY", "action": "block"}]
+  },
+  {
+    "id": "L1-SLACK-POS",
+    "layer": "L1",
+    "note": "slack_token xoxb-… → BLOCK",
+    "requires": null,
+    "text": "SLACK xoxb-1234567890-abcdefghijkl here",
+    "must_hit": [{"rule": "slack_token", "entity": "SLACK_TOKEN", "action": "block"}]
+  },
+  {
+    "id": "L1-JWT-POS",
+    "layer": "L1",
+    "note": "jwt 三段 eyJ..eyJ.. → BLOCK",
+    "requires": null,
+    "text": "Authorization: Bearer eyJhbGciOiJodfoo.eyJzdWIiOiJhYmMxMjM0.QWJjRGVmR2hpSg",
+    "must_hit": [{"rule": "jwt", "entity": "JWT", "action": "block"}]
+  },
+  {
+    "id": "L1-JWT-DEMO",
+    "layer": "L1",
+    "note": "FP-12 jwt.io John Doe demo payload → 零命中",
+    "requires": null,
+    "text": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lI.abc123def456",
+    "exact_none": true
+  },
+  {
+    "id": "L1-PLACEHOLDER-1",
+    "layer": "L1",
+    "note": "L1-06 占位符 YOUR_KEY_HERE 窗口豁免 → 零命中",
+    "requires": null,
+    "text": "STRIPE_KEY=sk_live_YOUR_KEY_HERE change me",
+    "exact_none": true
+  },
+  {
+    "id": "L1-PLACEHOLDER-2",
+    "layer": "L1",
+    "note": "占位符 CHANGE_ME 窗口豁免 → 零命中",
+    "requires": null,
+    "text": "ghp_CHANGE_ME_placeholder000000000000000",
+    "exact_none": true
+  }
+]

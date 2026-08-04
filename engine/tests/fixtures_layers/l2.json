@@ -1,0 +1,58 @@
+[
+  {
+    "id": "L2-POS",
+    "layer": "L2",
+    "note": "高熵(≥4.0)+ 语境词 password → high_entropy_secret BLOCK",
+    "requires": null,
+    "text": "password = Xk7Qp2mZ9vLwR4nT8sB1cF6yH3jD5gA0",
+    "must_hit": [{"rule": "high_entropy_secret", "entity": "GENERIC_SECRET", "action": "block"}]
+  },
+  {
+    "id": "L2-NOCTX",
+    "layer": "L2",
+    "note": "同串无语境词 → PASS(FP:无语境高熵不判)",
+    "requires": null,
+    "text": "random blob Xk7Qp2mZ9vLwR4nT8sB1cF6yH3jD5gA0 end",
+    "exact_none": true
+  },
+  {
+    "id": "L2-UUID",
+    "layer": "L2",
+    "note": "FP-01 UUID 结构豁免 → 零命中",
+    "requires": null,
+    "text": "id = 550e8400-e29b-41d4-a716-446655440000 token",
+    "exact_none": true
+  },
+  {
+    "id": "L2-GITSHA",
+    "layer": "L2",
+    "note": "FP-03 git SHA(40hex)结构豁免 → 零命中",
+    "requires": null,
+    "text": "commit a1b2c3d4e5f6789012345678901234567890abcd token",
+    "exact_none": true
+  },
+  {
+    "id": "L2-DATAURI",
+    "layer": "L2",
+    "note": "data:image;base64 前缀豁免 → 零命中",
+    "requires": null,
+    "text": "secret data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAA",
+    "exact_none": true
+  },
+  {
+    "id": "L2-LOCKFILE",
+    "layer": "L2",
+    "note": "FP-04 lockfile integrity: sha512- 豁免 → 零命中",
+    "requires": null,
+    "text": "integrity: \"sha512-Xk7Qp2mZ9vLwR4nT8sB1cF6yH3jD5gA0abcdefg\" token",
+    "exact_none": true
+  },
+  {
+    "id": "L2-LOWENT",
+    "layer": "L2",
+    "note": "低熵重复串(熵≈0)即便有语境也不判 → 零命中",
+    "requires": null,
+    "text": "token = aaaaaaaaaaaaaaaaaaaaaaaa here",
+    "exact_none": true
+  }
+]

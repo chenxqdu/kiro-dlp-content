@@ -1,0 +1,66 @@
+[
+  {
+    "id": "NORM-NFKC-ZW-CN",
+    "layer": "NORM",
+    "note": "normalize: NFKC 全角→半角 + 去零宽 + 中文数字→阿拉伯",
+    "requires": null,
+    "func": "normalize",
+    "text": "ＡＫＩＡ​一三八",
+    "expect_contains": ["AKIA138"]
+  },
+  {
+    "id": "NORM-STRIP-SEP",
+    "layer": "NORM",
+    "note": "strip_separators: token 内 -_空格. 剥离 → 还原连续串",
+    "requires": null,
+    "func": "strip_separators",
+    "text": "AKIA-IOSF ODNN.7EXA_MPLE",
+    "expect_contains": ["AKIAIOSFODNN7EXAMPLE"]
+  },
+  {
+    "id": "NORM-FOLD-LITERAL",
+    "layer": "NORM",
+    "note": "fold_concat: 相邻字符串字面量拼接 → 追加折叠结果",
+    "requires": null,
+    "func": "fold_concat",
+    "text": "key = \"AKIA1234\" + \"567890AB\" + \"CDEF\"",
+    "expect_contains": ["AKIA1234567890ABCDEF"]
+  },
+  {
+    "id": "NORM-FOLD-VAR",
+    "layer": "NORM",
+    "note": "fold_concat: 同段变量赋值+拼接 part1+part2 → 追加折叠结果",
+    "requires": null,
+    "func": "fold_concat",
+    "text": "part1='AKIA1234567890';part2='ABCDEF';full=part1+part2",
+    "expect_contains": ["AKIA1234567890ABCDEF"]
+  },
+  {
+    "id": "NORM-EXPAND-B64",
+    "layer": "NORM",
+    "note": "expand: base64 片段解码变体含明文 key",
+    "requires": null,
+    "func": "expand",
+    "text": "QUtJQTEyMzQ1Njc4OTBBQkNERUY=",
+    "expect_contains": ["AKIA1234567890ABCDEF"]
+  },
+  {
+    "id": "NORM-EXPAND-HEX",
+    "layer": "NORM",
+    "note": "expand: hex 片段解码变体含明文 key",
+    "requires": null,
+    "func": "expand",
+    "text": "414b494131323334353637383930414243444546",
+    "expect_contains": ["AKIA1234567890ABCDEF"]
+  },
+  {
+    "id": "NORM-EXPAND-WINDOW",
+    "layer": "NORM",
+    "note": "expand: 跨消息滑窗拼接 session_window+text → 还原被拆分的 key",
+    "requires": null,
+    "func": "expand",
+    "text": "MPLE",
+    "session_window": ["AKIA", "IOSFODNN7EXA"],
+    "expect_contains": ["AKIAIOSFODNN7EXAMPLE"]
+  }
+]

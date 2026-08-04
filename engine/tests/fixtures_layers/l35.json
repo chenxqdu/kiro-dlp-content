@@ -1,0 +1,82 @@
+[
+  {
+    "id": "L35-NIGHTINGALE",
+    "layer": "L3.5",
+    "note": "glossary:Project Nightingale(大小写敏感)→ BLOCK",
+    "requires": null,
+    "text": "roadmap for Project Nightingale Q3",
+    "must_hit": [{"rule": "glossary:Project Nightingale", "entity": "PROPRIETARY_TERM", "action": "block"}]
+  },
+  {
+    "id": "L35-NIGHTINGALE-CS",
+    "layer": "L3.5",
+    "note": "FP-09 小写 project nightingale 不匹配大小写敏感项 → 零命中",
+    "requires": null,
+    "text": "the project nightingale is public",
+    "exact_none": true
+  },
+  {
+    "id": "L35-KUNLUNPAY",
+    "layer": "L3.5",
+    "note": "glossary:KunlunPay(CS)→ BLOCK",
+    "requires": null,
+    "text": "integrate KunlunPay gateway",
+    "must_hit": [{"rule": "glossary:KunlunPay", "entity": "PROPRIETARY_TERM", "action": "block"}]
+  },
+  {
+    "id": "L35-CNSHADOW",
+    "layer": "L3.5",
+    "note": "glossary:region-cn-shadow(不CS,大写变体也命中)→ BLOCK",
+    "requires": null,
+    "text": "deploy to REGION-CN-SHADOW cluster",
+    "must_hit": [{"rule": "glossary:region-cn-shadow", "entity": "PROPRIETARY_TERM", "action": "block"}]
+  },
+  {
+    "id": "L35-TITAN",
+    "layer": "L3.5",
+    "note": "glossary:PROJECT-TITAN(CS)→ BLOCK",
+    "requires": null,
+    "text": "PROJECT-TITAN milestone",
+    "must_hit": [{"rule": "glossary:PROJECT-TITAN", "entity": "PROPRIETARY_TERM", "action": "block"}]
+  },
+  {
+    "id": "L35-MARGIN",
+    "layer": "L3.5",
+    "note": "glossary:internal-margin-formula(不CS)→ BLOCK",
+    "requires": null,
+    "text": "the internal-margin-formula spreadsheet",
+    "must_hit": [{"rule": "glossary:internal-margin-formula", "entity": "PROPRIETARY_TERM", "action": "block"}]
+  },
+  {
+    "id": "L35-FALCON-CTX",
+    "layer": "L3.5",
+    "note": "glossary:Falcon 有 codename/内部语境 → BLOCK",
+    "requires": null,
+    "text": "codename Falcon is internal",
+    "must_hit": [{"rule": "glossary:Falcon", "entity": "PROPRIETARY_TERM", "action": "block"}]
+  },
+  {
+    "id": "L35-FALCON-NOCTX",
+    "layer": "L3.5",
+    "note": "裸 falcon/Falcon 无专有语境 → 零命中(防撞普通英文/开源项目)",
+    "requires": null,
+    "text": "the falcon bird flies; Falcon 9 rocket",
+    "exact_none": true
+  },
+  {
+    "id": "L35-TICKET",
+    "layer": "L3.5",
+    "note": "ticket_id SEV\\d-\\d{3,6} → REDACT",
+    "requires": null,
+    "text": "see SEV1-12345 for details",
+    "must_hit": [{"rule": "ticket_id", "entity": "PROPRIETARY_TERM", "action": "redact"}]
+  },
+  {
+    "id": "L35-CORPDOMAIN",
+    "layer": "L3.5",
+    "note": "corp_domain *.corp.example.net → BLOCK(entity INTERNAL_DOMAIN)",
+    "requires": null,
+    "text": "host is jenkins.corp.example.net now",
+    "must_hit": [{"rule": "corp_domain", "entity": "INTERNAL_DOMAIN", "action": "block"}]
+  }
+]

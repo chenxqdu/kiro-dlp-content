@@ -1,0 +1,74 @@
+[
+  {
+    "id": "L4-HEUR-BIZLOGIC",
+    "layer": "L4",
+    "note": "离线启发式:业务领域词(风控)+ 自研逻辑(权重/阈值)→ proprietary-business-logic",
+    "requires": null,
+    "use_bedrock": false,
+    "text": "我们风控模型里 risk_score = 0.3*逾期 + 0.7*额度,阈值设 0.85",
+    "expect_alert": "proprietary-business-logic"
+  },
+  {
+    "id": "L4-HEUR-DISGUISE",
+    "layer": "L4",
+    "note": "离线启发式:注释/命名含内部专有标记 → proprietary-source",
+    "requires": null,
+    "use_bedrock": false,
+    "text": "这是我们 internal 专有的定价模块,机密,勿外传",
+    "expect_alert": "proprietary-source"
+  },
+  {
+    "id": "L4-HEUR-GENERIC",
+    "layer": "L4",
+    "note": "控告警疲劳:通用算法 quicksort 无业务词 → 无告警",
+    "requires": null,
+    "use_bedrock": false,
+    "text": "帮我用 Python 实现一个 quicksort 快速排序",
+    "expect_alert": null
+  },
+  {
+    "id": "L4-HEUR-CLEAN",
+    "layer": "L4",
+    "note": "阴性对照:纯干净请求 → 无告警",
+    "requires": null,
+    "use_bedrock": false,
+    "text": "今天天气不错,帮我把这段会议纪要润色得更正式一些,谢谢。",
+    "expect_alert": null
+  },
+  {
+    "id": "L4-BR-STRATEGY",
+    "layer": "L4",
+    "note": "Bedrock 标定(S6-01,阶段4 Qwen 已验证):商业策略 → business_strategy(⚠数据出VPC)",
+    "requires": "bedrock",
+    "use_bedrock": true,
+    "text": "我们下个季度计划把华东区的获客成本压到行业均值的六成,渠道结构也要重排。",
+    "expect_alert": "business_strategy"
+  },
+  {
+    "id": "L4-BR-FINANCIAL",
+    "layer": "L4",
+    "note": "Bedrock 标定(S6-02,阶段4 Qwen 已验证):未公开财务 → financial_nonpublic(⚠数据出VPC)",
+    "requires": "bedrock",
+    "use_bedrock": true,
+    "text": "把这版尚未公布的财务预测和上季度实际差异整理成一段对外口径。",
+    "expect_alert": "financial_nonpublic"
+  },
+  {
+    "id": "L4-BR-TECH",
+    "layer": "L4",
+    "note": "Bedrock 标定(S6-03,阶段4 Qwen 已验证):专有技术细节 → proprietary_tech(⚠数据出VPC)",
+    "requires": "bedrock",
+    "use_bedrock": true,
+    "text": "描述一下我们自研推荐引擎的召回排序两阶段是怎么协同的,越细越好。",
+    "expect_alert": "proprietary_tech"
+  },
+  {
+    "id": "L4-BR-CLEAN",
+    "layer": "L4",
+    "note": "Bedrock 标定(S6-04,阶段4 Qwen 已验证):干净请求阴性对照 → 无告警(⚠数据出VPC)",
+    "requires": "bedrock",
+    "use_bedrock": true,
+    "text": "今天天气不错,帮我把这段会议纪要润色得更正式一些,谢谢。",
+    "expect_alert": null
+  }
+]

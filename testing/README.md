@@ -1,6 +1,6 @@
 # 方案一测试复现手册（testing/）
 
-本目录汇总 2026-07-30 四阶段实测用到的**全部脚本、执行方法与原始输出**，供复现验证与分析。
+本目录汇总 2026-07-30 四阶段实测 + 2026-08-04 阶段5 分层完备测试用到的**全部脚本、执行方法与原始输出**，供复现验证与分析。
 实测结论与完整矩阵见 [../03-方案一测试方案.md](../03-方案一测试方案.md) §8；本 README 只讲"怎么跑出来的、怎么再跑一遍、结果怎么读"。
 
 ## 目录结构
@@ -14,12 +14,14 @@ testing/
 │   ├── host_stage1_offline.sh 阶段1：离线 56 条矩阵
 │   ├── host_stage2_gateway.sh 阶段2：网关集成测 + 指标复核
 │   ├── host_stage3_bench.sh   阶段3：开/关 DLP 压测 + docker stats 归因
-│   └── host_stage4_l4.sh      阶段4：L4 Bedrock 标定（直连 + 端到端 + 还原开关）
+│   ├── host_stage4_l4.sh      阶段4：L4 Bedrock 标定（直连 + 端到端 + 还原开关）
+│   └── host_stage5_layers.sh  阶段5：分层完备测试（Presidio 全量 + L3 隔离 + L4 --bedrock）
 ├── probes/                    ← 诊断探针（排障/根因分析）
 │   ├── probe_presidio_raw.py       取 Presidio 原始 NER 输出（绕过引擎过滤）
 │   ├── probe_presidio_variants.py  按引擎变体展开逐变体×逐语言归因误报
 │   └── test_l3_weak_ner_replay.py  本地 mock 回放回归（不依赖实例，秒级）
-└── results-2026-07-30/        ← 本轮原始实测输出（未加工，含失败轮次）
+├── results-2026-07-30/        ← 四阶段原始实测输出（未加工，含失败轮次）
+└── results-2026-08-04/        ← 阶段5 分层完备测试原始输出
 ```
 
 测试代码本体在仓库其它目录（本目录的脚本调用它们）：
@@ -30,6 +32,9 @@ testing/
 | [engine/tests/fixtures/suite1..6.json](../engine/tests/fixtures/) | 56 条测试语料（六套件，schema 见 engine/SPEC.md §7） |
 | [engine/tests/fixture_invariants_check.py](../engine/tests/fixture_invariants_check.py) | fixture 静态不变量校验器（改语料后先跑它） |
 | [engine/tests/l4_calibration.py](../engine/tests/l4_calibration.py) | 阶段4 L4 双模型标定（Qwen3-32B main / Llama-3.1-8B control） |
+| [engine/tests/run_layers.py](../engine/tests/run_layers.py) | 阶段5 分层 harness：直接调每层 `scan()`（不经引擎聚合），验每条规则的正例/豁免/边界；L3 缺 Presidio 自动 SKIP，L4-Bedrock 需 `--bedrock` |
+| [engine/tests/fixtures_layers/](../engine/tests/fixtures_layers/) | 阶段5 分层向量 78 条（l0/l1/l2/l3/l35/egress/norm/l4 八文件，schema 见 run_layers.py 头注释） |
+| [engine/tests/_probe_layers.py](../engine/tests/_probe_layers.py) | 阶段5 落笔前 oracle 探针：生成魔法值（mod-11 身份证/base64/hex/熵）+ 打印每层 scan() 真实命中，**所有向量断言据此实测输出写成，非臆断** |
 | [gateway/test_gateway.py](../gateway/test_gateway.py) | 阶段2 网关 harness：fixture → /chat/completions，block→400 / redact/pass→200 |
 | [gateway/bench_gateway.py](../gateway/bench_gateway.py) | 阶段3 压测：3 payload × 4 并发档 × n=30，输出 JSON 行 |
 | [gateway/dlp_guardrail.py](../gateway/dlp_guardrail.py) | 被测对象：LiteLLM CorpDLPGuardrail（两 hook） |
@@ -53,6 +58,20 @@ cd testing/remote
 ./ssm_exec.sh host_stage2_gateway.sh 900      # 阶段2，约 1 分钟
 ./ssm_exec.sh host_stage3_bench.sh 1800       # 阶段3，约 5 分钟（long-text 档慢）
 ./ssm_exec.sh host_stage4_l4.sh 900           # 阶段4（含还原 DLP_L4_BEDROCK=0）
+./ssm_exec.sh host_stage5_layers.sh 900       # 阶段5 分层完备（含 L4 --bedrock 段）
+```
+
+`ssm_exec.sh` 与 `sync_engine.sh` 需要两个环境变量（不硬编码实例/桶）：
+
+```bash
+export KIRO_DLP_INSTANCE=<实例ID>
+export KIRO_DLP_S3_BUCKET=<自有中转桶>
+```
+
+阶段5 也可先在本地空跑（无 Presidio/Bedrock，L3 与 L4-BR 向量自动 SKIP，其余 65 条应全绿）：
+
+```bash
+cd engine && python3 -m tests.run_layers --no-color
 ```
 
 改了本地 `engine/dlp/*.py` 或 fixtures 之后，先同步再跑：
@@ -71,6 +90,7 @@ cd testing/remote
 - 阶段3 无硬门，比对 `results-2026-07-30/stage3_*` 的量级：dlp-off 全档 p50≈103–130ms；
   dlp-on 短文本 c1 p50≈152ms；**long-text c8+ p50 劣化到 7s+ 且 stats 里 presidio 单核打满是预期现象**（已知瓶颈，见 03 §8.3）。
 - 阶段4 期望 main 4/4、`同步 verdict 污染: 0`、端到端 4×HTTP 200 + 3 条 l4_alert 落盘 + S6-04 无告警，收尾输出 `DLP_L4_BEDROCK=0`。
+- 阶段5 期望三段全绿：②带 Presidio `74/78 fail=0 skip=4`（4 条 Bedrock 向量按设计 SKIP）`LAYERS_EXIT=0`；②b `L3 9/9` `L3_EXIT=0`；③ `--bedrock 8/8` `L4_BEDROCK_EXIT=0`。L3 单条 ~12–15ms 属正常（Presidio HTTP 往返）。
 
 ## 排障方法（本轮实际用过的分析路径）
 
@@ -120,3 +140,11 @@ python3 probes/test_l3_weak_ner_replay.py
 
 > 失败轮次的输出**有意保留**：`stage1_prefix_*` 是"修引擎而非改语料"决策的原始证据；
 > `stage2_*_first/second_run` 记录了 Bedrock tool 序列两个坑的真实报错，复现踩坑时先对照它们。
+
+## results-2026-08-04/ 原始输出索引
+
+| 文件 | 内容 | 状态 |
+|---|---|---|
+| `stage5_layers_78.txt` | 阶段5 分层完备测试三段全量（Presidio 全量 74/78 + L3 隔离 9/9 + `--bedrock` 8/8） | ✅ 三段 exit=0 |
+
+**阶段5 与阶段1 的关系**：阶段1（`run_offline`）验的是"整机裁决"——56 条场景经 `engine.scan()` 全链路聚合出 verdict/top_layer；阶段5（`run_layers`）验的是"每层每条规则"——直接调 `l0_regex.scan()`/`l1_secrets.scan()`/… 逐规则断言正例、豁免（FP-01..12 白名单逐条独立成向量）、边界。阶段1 过不代表每条规则被触达（覆盖审计发现 L1 7 条签名、L3.5 5 条术语、EGRESS 全部变体在 56 条场景里为零覆盖），阶段5 补齐了这块。改任一层规则后两个 harness 都要跑。

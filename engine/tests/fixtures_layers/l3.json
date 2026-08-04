@@ -1,0 +1,74 @@
+[
+  {
+    "id": "L3-EMAIL-POS",
+    "layer": "L3",
+    "note": "Presidio EMAIL_ADDRESS 模式类强实体(非保留域)→ REDACT",
+    "requires": "presidio",
+    "text": "reach the owner at john.doe@realcorp.io for access",
+    "must_hit": [{"entity": "EMAIL_ADDRESS", "action": "redact"}]
+  },
+  {
+    "id": "L3-EMAIL-RESERVED",
+    "layer": "L3",
+    "note": "FP-06 保留域 example.com 邮箱 → 引擎 is_reserved_email 豁免,不产 EMAIL_ADDRESS hit",
+    "requires": "presidio",
+    "text": "contact support@example.com anytime",
+    "must_not_hit": [{"entity": "EMAIL_ADDRESS"}]
+  },
+  {
+    "id": "L3-CARD-POS",
+    "layer": "L3",
+    "note": "Luhn 通过、非测试卡、无流水语境 → CREDIT_CARD REDACT",
+    "requires": "presidio",
+    "text": "charge this card 4539578763621486 today",
+    "must_hit": [{"entity": "CREDIT_CARD", "action": "redact"}]
+  },
+  {
+    "id": "L3-CARD-TESTCARD",
+    "layer": "L3",
+    "note": "FP-08 公开测试卡 4111… 白名单 → 不产 CREDIT_CARD hit",
+    "requires": "presidio",
+    "text": "sandbox pay with 4111111111111111 works",
+    "must_not_hit": [{"entity": "CREDIT_CARD"}]
+  },
+  {
+    "id": "L3-CARD-SERIAL",
+    "layer": "L3",
+    "note": "L3-11 运单/流水语境 → CREDIT_CARD 降权 <0.5,不产 hit",
+    "requires": "presidio",
+    "text": "物流运单号 4539123456783457,请查询签收状态。",
+    "must_not_hit": [{"entity": "CREDIT_CARD"}]
+  },
+  {
+    "id": "L3-IP-POS",
+    "layer": "L3",
+    "note": "Presidio IP_ADDRESS 模式类强实体 → REDACT",
+    "requires": "presidio",
+    "text": "the box answers at 203.0.113.45 on port 22",
+    "must_hit": [{"entity": "IP_ADDRESS", "action": "redact"}]
+  },
+  {
+    "id": "L3-PERSON-PUBLIC",
+    "layer": "L3",
+    "note": "FP-07 公开人名 Guido 白名单 → 不产同步 PERSON REDACT",
+    "requires": "presidio",
+    "text": "感谢 Guido 对语言设计的贡献。",
+    "must_not_hit": [{"entity": "PERSON"}]
+  },
+  {
+    "id": "L3-WEAKNER-NOSTRONG",
+    "layer": "L3",
+    "note": "弱 NER 隔离:纯人名/地名无模式类强实体佐证 → 不产同步 REDACT(交 L4 异步)",
+    "requires": "presidio",
+    "text": "我的同事李明负责华东区的日常运营工作。",
+    "must_not_hit": [{"entity": "PERSON"}, {"entity": "LOCATION"}]
+  },
+  {
+    "id": "L3-WEAKNER-WITHSTRONG",
+    "layer": "L3",
+    "note": "弱 NER 佐证转正:人名 + 真邮箱强实体同现 → EMAIL_ADDRESS 必中(PERSON 此时可转正,实例观察)",
+    "requires": "presidio",
+    "text": "李明的邮箱是 liming@realcorp.io,有事联系他。",
+    "must_hit": [{"entity": "EMAIL_ADDRESS", "action": "redact"}]
+  }
+]

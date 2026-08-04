@@ -1,0 +1,123 @@
+# 阶段5 分层完备测试(L0-L4 每层每条规则:正例/豁免/边界)
+# 远程执行(SSM),2026-08-04, <TEST_INSTANCE_ID>
+# harness: engine/tests/run_layers.py + engine/tests/fixtures_layers/{l0,l1,l2,l3,l35,egress,norm,l4}.json
+# 投递: testing/remote/host_stage5_layers.sh(经 ssm_exec.sh)
+# 断言纪律:所有 must_hit/must_not_hit 先经本地 oracle 探针(tests/_probe_layers.py)实测源码
+#   scan() 真实输出后落笔;L3(需 Presidio)与 L4-Bedrock 向量本地 SKIP,只信实例真跑。
+# 结论:三段全绿 —— ②带 Presidio 74/78(4 条 Bedrock 向量按设计 SKIP)LAYERS_EXIT=0;
+#   ②b L3 隔离复跑 9/9 L3_EXIT=0;③ --bedrock 8/8 L4_BEDROCK_EXIT=0。
+# ⚠ 第③段经 Bedrock us-west-2,数据出 VPC —— 仅功能验证,非生产配置。
+
+### ① presidio-analyzer health 探测 ###
+Presidio Analyzer service is up
+
+### ② 分层全量(带 Presidio,不含 Bedrock)###
+============================================================================================================
+ID            层       ✓        ms  说明
+------------------------------------------------------------------------------------------------------------
+L0-AK-POS     L0      ✓      0.03  aws_access_key AKIA+16 真值 → BLOCK
+L0-AK-WL      L0      ✓      0.01  FP-05 官方示例 key AKIAIOSFODNN7EXAMPLE 白名单 → 零命中
+L0-AK-REGEXDEFNL0      ✓      0.01  FP-10 正则定义 AKIA[0-9A-Z]{16} 不是真值 → 零命中
+L0-SK-POS     L0      ✓      0.02  aws_secret_key 需语境词 + 40char → BLOCK
+L0-SK-NOCTX   L0      ✓      0.01  40char 裸串无 secret 语境 → 不判(aws_secret_key 零命中)
+L0-GCP-POS    L0      ✓      0.01  gcp_api_key AIza+35 → BLOCK
+L0-CNID-POS   L0      ✓      0.02  cn_id_card mod-11 校验通过 → REDACT
+L0-CNID-BADCHKL0      ✓      0.01  mod-11 校验不过的 18 位数 → 不判身份证
+L0-PHONE-CTX  L0      ✓      0.01  cn_phone 有联系语境 → REDACT
+L0-PHONE-NOCTXL0      ✓      0.01  孤立号无联系语境 → 不判(防 FP)
+L0-PHONE-TRACKINGL0      ✓      0.01  L0-03 tracking/订单语境抑制手机 → 不判
+L0-PHONE-WITHIDL0      ✓      0.02  手机与身份证同现 → phone_ctx 成立,两者都 REDACT
+L0-EMAIL-POS  L0      ✓      0.02  email 真值 → REDACT
+L0-EMAIL-RESERVEDL0      ✓      0.02  FP-06 RFC2606 保留域 example.com/.test 邮箱豁免 → 零命中
+L1-PEM-POS    L1      ✓      0.01  pem_private_key 私钥头 → BLOCK
+L1-PEM-CERT   L1      ✓      0.01  FP-11 CERTIFICATE 头非私钥 → 零命中
+L1-STRIPE-LIVEL1      ✓      0.01  stripe_live sk_live_ → BLOCK
+L1-STRIPE-TESTL1      ✓      0.01  stripe_test sk_test_ 仍属密钥 → BLOCK(独立规则名)
+L1-GHPAT-POS  L1      ✓      0.01  github_pat ghp_+36 → BLOCK
+L1-GHOTHER-POSL1      ✓      0.01  github_token gho/ghu/ghs/ghr_+36 → BLOCK(规则名 github_token)
+L1-OPENAI-POS L1      ✓      0.01  openai_key sk-proj-… → BLOCK
+L1-SLACK-POS  L1      ✓      0.01  slack_token xoxb-… → BLOCK
+L1-JWT-POS    L1      ✓      0.01  jwt 三段 eyJ..eyJ.. → BLOCK
+L1-JWT-DEMO   L1      ✓      0.01  FP-12 jwt.io John Doe demo payload → 零命中
+L1-PLACEHOLDER-1L1      ✓      0.00  L1-06 占位符 YOUR_KEY_HERE 窗口豁免 → 零命中
+L1-PLACEHOLDER-2L1      ✓      0.00  占位符 CHANGE_ME 窗口豁免 → 零命中
+L2-POS        L2      ✓      0.10  高熵(≥4.0)+ 语境词 password → high_entropy_secret BLOCK
+L2-NOCTX      L2      ✓      0.01  同串无语境词 → PASS(FP:无语境高熵不判)
+L2-UUID       L2      ✓      0.00  FP-01 UUID 结构豁免 → 零命中
+L2-GITSHA     L2      ✓      0.01  FP-03 git SHA(40hex)结构豁免 → 零命中
+L2-DATAURI    L2      ✓      0.00  data:image;base64 前缀豁免 → 零命中
+L2-LOCKFILE   L2      ✓      0.00  FP-04 lockfile integrity: sha512- 豁免 → 零命中
+L2-LOWENT     L2      ✓      0.01  低熵重复串(熵≈0)即便有语境也不判 → 零命中
+L3-EMAIL-POS  L3      ✓     13.66  Presidio EMAIL_ADDRESS 模式类强实体(非保留域)→ REDACT
+L3-EMAIL-RESERVEDL3      ✓     13.59  FP-06 保留域 example.com 邮箱 → 引擎 is_reserved_email 豁免,不产 EMAIL_ADDRESS hit
+L3-CARD-POS   L3      ✓     13.09  Luhn 通过、非测试卡、无流水语境 → CREDIT_CARD REDACT
+L3-CARD-TESTCARDL3      ✓     13.13  FP-08 公开测试卡 4111… 白名单 → 不产 CREDIT_CARD hit
+L3-CARD-SERIALL3      ✓     13.39  L3-11 运单/流水语境 → CREDIT_CARD 降权 <0.5,不产 hit
+L3-IP-POS     L3      ✓     13.96  Presidio IP_ADDRESS 模式类强实体 → REDACT
+L3-PERSON-PUBLICL3      ✓     12.29  FP-07 公开人名 Guido 白名单 → 不产同步 PERSON REDACT
+L3-WEAKNER-NOSTRONGL3      ✓     12.73  弱 NER 隔离:纯人名/地名无模式类强实体佐证 → 不产同步 REDACT(交 L4 异步)
+L3-WEAKNER-WITHSTRONGL3      ✓     14.90  弱 NER 佐证转正:人名 + 真邮箱强实体同现 → EMAIL_ADDRESS 必中
+L35-NIGHTINGALEL3.5    ✓      0.31  glossary:Project Nightingale(大小写敏感)→ BLOCK
+L35-NIGHTINGALE-CSL3.5    ✓      0.02  FP-09 小写 project nightingale 不匹配大小写敏感项 → 零命中
+L35-KUNLUNPAY L3.5    ✓      0.02  glossary:KunlunPay(CS)→ BLOCK
+L35-CNSHADOW  L3.5    ✓      0.02  glossary:region-cn-shadow(不CS,大写变体也命中)→ BLOCK
+L35-TITAN     L3.5    ✓      0.01  glossary:PROJECT-TITAN(CS)→ BLOCK
+L35-MARGIN    L3.5    ✓      0.01  glossary:internal-margin-formula(不CS)→ BLOCK
+L35-FALCON-CTXL3.5    ✓      0.01  glossary:Falcon 有 codename/内部语境 → BLOCK
+L35-FALCON-NOCTXL3.5    ✓      0.01  裸 falcon/Falcon 无专有语境 → 零命中(防撞普通英文/开源项目)
+L35-TICKET    L3.5    ✓      0.02  ticket_id SEV\d-\d{3,6} → REDACT
+L35-CORPDOMAINL3.5    ✓      0.02  corp_domain *.corp.example.net → BLOCK(entity INTERNAL_DOMAIN)
+EG-READ-EXFIL EGRESS  ✓      0.02  read-then-exfil: cat|curl → EGRESS_READ_EXFIL BLOCK
+EG-DATA-UPLOADEGRESS  ✓      0.01  curl --data-binary @file → EGRESS_DATA_UPLOAD BLOCK
+EG-GITPUSH-DENYEGRESS  ✓      0.01  git push 非白名单 remote → EGRESS_GIT_PUSH BLOCK
+EG-GITPUSH-ALLOWEGRESS  ✓      0.01  git push 白名单 git.corp.example.net → 零命中
+EG-HTTP-DENY  EGRESS  ✓      0.01  curl 非 corp host → EGRESS_HTTP BLOCK
+EG-HTTP-ALLOW EGRESS  ✓      0.01  curl corp.example.net host → 零命中
+EG-SQL-DENY   EGRESS  ✓      0.01  execute_sql connection 非 allowlist → EGRESS_SQL_CONN BLOCK
+EG-SQL-ALLOW  EGRESS  ✓      0.00  execute_sql connection analytics-ro 在 allowlist → 零命中
+EG-CODESEARCH EGRESS  ✓      0.00  code_search remote:true → EGRESS_CODE_SEARCH BLOCK
+EG-GITPUSH-TOOL-DENYEGRESS  ✓      0.00  git_push 独立工具 非白名单 → EGRESS_GIT_PUSH BLOCK
+EG-GITPUSH-TOOL-ALLOWEGRESS  ✓      0.00  git_push 独立工具 codecommit 白名单 → 零命中
+NORM-NFKC-ZW-CNNORM    ✓      0.07  normalize: NFKC 全角→半角 + 去零宽 + 中文数字→阿拉伯
+NORM-STRIP-SEPNORM    ✓      0.01  strip_separators: token 内 -_空格. 剥离 → 还原连续串
+NORM-FOLD-LITERALNORM    ✓      0.29  fold_concat: 相邻字符串字面量拼接 → 追加折叠结果
+NORM-FOLD-VAR NORM    ✓      0.02  fold_concat: 同段变量赋值+拼接 part1+part2 → 追加折叠结果
+NORM-EXPAND-B64NORM    ✓      0.78  expand: base64 片段解码变体含明文 key
+NORM-EXPAND-HEXNORM    ✓      0.07  expand: hex 片段解码变体含明文 key
+NORM-EXPAND-WINDOWNORM    ✓      0.02  expand: 跨消息滑窗拼接 session_window+text → 还原被拆分的 key
+L4-HEUR-BIZLOGICL4      ✓      0.02  离线启发式:业务领域词(风控)+ 自研逻辑(权重/阈值)→ proprietary-business-logic
+L4-HEUR-DISGUISEL4      ✓      0.01  离线启发式:注释/命名含内部专有标记 → proprietary-source
+L4-HEUR-GENERICL4      ✓      0.01  控告警疲劳:通用算法 quicksort 无业务词 → 无告警
+L4-HEUR-CLEAN L4      ✓      0.01  阴性对照:纯干净请求 → 无告警
+L4-BR-STRATEGYL4      ~      0.00  (SKIP:需 --bedrock)
+L4-BR-FINANCIALL4      ~      0.00  (SKIP:需 --bedrock)
+L4-BR-TECH    L4      ~      0.00  (SKIP:需 --bedrock)
+L4-BR-CLEAN   L4      ~      0.00  (SKIP:需 --bedrock)
+============================================================================================================
+  L0      : 14/14 通过  fail=0 skip=0
+  L1      : 12/12 通过  fail=0 skip=0
+  L2      : 7/7 通过  fail=0 skip=0
+  L3      : 9/9 通过  fail=0 skip=0
+  L3.5    : 10/10 通过  fail=0 skip=0
+  EGRESS  : 11/11 通过  fail=0 skip=0
+  NORM    : 7/7 通过  fail=0 skip=0
+  L4      : 4/8 通过  fail=0 skip=4
+------------------------------------------------------------------------------------------------------------
+  合计: 74/78  fail=0 skip=4  (presidio=可达, bedrock=关)
+LAYERS_EXIT=0
+
+### ②b 仅 L3 隔离复跑(聚焦 Presidio 逐实体)###
+  L3      : 9/9 通过  fail=0 skip=0   (单条 11.7–31.7ms,首条含连接预热)
+L3_EXIT=0
+
+### ③ 仅 L4 --bedrock(⚠ 数据出 VPC,仅功能验证,非生产)###
+L4-HEUR-BIZLOGICL4      ✓      0.02  离线启发式 → proprietary-business-logic
+L4-HEUR-DISGUISEL4      ✓      0.01  离线启发式 → proprietary-source
+L4-HEUR-GENERICL4      ✓      0.01  quicksort 无业务词 → 无告警
+L4-HEUR-CLEAN L4      ✓      0.01  阴性对照 → 无告警
+L4-BR-STRATEGYL4      ✓   1142.76  Bedrock(Qwen): business_strategy ✓
+L4-BR-FINANCIALL4      ✓    454.04  Bedrock(Qwen): financial_nonpublic ✓
+L4-BR-TECH    L4      ✓    550.32  Bedrock(Qwen): proprietary_tech ✓
+L4-BR-CLEAN   L4      ✓    639.42  Bedrock(Qwen): 阴性对照无告警 ✓
+  L4      : 8/8 通过  fail=0 skip=0
+L4_BEDROCK_EXIT=0

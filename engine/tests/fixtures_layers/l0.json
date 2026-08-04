@@ -1,0 +1,117 @@
+[
+  {
+    "id": "L0-AK-POS",
+    "layer": "L0",
+    "note": "aws_access_key AKIA+16 真值 → BLOCK",
+    "requires": null,
+    "text": "deploy key AKIA1234567890ABCDEF to prod",
+    "must_hit": [{"rule": "aws_access_key", "entity": "AWS_ACCESS_KEY", "action": "block"}]
+  },
+  {
+    "id": "L0-AK-WL",
+    "layer": "L0",
+    "note": "FP-05 官方示例 key AKIAIOSFODNN7EXAMPLE 白名单 → 零命中",
+    "requires": null,
+    "text": "example AKIAIOSFODNN7EXAMPLE docs",
+    "exact_none": true
+  },
+  {
+    "id": "L0-AK-REGEXDEFN",
+    "layer": "L0",
+    "note": "FP-10 正则定义 AKIA[0-9A-Z]{16} 不是真值 → 零命中",
+    "requires": null,
+    "text": "pattern AKIA[0-9A-Z]{16} matches keys",
+    "exact_none": true
+  },
+  {
+    "id": "L0-SK-POS",
+    "layer": "L0",
+    "note": "aws_secret_key 需语境词 + 40char → BLOCK",
+    "requires": null,
+    "text": "aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+    "must_hit": [{"rule": "aws_secret_key", "entity": "AWS_SECRET_KEY", "action": "block"}]
+  },
+  {
+    "id": "L0-SK-NOCTX",
+    "layer": "L0",
+    "note": "40char 裸串无 secret 语境 → 不判(aws_secret_key 零命中)",
+    "requires": null,
+    "text": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY alone",
+    "must_not_hit": [{"rule": "aws_secret_key"}]
+  },
+  {
+    "id": "L0-GCP-POS",
+    "layer": "L0",
+    "note": "gcp_api_key AIza+35 → BLOCK",
+    "requires": null,
+    "text": "key AIzaSyDaGmWKa4JsXZ-HjGw7ISLn_3namBGewQe here",
+    "must_hit": [{"rule": "gcp_api_key", "entity": "GCP_API_KEY", "action": "block"}]
+  },
+  {
+    "id": "L0-CNID-POS",
+    "layer": "L0",
+    "note": "cn_id_card mod-11 校验通过 → REDACT",
+    "requires": null,
+    "text": "身份证号 110101199003072519",
+    "must_hit": [{"rule": "cn_id_card", "entity": "CN_ID_CARD", "action": "redact"}]
+  },
+  {
+    "id": "L0-CNID-BADCHK",
+    "layer": "L0",
+    "note": "mod-11 校验不过的 18 位数 → 不判身份证",
+    "requires": null,
+    "text": "编号 110101199003072518",
+    "must_not_hit": [{"rule": "cn_id_card"}]
+  },
+  {
+    "id": "L0-PHONE-CTX",
+    "layer": "L0",
+    "note": "cn_phone 有联系语境 → REDACT",
+    "requires": null,
+    "text": "联系电话 13800138000 请拨打",
+    "must_hit": [{"rule": "cn_phone", "entity": "CN_PHONE", "action": "redact"}]
+  },
+  {
+    "id": "L0-PHONE-NOCTX",
+    "layer": "L0",
+    "note": "孤立号无联系语境 → 不判(防 FP)",
+    "requires": null,
+    "text": "序号 13800138000",
+    "must_not_hit": [{"rule": "cn_phone"}]
+  },
+  {
+    "id": "L0-PHONE-TRACKING",
+    "layer": "L0",
+    "note": "L0-03 tracking/订单语境抑制手机 → 不判",
+    "requires": null,
+    "text": "订单单号 13800138000 已发货",
+    "must_not_hit": [{"rule": "cn_phone"}]
+  },
+  {
+    "id": "L0-PHONE-WITHID",
+    "layer": "L0",
+    "note": "手机与身份证同现 → phone_ctx 成立,两者都 REDACT",
+    "requires": null,
+    "text": "110101199003072519 13800138000",
+    "must_hit": [
+      {"rule": "cn_id_card", "action": "redact"},
+      {"rule": "cn_phone", "action": "redact"}
+    ]
+  },
+  {
+    "id": "L0-EMAIL-POS",
+    "layer": "L0",
+    "note": "email 真值 → REDACT",
+    "requires": null,
+    "text": "reach me at john.doe@gmail.com please",
+    "must_hit": [{"rule": "email", "entity": "EMAIL", "action": "redact"}]
+  },
+  {
+    "id": "L0-EMAIL-RESERVED",
+    "layer": "L0",
+    "note": "FP-06 RFC2606 保留域 example.com/.test 邮箱豁免 → 零命中",
+    "requires": null,
+    "text": "test acct alice@example.com and bob@foo.test",
+    "exact_none": true
+  }
+]
