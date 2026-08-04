@@ -41,8 +41,11 @@ kiro-dlp-content/
 ├── docker/    ★共享             引擎 / Presidio 中文 NER 镜像与 compose（含方案一网关叠加层）
 │
 ├── 方案一-litellm-gateway/       【能改 base_url】opt-in TLS 终止网关（无需伪造证书）
-│   ├── gateway/                   LiteLLM 配置、DLP guardrail、端到端与压测脚本
+│   ├── 方案一-01-设计与架构.md      纲领：为什么 opt-in 不 MITM、组件职责、安全红线
+│   ├── 方案一-02-部署指南.md        镜像构建 → 扁平布局装配 → 网关启动 → 变更流/拆除
 │   ├── 方案一-03-测试方案.md        四阶段实测方法与完整矩阵
+│   ├── 方案一-04-实测踩坑实录.md     引擎弱 NER 误报、测量假象、压测归因、SSM/L4 纪律
+│   ├── gateway/                   LiteLLM 配置、DLP guardrail、端到端与压测脚本
 │   └── testing/                   实测:探针、远程执行脚本、results-* 原始输出
 │
 └── 方案二-selective-bump-mitm/   【不能改 base_url】选择性 bump MITM（有真实代价）
@@ -61,7 +64,7 @@ kiro-dlp-content/
 |---|---|---|
 | 1 | [00-总览/01-方案介绍-宣传.md](00-总览/01-方案介绍-宣传.md) | 决策者 —— 场景、能力矩阵、按威胁模型选路径的决策清单 |
 | 2 | [00-总览/02-技术博客.md](00-总览/02-技术博客.md) | 工程师 —— 第一性原理、两套方案的协议细节、CA 硬门槛、合规风险 |
-| 3a | [方案一-litellm-gateway/](方案一-litellm-gateway/) | 方案一：opt-in LiteLLM 网关 —— 实现 + [四阶段测试方案](方案一-litellm-gateway/方案一-03-测试方案.md) |
+| 3a | [方案一-litellm-gateway/README.md](方案一-litellm-gateway/README.md) | 方案一：opt-in LiteLLM 网关 —— [设计与架构](方案一-litellm-gateway/方案一-01-设计与架构.md) / [部署指南](方案一-litellm-gateway/方案一-02-部署指南.md) / [测试方案](方案一-litellm-gateway/方案一-03-测试方案.md) / [实测踩坑实录](方案一-litellm-gateway/方案一-04-实测踩坑实录.md) 四件套 |
 | 3b | [方案二-selective-bump-mitm/README.md](方案二-selective-bump-mitm/README.md) | 方案二：选择性 bump MITM —— 设计 / 部署 / 测试 / 真机踩坑四件套入口 |
 
 ## 共享组件
@@ -75,8 +78,9 @@ kiro-dlp-content/
 
 **方案一已完成**（2026-07-30，us-west-2 真实单机 m7i.2xlarge）：离线 56/56、网关端到端 46/46，
 漏拦 0 / 误报 0；DLP 同步扫描 p50≈28ms / p95≈53ms。**诚实标定**：~2000 token 长文本高并发下
-单副本 Presidio 单核打满，p50 劣化到 7.4s —— 属部署配置问题，长文本生产须多 worker 扩容。
-完整矩阵见 [方案一-litellm-gateway/方案一-03-测试方案.md](方案一-litellm-gateway/方案一-03-测试方案.md) §8。
+单副本 Presidio 单核打满，p50 劣化到 7.6s —— 属部署配置问题，长文本生产须多 worker 扩容。
+完整矩阵见 [方案一-03-测试方案.md](方案一-litellm-gateway/方案一-03-测试方案.md) §8，
+四阶段踩坑复盘见 [方案一-04-实测踩坑实录.md](方案一-litellm-gateway/方案一-04-实测踩坑实录.md)。
 
 **方案二真机端到端已完成**（2026-08-03，真实 Kiro 桌面端 → 验证节点选择性 bump → VPC 内
 DLP → 真实上游）：三态全绿 —— PASS 正常回答 / REDACT 手机号链路遮蔽（工具目录与协议字段
