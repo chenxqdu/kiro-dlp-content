@@ -78,6 +78,19 @@ L3_UNAVAILABLE_ACTION = os.environ.get("DLP_L3_UNAVAILABLE_ACTION", "block").low
 RUN_L3_ON_ALL = os.environ.get("DLP_RUN_L3_ON_ALL_VARIANTS", "false").lower() in ("1", "true", "yes")
 L3_CONCURRENCY = int(os.environ.get("DLP_L3_CONCURRENCY", "16"))
 
+# ---- L4 语义(★测试期配置:同步阻断 + Bedrock 后端)----
+# 默认全关 = 保持"L4 永不改 verdict"铁律、内容不出 VPC。四个开关须【一起】置真才生效:
+#   DLP_RUN_ASYNC_L4=true       同步腿真正调用 L4(否则 scan 连 L4 都不跑)
+#   DLP_L4_SYNC_BLOCK=true      让高置信 L4 告警合成 BLOCK Hit,升级 verdict(打破铁律)
+#   DLP_USE_BEDROCK_L4=true     L4 后端用 Bedrock(⚠ 内容出 VPC,临时;生产须换 VPC-local)
+# 任一关闭都退回安全侧:不调 L4 / 只告警不阻断 / 走离线启发式(不出 VPC)。
+_BOOL = ("1", "true", "yes", "on")
+RUN_ASYNC_L4 = os.environ.get("DLP_RUN_ASYNC_L4", "false").lower() in _BOOL
+L4_SYNC_BLOCK = os.environ.get("DLP_L4_SYNC_BLOCK", "false").lower() in _BOOL
+USE_BEDROCK_L4 = os.environ.get("DLP_USE_BEDROCK_L4", "false").lower() in _BOOL
+L4_MODEL_KEY = os.environ.get("DLP_L4_MODEL_KEY", "main")  # main=Qwen3-32B / control=Llama-3.1-8B
+L4_BLOCK_MIN_CONF = float(os.environ.get("DLP_L4_BLOCK_MIN_CONFIDENCE", "0.7"))
+
 log = logging.getLogger("dlp-http")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
@@ -85,12 +98,16 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 # 用 N 个预构造引擎实例；每个请求独占一个，用完归还。无论 scan 是否线程安全都成立，
 # 且并发上限 = POOL_N，形成天然背压（池空则新请求等待 POOL_WAIT，超时回 503 -> addon fail-closed）。
 #
-# EngineConfig：绝不传 presidio_url（真实签名无此参数）；use_bedrock_l4=False 双保险
-# （同步腿红线：永不触 Bedrock/第三方，scan 也显式 run_async_l4=False）。
+# EngineConfig：绝不传 presidio_url（真实签名无此参数）。
+# L4 字段默认全关(见上 env 区)——不显式开启则同步腿永不触 Bedrock、内容不出 VPC,
+# 与历来红线一致;显式开启为【测试期配置】,生产须换 VPC-local 模型。
 _CFG = EngineConfig(
     presidio_languages=PRESIDIO_LANGS,
     l3_timeout=L3_TIMEOUT_S,
-    use_bedrock_l4=False,
+    use_bedrock_l4=USE_BEDROCK_L4,
+    l4_model_key=L4_MODEL_KEY,
+    l4_sync_block=L4_SYNC_BLOCK,
+    l4_block_min_confidence=L4_BLOCK_MIN_CONF,
     run_l3_on_all_variants=RUN_L3_ON_ALL,
     l3_concurrency=L3_CONCURRENCY,
 )
@@ -103,7 +120,9 @@ def _do_scan(content):
     """从池取引擎跑 scan，用完归还。池空等待 POOL_WAIT，超时抛 queue.Empty -> 上层 503。"""
     eng = _pool.get(timeout=POOL_WAIT)
     try:
-        return eng.scan(content, injection_point=INJ, run_async_l4=False)
+        # run_async_l4 由 env 门控:默认 False(同步腿不跑 L4,与历来一致);
+        # 测试期置 DLP_RUN_ASYNC_L4=true 才在同步腿调 L4(配合 L4_SYNC_BLOCK 决定是否阻断)。
+        return eng.scan(content, injection_point=INJ, run_async_l4=RUN_ASYNC_L4)
     finally:
         _pool.put(eng)
 
@@ -248,6 +267,15 @@ def main():
         BIND, PORT, INJ.name, POOL_N, L3_TIMEOUT_S, ",".join(PRESIDIO_LANGS),
         L3_UNAVAILABLE_ACTION,
     )
+    # L4 门控状态(测试期配置醒目告警)
+    if RUN_ASYNC_L4 or L4_SYNC_BLOCK or USE_BEDROCK_L4:
+        log.warning(
+            "★ L4 已启用(测试期): run_async=%s sync_block=%s use_bedrock=%s model=%s min_conf=%.2f"
+            " —— use_bedrock=True 时内容将出 VPC 至 Bedrock,生产须换 VPC-local 模型",
+            RUN_ASYNC_L4, L4_SYNC_BLOCK, USE_BEDROCK_L4, L4_MODEL_KEY, L4_BLOCK_MIN_CONF,
+        )
+    else:
+        log.info("L4 未启用(默认): 同步腿只 L0–L3.5,内容不出 VPC")
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

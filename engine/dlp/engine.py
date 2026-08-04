@@ -43,6 +43,13 @@ class EngineConfig:
     run_l3_on_all_variants: bool = True   # False = 只扫 raw+normalized(省 HTTP)
     use_bedrock_l4: bool = False           # 离线单测走启发式;标定时置 True
     l4_model_key: str = "main"             # "main"=Qwen3-32B / "control"=Llama-3.1-8B
+    # ★ L4 同步阻断开关(默认 False = 保持"L4 永不改 verdict"铁律,行为与历来一致)。
+    #   显式置 True 才让 L4 语义告警(置信度 ≥ l4_block_min_confidence)在 scan() 内
+    #   合成一条 L4 BLOCK Hit、併入聚合,把 verdict 升级为 BLOCK。
+    #   ⚠ 这是【测试期配置】:当前 L4 后端 = Bedrock(use_bedrock_l4=True),内容会出 VPC;
+    #     生产必须换 VPC-local 模型后再启用。默认关闭确保未显式开启时红线不破。见 scan() 第 6 步。
+    l4_sync_block: bool = False
+    l4_block_min_confidence: float = 0.7
     redact_mask: str = "[REDACTED:{entity}]"
     # ---- L3 大 body 性能(套件:去重+省扫+并发,SPEC §5-L3 性能补丁)----
     # 现网(mitmproxy addon → /inspect)body 可达数百 KB(Kiro 每次推理都带系统提示 +
@@ -445,7 +452,12 @@ class DLPEngine:
             if redacted_text == original_repr:
                 notes.append("REDACT 未生效(命中片段不在原文字面,脱敏落空)——非真 PASS,须人工复核")
 
-        # 6. L4(仅异步告警,不改 verdict)
+        # 6. L4 语义
+        #    默认(l4_sync_block=False):仅异步告警,不改 verdict —— 历来铁律,行为不变。
+        #    ★ l4_sync_block=True(测试期配置):把高置信 L4 告警合成一条 L4 BLOCK Hit
+        #      併入 all_hits 后【重新聚合】,使 verdict 可被 L4 升级为 BLOCK。这【刻意打破】
+        #      顶注"同步 verdict 只由 L0–L3.5 聚合;L4 只产 AsyncAlert"的铁律,仅在显式开启时。
+        #      ⚠ 当前 L4 后端 = Bedrock(内容出 VPC),属临时测试;生产须换 VPC-local 模型。
         async_alerts: list[AsyncAlert] = []
         if run_async_l4:
             t = time.perf_counter()
@@ -454,6 +466,34 @@ class DLPEngine:
                 l4_text, use_bedrock=self.cfg.use_bedrock_l4, model_key=self.cfg.l4_model_key
             )
             latency["L4"] = (time.perf_counter() - t) * 1000
+
+            if self.cfg.l4_sync_block and async_alerts:
+                thr = self.cfg.l4_block_min_confidence
+                blocking = [a for a in async_alerts if a.confidence >= thr]
+                if blocking:
+                    top_alert = max(blocking, key=lambda a: a.confidence)
+                    # 合成 L4 BLOCK Hit。matched 用类别标签(非敏感),span=(-1,-1)。
+                    # confidence 取触发告警的置信度;field_path=None(整体内容级判定)。
+                    all_hits.append(Hit(
+                        Layer.L4,
+                        f"l4_semantic:{top_alert.category}",
+                        top_alert.category.upper().replace("-", "_"),
+                        (-1, -1),
+                        top_alert.category,           # 非敏感标签,绝不放原文
+                        Verdict.BLOCK,
+                        confidence=float(top_alert.confidence),
+                        source="l4-semantic",
+                    ))
+                    # 重新去重 + 聚合:L4 BLOCK 併入后可把 verdict 升级为 BLOCK。
+                    # 若已有更低层 BLOCK,top_layer 仍取最低层(L4 rank 最高),语义正确。
+                    all_hits = self._dedup(all_hits)
+                    verdict, top_layer = self._aggregate(all_hits)
+                    if verdict == Verdict.BLOCK:
+                        redacted_text = None  # BLOCK 短路,丢弃可能已生成的脱敏文本
+                    notes.append(
+                        f"L4 同步阻断(测试期/Bedrock):{top_alert.category} "
+                        f"conf={top_alert.confidence:.2f}≥{thr} → BLOCK"
+                    )
         else:
             notes.append("L4 未在同步跑(生产为队列异步)")
 

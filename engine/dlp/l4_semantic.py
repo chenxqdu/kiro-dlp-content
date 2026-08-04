@@ -29,8 +29,16 @@ _PROPRIETARY_BIZ = re.compile(
     r"排序权重|ranking[_ ]?weight|反欺诈|fraud|额度|费率)",
     re.IGNORECASE,
 )
-_LOGIC_SHAPE = re.compile(r"(weight|系数|阈值|threshold|\*\s*0\.\d|formula|公式|score\s*[+\-*])",
-                          re.IGNORECASE)
+# 逻辑形状:权重/系数/阈值/公式,或"× 0.d / * 0.d"这类加权系数写法。
+# ★ 修真机 bug:用户写 "risk_score = 0.3 × 逾期指标 + 0.7 × 额度指标",原正则
+#   只认半角 `*` 和 `score[+\-*]`(紧邻),既不认全角乘号 ×(U+00D7)也不认 `score =`,
+#   导致 heuristic logic=False、biz&logic 不成立而漏告警。此处补:
+#   - 全角/半角乘号后接 0.d 系数:[*×] \s* 0\.\d
+#   - score 后带 =/:/+/-/×/* 任一(容许空格):公式定义写法
+_LOGIC_SHAPE = re.compile(
+    r"(weight|系数|阈值|threshold|[*×]\s*0\.\d|formula|公式|score\s*[+\-*×=:])",
+    re.IGNORECASE,
+)
 # 专有源码伪装:注释说"通用工具"但函数名/常量像内部系统
 _DISGUISE = re.compile(r"(内部|internal|proprietary|专有|机密|confidential)", re.IGNORECASE)
 # 通用/开源风格(控告警疲劳):经典算法,无业务领域词
@@ -84,7 +92,20 @@ def _bedrock_alert(text: str, model_key: str) -> AsyncAlert | None:
         "\"confidence\":0-1,\"reason\":\"...\"}\n\nCONTENT:\n" + text[:4000]
     )
     try:
-        client = boto3.client("bedrock-runtime", region_name="us-west-2")
+        # ★ 同步阻断路径:Bedrock 调用被计入 addon DLP_TIMEOUT(默认 8s)总预算。
+        #   L0–L3 已占一部分,故给 Bedrock 配硬超时 + 有限重试,宁可 L4 失败回退启发式,
+        #   也不拖爆 addon 8s 线(拖爆 → fail-closed 503 → Kiro 反复重试)。
+        from botocore.config import Config as _BotoConfig
+
+        client = boto3.client(
+            "bedrock-runtime",
+            region_name="us-west-2",
+            config=_BotoConfig(
+                connect_timeout=2,
+                read_timeout=5,
+                retries={"max_attempts": 1, "mode": "standard"},
+            ),
+        )
         resp = client.converse(
             modelId=model_id,
             messages=[{"role": "user", "content": [{"text": prompt}]}],

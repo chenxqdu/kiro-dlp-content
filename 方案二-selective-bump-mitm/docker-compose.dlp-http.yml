@@ -29,10 +29,24 @@ services:
       DLP_PRESIDIO_TIMEOUT_MS: "2000"       # L3 单次调用超时（引擎 EngineConfig.l3_timeout）
       DLP_PRESIDIO_LANGS: "en,zh"           # 与现有 presidio-analyzer-zh 对齐
       DLP_L3_UNAVAILABLE_ACTION: block      # 规格 D4：L3 不可达 -> 强制 BLOCK（fail-closed 打底）
+      # ---- L4 语义（★测试期配置：同步阻断 + Bedrock 后端；默认全注释=不启用）----
+      # ⚠ 默认关闭 = 保持“L4 永不改 verdict”铁律、内容不出 VPC。三开关须【一起】取消注释才生效：
+      #   DLP_RUN_ASYNC_L4    同步腿真正调 L4（否则 scan 连 L4 都不跑）
+      #   DLP_L4_SYNC_BLOCK   让高置信 L4 告警合成 BLOCK Hit、升级 verdict（刻意打破铁律）
+      #   DLP_USE_BEDROCK_L4  L4 后端用 Bedrock —— ⚠ 内容会出 VPC 至 Bedrock，仅限测试；
+      #                       生产必须换 VPC-local 模型后再启用（届时此项保持 false）。
+      # 需要容器内 boto3（镜像已含）+ 宿主实例角色可 bedrock:InvokeModel/Converse（已实测 qwen.qwen3-32b-v1:0）。
+      # DLP_RUN_ASYNC_L4: "true"
+      # DLP_L4_SYNC_BLOCK: "true"
+      # DLP_USE_BEDROCK_L4: "true"
+      # DLP_L4_MODEL_KEY: main                # main=Qwen3-32B / control=Llama-3.1-8B
+      # DLP_L4_BLOCK_MIN_CONFIDENCE: "0.7"    # L4 告警置信 >= 此值才阻断
       PYTHONUNBUFFERED: "1"
     volumes:
       # 把判定服务代码以只读方式挂进镜像的包根旁（dlp_http 与 dlp 同在 /app，命名空间包可 import）。
       - ./http_service/server.py:/app/dlp_http/server.py:ro
+      # 引擎源码 bind-mount（覆盖镜像内旧版 dlp/，随改随生效、无需重建镜像）。
+      - ./engine/dlp:/app/dlp:ro
     networks:
       - dlpnet
     ports:
