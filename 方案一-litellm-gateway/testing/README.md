@@ -1,7 +1,7 @@
 # 方案一测试复现手册（testing/）
 
 本目录汇总 2026-07-30 四阶段实测 + 2026-08-04 阶段5 分层完备测试用到的**全部脚本、执行方法与原始输出**，供复现验证与分析。
-实测结论与完整矩阵见 [../03-方案一测试方案.md](../03-方案一测试方案.md) §8；本 README 只讲"怎么跑出来的、怎么再跑一遍、结果怎么读"。
+实测结论与完整矩阵见 [../方案一-03-测试方案.md](../方案一-03-测试方案.md) §8；本 README 只讲"怎么跑出来的、怎么再跑一遍、结果怎么读"。
 
 ## 目录结构
 
@@ -28,13 +28,13 @@ testing/
 
 | 文件 | 作用 |
 |---|---|
-| [engine/tests/run_offline.py](../engine/tests/run_offline.py) | 阶段1 离线 harness：56 条 → `engine.scan()`，判定 verdict/top_layer/must_hit/must_not_hit，硬门=套件1 漏拦0 + 套件2 误报0 |
-| [engine/tests/fixtures/suite1..6.json](../engine/tests/fixtures/) | 56 条测试语料（六套件，schema 见 engine/SPEC.md §7） |
-| [engine/tests/fixture_invariants_check.py](../engine/tests/fixture_invariants_check.py) | fixture 静态不变量校验器（改语料后先跑它） |
-| [engine/tests/l4_calibration.py](../engine/tests/l4_calibration.py) | 阶段4 L4 双模型标定（Qwen3-32B main / Llama-3.1-8B control） |
-| [engine/tests/run_layers.py](../engine/tests/run_layers.py) | 阶段5 分层 harness：直接调每层 `scan()`（不经引擎聚合），验每条规则的正例/豁免/边界；L3 缺 Presidio 自动 SKIP，L4-Bedrock 需 `--bedrock` |
-| [engine/tests/fixtures_layers/](../engine/tests/fixtures_layers/) | 阶段5 分层向量 78 条（l0/l1/l2/l3/l35/egress/norm/l4 八文件，schema 见 run_layers.py 头注释） |
-| [engine/tests/_probe_layers.py](../engine/tests/_probe_layers.py) | 阶段5 落笔前 oracle 探针：生成魔法值（mod-11 身份证/base64/hex/熵）+ 打印每层 scan() 真实命中，**所有向量断言据此实测输出写成，非臆断** |
+| [engine/tests/run_offline.py](../../engine/tests/run_offline.py) | 阶段1 离线 harness：56 条 → `engine.scan()`，判定 verdict/top_layer/must_hit/must_not_hit，硬门=套件1 漏拦0 + 套件2 误报0 |
+| [engine/tests/fixtures/suite1..6.json](../../engine/tests/fixtures/) | 56 条测试语料（六套件，schema 见 engine/SPEC.md §7） |
+| [engine/tests/fixture_invariants_check.py](../../engine/tests/fixture_invariants_check.py) | fixture 静态不变量校验器（改语料后先跑它） |
+| [engine/tests/l4_calibration.py](../../engine/tests/l4_calibration.py) | 阶段4 L4 双模型标定（Qwen3-32B main / Llama-3.1-8B control） |
+| [engine/tests/run_layers.py](../../engine/tests/run_layers.py) | 阶段5 分层 harness：直接调每层 `scan()`（不经引擎聚合），验每条规则的正例/豁免/边界；L3 缺 Presidio 自动 SKIP，L4-Bedrock 需 `--bedrock` |
+| [engine/tests/fixtures_layers/](../../engine/tests/fixtures_layers/) | 阶段5 分层向量 78 条（l0/l1/l2/l3/l35/egress/norm/l4 八文件，schema 见 run_layers.py 头注释） |
+| [engine/tests/_probe_layers.py](../../engine/tests/_probe_layers.py) | 阶段5 落笔前 oracle 探针：生成魔法值（mod-11 身份证/base64/hex/熵）+ 打印每层 scan() 真实命中，**所有向量断言据此实测输出写成，非臆断** |
 | [gateway/test_gateway.py](../gateway/test_gateway.py) | 阶段2 网关 harness：fixture → /chat/completions，block→400 / redact/pass→200 |
 | [gateway/bench_gateway.py](../gateway/bench_gateway.py) | 阶段3 压测：3 payload × 4 并发档 × n=30，输出 JSON 行 |
 | [gateway/dlp_guardrail.py](../gateway/dlp_guardrail.py) | 被测对象：LiteLLM CorpDLPGuardrail（两 hook） |
@@ -45,7 +45,7 @@ testing/
   **无 SSH key，只能走 SSM**（实例须 SSM Online；本机 aws CLI 有 `ssm:SendCommand` 权限）。
 - **实例上已就绪**：`/home/ec2-user/kiro-dlp/{engine,gateway,docker}`；容器
   `litellm`(:4000, DLP on)、`litellm-nodlp`(:4001, 对照)、`presidio-analyzer`(内网:5002, en_core_web_lg + zh_core_web_sm)；
-  镜像 `kiro-dlp-engine:latest`。compose 定义在 [docker/](../docker/)。
+  镜像 `kiro-dlp-engine:latest`。compose 定义在 [docker/](../../docker/)。
 - **Bedrock**（仅阶段4）：实例 IAM 角色带 `bedrock:InvokeModel`（qwen.qwen3-32b-v1:0 / meta.llama3-1-8b-instruct-v1:0），IMDS hop-limit=2。
 
 ## 复现步骤（按阶段）

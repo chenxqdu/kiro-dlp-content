@@ -1,7 +1,18 @@
-# 阶段2 网关叠加层:在 kiro-dlp 上与 docker-compose.yml 合用 ——
+# 阶段2 网关叠加层:在 kiro-dlp 实例上与 docker-compose.yml 合用 ——
 #   docker compose -f docker-compose.yml -f docker-compose.gateway.yml up -d presidio-analyzer litellm
 # litellm 容器挂 CorpDLPGuardrail;DLP 引擎源码直接挂进容器(纯 stdlib,无需安装)。
 # Bedrock 凭证:实例 IAM 角色经 IMDS(hop-limit 已设 2,容器内可取)。
+#
+# ★ 这是方案一网关的编排,与共享的 base docker-compose.yml 强耦合(它是 base 的 override)——
+#   两文件须同处一目录,故都留在 docker/。Docker 规则:override(-f 的第2个文件)里的相对路径
+#   一律按 BASE(第1个 -f 文件,即 docker-compose.yml)所在目录解析,与 override 自身位置无关。
+#
+# ★★ 下方 volumes 的 ../gateway/* 与 ../engine/dlp 是【实例上的部署布局】相对路径,不是仓库布局:
+#   实例布局扁平 —— /home/ec2-user/kiro-dlp/{docker,gateway,engine}(由 testing/remote/ 的 sync
+#   脚本拼装,与仓库结构解耦)。从 docker/ 看 ../gateway、../engine 即命中同级目录,实例上有效。
+#   仓库里 gateway 已归入 ../方案一-litellm-gateway/gateway/、engine 在根 ../engine/——
+#   本文件是"跑在实例上的产物",路径按实例布局写(同 host_*.sh 的 /home/ec2-user/kiro-dlp 硬编码),
+#   浏览仓库时勿按目录树直接解析这两行。
 services:
   litellm:
     image: ghcr.io/berriai/litellm:main-latest

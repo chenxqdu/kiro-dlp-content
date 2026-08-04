@@ -5,7 +5,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"   # 先固化绝对路径:后面 cd 会使相对 $0 失效
-REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+# remote/ -> testing/ -> 方案一-litellm-gateway/ -> 仓库根(engine/ 是两方案共享层,留在根)
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 BUCKET="${KIRO_DLP_S3_BUCKET:?请设置 KIRO_DLP_S3_BUCKET 为你自有的中转 bucket}"
 KEY="kiro-dlp/engine_sync_$(date +%s).tgz"
 
