@@ -37,6 +37,7 @@ testing/
 | [engine/tests/run_layers.py](../../engine/tests/run_layers.py) | 阶段5 分层 harness：直接调每层 `scan()`（不经引擎聚合），验每条规则的正例/豁免/边界；L3 缺 Presidio 自动 SKIP，L4-Bedrock 需 `--bedrock` |
 | [engine/tests/fixtures_layers/](../../engine/tests/fixtures_layers/) | 阶段5 分层向量 78 条（l0/l1/l2/l3/l35/egress/norm/l4 八文件，schema 见 run_layers.py 头注释） |
 | [engine/tests/_probe_layers.py](../../engine/tests/_probe_layers.py) | 阶段5 落笔前 oracle 探针：生成魔法值（mod-11 身份证/base64/hex/熵）+ 打印每层 scan() 真实命中，**所有向量断言据此实测输出写成，非臆断** |
+| [engine/tests/inspect_cases.py](../../engine/tests/inspect_cases.py) | **逐条三合一检视器（只读）**：把 56/78 用例的「输入原文 + 效果(裁决/脱敏) + 分层延迟」拼成逐条卡片；本地 `scan()` 或 `--via-http` 打方案二 `/inspect`；`--format md/jsonl` 归档。跨方案统一用法见 [00-总览/03-手动复现指南-逐条三合一.md](../../00-总览/03-手动复现指南-逐条三合一.md) |
 | [gateway/test_gateway.py](../gateway/test_gateway.py) | 阶段2 网关 harness：fixture → /chat/completions，block→400 / redact/pass→200 |
 | [gateway/bench_gateway.py](../gateway/bench_gateway.py) | 阶段3 压测：3 payload × 4 并发档 × n=30，输出 JSON 行 |
 | [gateway/dlp_guardrail.py](../gateway/dlp_guardrail.py) | 被测对象：LiteLLM CorpDLPGuardrail（两 hook） |

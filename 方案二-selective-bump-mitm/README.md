@@ -80,6 +80,22 @@ cd ~/tests && ./run_all.sh                       # 跑全部层：0 a b c d f
 > Tier D 每条探针都**穿过真实 addon → HTTP → `:9000`** 再由 echo 上游做字节取证，证明「规则在真链路上仍然对」。
 > 两者互补，**stage5 全绿不替 Tier D 背书**（addon 的字段定位/改包/短路全在 stage5 覆盖之外）。详见 [03 §4.4](方案二-03-测试报告.md)。
 
+#### 逐条三合一：`inspect_cases --via-http`（输入 + 效果 + 逐条延迟）
+
+`run_all.sh` 的 Tier A/D 有「效果」无「逐条延迟数字」。要把**每条用例的输入原文 + 裁决/脱敏 + 分层延迟**
+拼在一张卡片里，用共享引擎的只读检视器打本服务的 `/inspect`（返回 JSON 自带 `latency_ms` + `http_total`）：
+
+```bash
+# 在能访问 :9000 的节点（DLP 主机 / 经 SSM），engine/ 目录内
+python3 -m tests.inspect_cases --set offline \
+  --via-http http://172.31.27.174:9000 \
+  --format md --report results-manual/via_http_YYYYMMDD
+```
+
+先 `GET /health` 探活，不可达即整批 SKIP（不伪造）；REDACT 显示 `redacted_body`，fail-closed 时高亮 `forced_block`。
+完整用法、卡片字段、延迟口径（单发 ≠ k6 分位）见
+[00-总览/03-手动复现指南-逐条三合一.md](../00-总览/03-手动复现指南-逐条三合一.md) §4。
+
 ### 一键回滚（不拆机器，退化为透传）
 ```bash
 # config.env 里 MITM_BUMP_DOMAIN="" 后重部署 → 全透传，不解密任何流量
