@@ -1,0 +1,40 @@
+# LiteLLM 配置(性能测试专用,03 文档 §9.3 法1)。
+# 在阶段2 网关基础上增加一个假上游模型 echo-fast → 本机 fake_upstream.py。
+# 目的:把上游生成延迟从测量剔除,只留【网关 + DLP 引擎】净开销;且 REDACT 路径
+#       走完整改写+转发,客户端能从 echo 里验证脱敏是否真生效(§9.6 源1)。
+# guardrails 与阶段2 完全一致(CorpDLPGuardrail 两 hook),故拦截行为可直接沿用阶段2 判据。
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+model_list:
+  # ★ 假上游:OpenAI 兼容 echo 端点(fake_upstream.py 跑在 host 127.0.0.1:18080)。
+  #   容器内经 host.docker.internal 访问宿主(compose 已加 extra_hosts;见 runner)。
+  - model_name: echo-fast
+    litellm_params:
+      model: openai/echo
+      api_base: http://host.docker.internal:18080/v1
+      api_key: "sk-fake-not-used"
+  # 保留真 Bedrock 上游(冒烟/对照用,不在压测热路径)
+  - model_name: qwen3-32b
+    litellm_params:
+      model: bedrock/qwen.qwen3-32b-v1:0
+      aws_region_name: us-west-2
+
+guardrails:
+  - guardrail_name: corp-dlp-pre
+    litellm_params:
+      guardrail: dlp_guardrail.CorpDLPGuardrail
+      mode: "pre_call"
+      default_on: true
+  - guardrail_name: corp-dlp-mcp
+    litellm_params:
+      guardrail: dlp_guardrail.CorpDLPGuardrail
+      mode: "pre_mcp_call"
+      default_on: true
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false

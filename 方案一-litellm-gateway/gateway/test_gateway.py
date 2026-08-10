@@ -95,6 +95,22 @@ def is_blocked(status: int, body: dict) -> bool:
     return "blocked_by_corp_dlp" in s
 
 
+# fail-closed(规格 D4)下,网关会把「脱敏落空」的 redact 强制升级为 400 BLOCK。
+# 这些 forced_block 原因是 redact 期望向量在网关侧的**预期收紧**(offline 仍判 redact,
+# 见 run_offline.py 只读 verdict),不算失败。l3_unavailable 不在此列——健康 Presidio
+# 下不应出现,若出现说明本轮 Presidio 异常,应作为异常暴露而非吞掉。
+_REDACT_FAILCLOSED_REASONS = ("redaction_ineffective", "redact_writeback_failed")
+
+
+def forced_reason(body: dict) -> str:
+    """从(可能被 LiteLLM 包装嵌套的)响应体里取 forced_block 原因,取不到返回空串。"""
+    s = json.dumps(body, ensure_ascii=False)
+    for r in ("redaction_ineffective", "redact_writeback_failed", "l3_unavailable"):
+        if r in s:
+            return r
+    return ""
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--base-url", default="http://localhost:4000")
@@ -124,24 +140,35 @@ def main():
             status, body, ms = call_gateway(
                 args.base_url, args.key, args.model, messages, tools=tools)
             blocked = is_blocked(status, body)
+            reason = forced_reason(body) if blocked else ""
+            note = ""
             if exp == "block":
                 ok = blocked
-            elif exp in ("redact", "pass"):
-                # redact/pass 都应 200 放行;redact 的"确已脱敏"由网关指标 jsonl 复核
+            elif exp == "pass":
                 ok = (status == 200)
+            elif exp == "redact":
+                # 正常脱敏 → 200(确已脱敏由网关指标 jsonl 复核);
+                # fail-closed 收紧:脱敏落空/无法写回 → 400 forced_block(D4 预期,非失败)。
+                if status == 200:
+                    ok = True
+                elif blocked and reason in _REDACT_FAILCLOSED_REASONS:
+                    ok = True
+                    note = f"→fail-closed({reason})"
+                else:
+                    ok = False
             else:
                 ok = False
             st = "pass" if ok else "fail"
             agg[st] += 1
-            rows.append((case["id"], s, exp, f"{status}{'/blocked' if blocked else ''}",
-                         "✓" if ok else "✗", ms))
+            http = f"{status}{'/blocked' if blocked else ''}{note}"
+            rows.append((case["id"], s, exp, http, "✓" if ok else "✗", ms))
 
-    print("=" * 88)
-    print(f"{'ID':<10}{'套件':<4}{'期望':<26}{'HTTP':<14}{'✓':<3}{'RTT ms':>9}")
-    print("-" * 88)
+    print("=" * 104)
+    print(f"{'ID':<10}{'套件':<4}{'期望':<26}{'HTTP':<44}{'✓':<3}{'RTT ms':>9}")
+    print("-" * 104)
     for cid, s, exp, http, mark, ms in rows:
-        print(f"{cid:<10}{s:<4}{exp:<26}{http:<14}{mark:<3}{ms:>9.1f}")
-    print("=" * 88)
+        print(f"{cid:<10}{s:<4}{exp:<26}{http:<44}{mark:<3}{ms:>9.1f}")
+    print("=" * 104)
     print(f"经网关: pass={agg['pass']} fail={agg['fail']} skip(mcp)={agg['skip']}")
     sys.exit(0 if agg["fail"] == 0 else 1)
 

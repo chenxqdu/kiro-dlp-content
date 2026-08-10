@@ -30,6 +30,10 @@ services:
       - PRESIDIO_ANALYZER_URL=http://presidio-analyzer:5002/analyze
       - DLP_L4_BEDROCK=${DLP_L4_BEDROCK:-0}   # 阶段4 置 1 开 Bedrock 标定
       - DLP_METRICS_PATH=/metrics/dlp_gateway_metrics.jsonl
+      # L3 降级动作(规格 D4,与方案二 server.py 同名同义):
+      #   block=fail-closed(默认,安全)—— L3 不可达/超预算截断/部分语言失败 → 400 forced_block
+      #   keep =保留引擎原判(危险,fail-open,仅性能测试实验 D 对照用)
+      - DLP_L3_UNAVAILABLE_ACTION=${DLP_L3_UNAVAILABLE_ACTION:-block}
     volumes:
       - ../gateway/litellm_config.yaml:/app/config.yaml:ro
       - ../gateway/dlp_guardrail.py:/app/dlp_guardrail.py:ro

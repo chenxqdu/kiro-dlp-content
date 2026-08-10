@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "note": "性能测试攻击/合法向量库(§9.1.1)。攻击向量分两类以给 fail-open/fail-closed 对账分辨率:local=本地层裁决(L0/L1/L2/L3.5,不依赖 Presidio,对过载鲁棒);l3only=仅 Presidio NER 可检(过载时是退化探针)。合法向量用于误杀率与背景流。所有敏感值均为公开示例/合成串,非真实凭证。",
+    "copyright": "Copyright (c) 2026 Amazon.com and Affiliates. SPDX-License-Identifier: Apache-2.0",
+    "sources": "取自 engine/tests/fixtures_layers/{l0,l3}.json 已验证向量"
+  },
+  "attack_local_block": [
+    {"id": "AK-BLOCK", "text": "deploy key AKIA1234567890ABCDEF to prod", "expect": "block", "layer": "L0", "rule": "aws_access_key"},
+    {"id": "SK-BLOCK", "text": "aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY", "expect": "block", "layer": "L0", "rule": "aws_secret_key"},
+    {"id": "GCP-BLOCK", "text": "key AIzaSyDaGmWKa4JsXZ-HjGw7ISLn_3namBGewQe here", "expect": "block", "layer": "L0", "rule": "gcp_api_key"}
+  ],
+  "attack_local_redact": [
+    {"id": "CNID-REDACT", "text": "身份证号 110101199003072519", "expect": "redact", "layer": "L0", "rule": "cn_id_card", "plaintext_leak_probe": "110101199003072519"},
+    {"id": "PHONE-REDACT", "text": "联系电话 13800138000 请拨打", "expect": "redact", "layer": "L0", "rule": "cn_phone", "plaintext_leak_probe": "13800138000"},
+    {"id": "EMAIL-REDACT", "text": "reach me at john.doe@gmail.com please", "expect": "redact", "layer": "L0", "rule": "email", "plaintext_leak_probe": "john.doe@gmail.com"}
+  ],
+  "attack_l3only": [
+    {"id": "L3-EMAIL", "text": "reach the owner at john.doe@realcorp.io for access", "expect": "redact", "layer": "L3", "entity": "EMAIL_ADDRESS", "plaintext_leak_probe": "john.doe@realcorp.io"},
+    {"id": "L3-CARD", "text": "charge this card 4539578763621486 today", "expect": "redact", "layer": "L3", "entity": "CREDIT_CARD", "plaintext_leak_probe": "4539578763621486"},
+    {"id": "L3-IP", "text": "the box answers at 203.0.113.45 on port 22", "expect": "redact", "layer": "L3", "entity": "IP_ADDRESS", "plaintext_leak_probe": "203.0.113.45"}
+  ],
+  "legal_short": [
+    {"id": "LEGAL-1", "text": "请帮我把这段产品介绍润色得更专业一些,面向企业客户。"},
+    {"id": "LEGAL-2", "text": "总结一下这次会议的三个行动项,并按优先级排序。"},
+    {"id": "LEGAL-3", "text": "example AKIAIOSFODNN7EXAMPLE docs"},
+    {"id": "LEGAL-4", "text": "test acct alice@example.com and bob@foo.test"},
+    {"id": "LEGAL-5", "text": "pattern AKIA[0-9A-Z]{16} matches keys"},
+    {"id": "LEGAL-6", "text": "感谢 Guido 对语言设计的贡献。"},
+    {"id": "LEGAL-7", "text": "sandbox pay with 4111111111111111 works"},
+    {"id": "LEGAL-8", "text": "物流运单号 4539123456783457,请查询签收状态。"}
+  ]
+}

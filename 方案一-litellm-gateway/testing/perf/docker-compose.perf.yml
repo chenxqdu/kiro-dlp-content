@@ -1,0 +1,20 @@
+# 性能测试 compose override(§9.3 法1)——在 gateway 编排上叠加:
+#   1) 让 litellm 容器能经 host.docker.internal 访问【宿主机】上的 fake_upstream.py;
+#   2) 换用 perf 版 litellm 配置(多一个 echo-fast 假上游模型)。
+# 用法(实例上,三文件叠加):
+#   docker compose -f docker-compose.yml -f docker-compose.gateway.yml -f <此文件> up -d litellm
+# 路径解析规则同 gateway override:相对路径按 BASE(docker-compose.yml)所在目录 = docker/。
+# 本文件部署到实例时置于 docker/ 下,故 ../testing/perf/... 指向实例扁平布局的 perf 目录。
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+services:
+  litellm:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # 容器内 host.docker.internal → 宿主机
+    environment:
+      # fail-closed 默认 block;实验 D 对照可 export DLP_L3_UNAVAILABLE_ACTION=keep 复现旧 fail-open
+      - DLP_L3_UNAVAILABLE_ACTION=${DLP_L3_UNAVAILABLE_ACTION:-block}
+    volumes:
+      # 覆盖阶段2 配置为 perf 版(加 echo-fast 假上游)
+      - ../testing/perf/litellm_config_perf.yaml:/app/config.yaml:ro
