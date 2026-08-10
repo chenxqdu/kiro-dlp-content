@@ -1,0 +1,43 @@
+
+===== DLP 性能测试 [EXP=C RATE=20 BG=70 ATK=5 DUR=60s] =====
+      ✓ GCP-BLOCK BLOCK→400
+      ✓ LEGAL-8 合法→200
+      ✓ LEGAL-7 合法→200
+      ✓ LEGAL-6 合法→200
+      ✓ LEGAL-1 合法→200
+      ✓ LEGAL-4 合法→200
+      ✓ LEGAL-3 合法→200
+      ✓ LEGAL-5 合法→200
+      ✓ LEGAL-2 合法→200
+      ✓ L3-IP REDACT→200脱敏生效
+      ✓ EMAIL-REDACT REDACT→200脱敏生效
+      ✓ AK-BLOCK BLOCK→400
+      ✓ SK-BLOCK BLOCK→400
+      ✓ L3-EMAIL REDACT→200脱敏生效
+      ✓ L3-CARD REDACT→200脱敏生效
+      ✓ PHONE-REDACT REDACT→200脱敏生效
+      ✓ CNID-REDACT REDACT→200脱敏生效
+
+      atk_l3_handled.................: 100.00% ✓ 103       ✗ 0    
+      atk_local_handled..............: 100.00% ✓ 198       ✗ 0    
+      checks.........................: 100.00% ✓ 4502      ✗ 0    
+      data_received..................: 6.9 MB  114 kB/s
+      data_sent......................: 1.4 MB  24 kB/s
+      dlp_block_ms...................: avg=96.06ms  min=37.01ms med=53.23ms p(95)=451.15ms p(99)=741.36ms p(99.9)=955.08ms max=978.82ms
+      dlp_pass_ms....................: avg=107.13ms min=19.17ms med=37.33ms p(95)=610.15ms p(99)=1.06s    p(99.9)=2.29s    max=2.71s   
+      dlp_redact_ms..................: avg=114.33ms min=22.41ms med=45.46ms p(95)=641.49ms p(99)=1.04s    p(99.9)=1.34s    max=1.37s   
+      http_req_blocked...............: avg=178.74µs min=3.3µs   med=5.6µs   p(95)=180.7µs  p(99)=245.86µs p(99.9)=55.62ms  max=85.05ms 
+      http_req_connecting............: avg=166.1µs  min=0s      med=0s      p(95)=114.94µs p(99)=156.2µs  p(99.9)=55.56ms  max=85ms    
+      http_req_duration..............: avg=107.24ms min=19.17ms med=37.96ms p(95)=610.12ms p(99)=1.05s    p(99.9)=2.28s    max=2.71s   
+        { expected_response:true }...: avg=107.47ms min=19.17ms med=37.58ms p(95)=611.52ms p(99)=1.06s    p(99.9)=2.28s    max=2.71s   
+      http_req_failed................: 2.02%   ✓ 91        ✗ 4411 
+      http_req_receiving.............: avg=63.43µs  min=20.09µs med=61.26µs p(95)=90.26µs  p(99)=107.77µs p(99.9)=145.08µs max=280.01µs
+      http_req_sending...............: avg=25.98µs  min=9.54µs  med=21.11µs p(95)=60.25µs  p(99)=80.66µs  p(99.9)=102.16µs max=1ms     
+      http_req_tls_handshaking.......: avg=0s       min=0s      med=0s      p(95)=0s       p(99)=0s       p(99.9)=0s       max=0s      
+      http_req_waiting...............: avg=107.15ms min=19.09ms med=37.87ms p(95)=610.03ms p(99)=1.05s    p(99.9)=2.28s    max=2.71s   
+      http_reqs......................: 4502    74.978072/s
+      iteration_duration.............: avg=107.62ms min=19.32ms med=38.18ms p(95)=610.35ms p(99)=1.05s    p(99.9)=2.28s    max=2.71s   
+      iterations.....................: 4502    74.978072/s
+      legal_false_positive...........: 0.00%   ✓ 0         ✗ 4201 
+      vus............................: 1       min=1       max=105
+      vus_max........................: 375     min=375     max=375

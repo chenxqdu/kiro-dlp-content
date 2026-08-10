@@ -1,0 +1,50 @@
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: CC-BY-4.0
+#
+# 实验 D fail-closed 验证 + keep 对照组(03 §9.4 / §9.12)
+# 实例 <TEST_INSTANCE_ID>, us-west-2, 2026-08-10
+# 上游 = fake_upstream.py echo(绑 0.0.0.0,端口 18080 不在实例 SG,内容不出实例)
+# probe 向量 = 信用卡号 4539578763621486(公开 Luhn 合成串,top=L3,仅 Presidio NER 可检)
+# 裁决:HTTP + 网关 metrics verdict/forced_block + echo 回显里明文是否出现(三源)
+
+============================================================
+D-1) 负载态 fail-closed(k6 EXP=D:长文本2000tok 背景15/s + local5/s + l3only5/s,60s)
+============================================================
+Presidio 中段 docker stats:  presidio-analyzer 750.17% CPU / 8.32GiB  (7.5/8 核,真过载)
+                             litellm 29.48%      kiro-dlp-http 0.01%
+k6 客户端侧:
+  atk_local_handled = 71.75%  (✓94 / ✗37)   ← ✗ 全为 status=0 客户端超时(14 CNID +14 PHONE +9 EMAIL)
+  atk_l3_handled    = 43.51%  (✓47 / ✗61)   ← ✗ 全为 status=0 客户端超时(21 CARD +18 EMAIL +22 IP)
+  plaintext_leak    = 0        (计数器未出现 → 明文泄漏 = 0,§9.4 硬判据达标)
+  legal_false_positive = 0.00% (✓0 误杀)
+  dropped_iterations = 496     (open-loop 过载信号)
+  http_req_duration p99 = 60s(客户端超时墙),iteration p50 = 1m
+网关 metrics 侧(源2)verdict 分布(完成的请求):
+  ('block','L0','-') 70   ('pass',None,'-') 438   ('redact','L0','-') 127   ('redact','L3','-') 91
+  forced_block 明细: {}   ← 本轮降级模式是"排队阻塞超时",非"逐请求 L3 预算跳过",故 marker 未触发
+判读:凡完成的请求处置全部正确(BLOCK→400/REDACT→200脱敏);过载时超额请求在网关内
+      排队超时、内容未外发,而非静默 PASS 泄漏。可用性降、安全性不降,明文泄漏 = 0。
+
+============================================================
+D-2) marker 通道单点坐实 + keep 对照(Presidio 停 → L3 不可达,marker 必触发)
+============================================================
+# 时序要点:litellm 经 compose recreate 时 depends_on: presidio(service_healthy) 会把
+# presidio 一并带起,故 keep 组必须【recreate 之后再停 presidio】,否则探测时 L3 已自愈。
+
+停 Presidio 后:
+  [block 默认 / 生产态]      HTTP=400  verdict=block top=None forced=l3_unavailable   明文泄漏=no
+  [keep 对照 / 复现旧fail-open] HTTP=200  verdict=pass  top=None forced=-             明文泄漏=YES(卡号明文到达上游 echo)
+
+结论:
+- 同一请求、同一 L3 不可达故障,block(默认)→ 强制拦截、卡号不出网关;keep(旧 fail-open)
+  → 静默放行、卡号明文 4539578763621486 出现在上游 echo 响应里。这就是本轮 fail-closed
+  改造相对旧 fail-open 的收益量化:L3-only 敏感数据在 Presidio 宕机时的明文泄漏率 1→0。
+- keep 为对照/量化用,非生产配置(生产默认 DLP_L3_UNAVAILABLE_ACTION unset→block)。
+
+============================================================
+复原核对(压测毕)
+============================================================
+  presidio: running healthy
+  litellm:  running,已切回阶段2 生产配置(挂载 gateway/litellm_config.yaml,移除 echo-fast 假上游)
+  DLP_L3_UNAVAILABLE_ACTION=block(fail-closed 默认)  DLP_L4_BEDROCK=0  假上游进程=0
+  readiness=200

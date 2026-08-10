@@ -1,0 +1,31 @@
+
+===== DLP 性能测试 [EXP=B RATE=100 BG=20 ATK=5 DUR=40s] =====
+      ✓ LEGAL-3 合法→200
+      ✓ LEGAL-8 合法→200
+      ✓ LEGAL-4 合法→200
+      ✓ LEGAL-1 合法→200
+      ✓ LEGAL-7 合法→200
+      ✓ LEGAL-6 合法→200
+      ✓ LEGAL-5 合法→200
+      ✓ LEGAL-2 合法→200
+
+      checks.........................: 100.00% ✓ 3677      ✗ 0    
+      data_received..................: 5.7 MB  129 kB/s
+      data_sent......................: 1.2 MB  27 kB/s
+      dlp_pass_ms....................: avg=3.55s    min=28.96ms med=3.14s   p(95)=9.7s     p(99)=17.95s   p(99.9)=18.99s   max=19s    
+      dropped_iterations.............: 324     7.371584/s
+      http_req_blocked...............: avg=362.03µs min=2.77µs  med=5.88µs  p(95)=182.39µs p(99)=423.37µs p(99.9)=79.49ms  max=99.73ms
+      http_req_connecting............: avg=350.05µs min=0s      med=0s      p(95)=123.91µs p(99)=363.51µs p(99.9)=79.44ms  max=99.68ms
+      http_req_duration..............: avg=3.55s    min=28.96ms med=3.14s   p(95)=9.7s     p(99)=17.95s   p(99.9)=18.99s   max=19s    
+        { expected_response:true }...: avg=3.55s    min=28.96ms med=3.14s   p(95)=9.7s     p(99)=17.95s   p(99.9)=18.99s   max=19s    
+      http_req_failed................: 0.00%   ✓ 0         ✗ 3677 
+      http_req_receiving.............: avg=71.18µs  min=16.75µs med=41.48µs p(95)=84.28µs  p(99)=208.15µs p(99.9)=7.03ms   max=20.74ms
+      http_req_sending...............: avg=26.92µs  min=10.84µs med=21.92µs p(95)=61.41µs  p(99)=84.01µs  p(99.9)=153.44µs max=302.1µs
+      http_req_tls_handshaking.......: avg=0s       min=0s      med=0s      p(95)=0s       p(99)=0s       p(99.9)=0s       max=0s     
+      http_req_waiting...............: avg=3.55s    min=28.84ms med=3.14s   p(95)=9.7s     p(99)=17.95s   p(99.9)=18.99s   max=19s    
+      http_reqs......................: 3677    83.658373/s
+      iteration_duration.............: avg=3.55s    min=29.5ms  med=3.14s   p(95)=9.7s     p(99)=17.95s   p(99.9)=18.99s   max=19s    
+      iterations.....................: 3677    83.658373/s
+      legal_false_positive...........: 0.00%   ✓ 0         ✗ 3677 
+      vus............................: 1       min=1       max=511
+      vus_max........................: 523     min=200     max=523

@@ -1,0 +1,30 @@
+
+===== DLP 性能测试 [EXP=B RATE=80 BG=20 ATK=5 DUR=40s] =====
+      ✓ LEGAL-1 合法→200
+      ✓ LEGAL-6 合法→200
+      ✓ LEGAL-8 合法→200
+      ✓ LEGAL-7 合法→200
+      ✓ LEGAL-5 合法→200
+      ✓ LEGAL-4 合法→200
+      ✓ LEGAL-3 合法→200
+      ✓ LEGAL-2 合法→200
+
+      checks.........................: 100.00% ✓ 3201      ✗ 0    
+      data_received..................: 4.9 MB  123 kB/s
+      data_sent......................: 1.0 MB  25 kB/s
+      dlp_pass_ms....................: avg=54.54ms  min=20.46ms med=37.88ms p(95)=124.66ms p(99)=183.75ms p(99.9)=222.49ms max=231.51ms
+      http_req_blocked...............: avg=361.13µs min=3.45µs  med=5.78µs  p(95)=163.41µs p(99)=258.01µs p(99.9)=101.37ms max=138.99ms
+      http_req_connecting............: avg=350.63µs min=0s      med=0s      p(95)=105.6µs  p(99)=164.47µs p(99.9)=101.31ms max=138.91ms
+      http_req_duration..............: avg=54.54ms  min=20.46ms med=37.88ms p(95)=124.66ms p(99)=183.75ms p(99.9)=222.49ms max=231.51ms
+        { expected_response:true }...: avg=54.54ms  min=20.46ms med=37.88ms p(95)=124.66ms p(99)=183.75ms p(99.9)=222.49ms max=231.51ms
+      http_req_failed................: 0.00%   ✓ 0         ✗ 3201 
+      http_req_receiving.............: avg=68.99µs  min=21.34µs med=66.89µs p(95)=97.85µs  p(99)=117.12µs p(99.9)=242.72µs max=318.65µs
+      http_req_sending...............: avg=25.51µs  min=11.59µs med=21.78µs p(95)=58.88µs  p(99)=82.43µs  p(99.9)=110.31µs max=197.67µs
+      http_req_tls_handshaking.......: avg=0s       min=0s      med=0s      p(95)=0s       p(99)=0s       p(99.9)=0s       max=0s      
+      http_req_waiting...............: avg=54.45ms  min=20.4ms  med=37.78ms p(95)=124.56ms p(99)=183.59ms p(99.9)=222.31ms max=231.45ms
+      http_reqs......................: 3201    79.928936/s
+      iteration_duration.............: avg=55.11ms  min=20.6ms  med=38.12ms p(95)=125.33ms p(99)=196.83ms p(99.9)=252.9ms  max=297.62ms
+      iterations.....................: 3201    79.928936/s
+      legal_false_positive...........: 0.00%   ✓ 0         ✗ 3201 
+      vus............................: 5       min=3       max=19 
+      vus_max........................: 250     min=250     max=250

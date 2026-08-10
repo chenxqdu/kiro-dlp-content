@@ -31,8 +31,12 @@ log(){ echo "[$(date +%T)] $*"; }
 start_fake_upstream(){
   if curl -sf http://127.0.0.1:18080/health >/dev/null 2>&1; then
     log "假上游已在跑"; return; fi
-  log "起假上游 fake_upstream.py :18080"
-  nohup python3 "$PERF/fake_upstream.py" >"$OUT/fake_upstream.log" 2>&1 &
+  log "起假上游 fake_upstream.py :18080(绑 0.0.0.0)"
+  # 必须绑 0.0.0.0:litellm 容器经 docker 网桥 host.docker.internal→172.17.0.1 回连宿主,
+  # 仅绑 127.0.0.1 会拒绝网桥 IP → PASS/REDACT 打不到假上游 → litellm 500(非泄漏,是连不上)。
+  # 端口 18080 不在实例 SG 任何 ingress 规则里,故绑 0.0.0.0 不产生 VPC/公网暴露;假上游是
+  # 纯本机 echo 服务,内容不出实例。宿主 127.0.0.1 健康检查仍可用。
+  FAKE_UPSTREAM_BIND=0.0.0.0 nohup python3 "$PERF/fake_upstream.py" >"$OUT/fake_upstream.log" 2>&1 &
   echo $! > "$PERF/.fake_upstream.pid"
   for i in $(seq 1 20); do
     curl -sf http://127.0.0.1:18080/health >/dev/null 2>&1 && { log "假上游就绪"; return; }

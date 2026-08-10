@@ -22,10 +22,11 @@ mkdir -p "$STAGE/gateway" "$STAGE/testing/perf" "$STAGE/docker"
 # (S3-09/S5-05 在 fail-closed 下由 redact 收紧为 400 forced_block=redaction_ineffective,
 #  旧 harness 会误判为 fail;test_gateway.py 已按 D4 放宽,必须同步)
 cp "$PLAN1_ROOT/gateway/dlp_guardrail.py" "$PLAN1_ROOT/gateway/test_gateway.py" "$STAGE/gateway/"
-# 性能测试资产
+# 性能测试资产(含 docker-compose.perf.yml —— 注意它是 .yml,须与 *.yaml 一并 glob,
+#  否则 run_perf.sh 的 switch_perf_config 会因 $PERF/docker-compose.perf.yml 缺失而失败)
 cp "$PLAN1_ROOT/testing/perf/"*.py "$PLAN1_ROOT/testing/perf/"*.js \
    "$PLAN1_ROOT/testing/perf/"*.json "$PLAN1_ROOT/testing/perf/"*.yaml \
-   "$PLAN1_ROOT/testing/perf/"*.sh "$STAGE/testing/perf/"
+   "$PLAN1_ROOT/testing/perf/"*.yml "$PLAN1_ROOT/testing/perf/"*.sh "$STAGE/testing/perf/"
 # gateway compose(含 DLP_L3_UNAVAILABLE_ACTION env)
 cp "$REPO_ROOT/docker/docker-compose.gateway.yml" "$STAGE/docker/"
 
