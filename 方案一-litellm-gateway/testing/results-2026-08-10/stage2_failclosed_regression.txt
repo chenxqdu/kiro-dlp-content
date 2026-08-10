@@ -1,0 +1,77 @@
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: CC-BY-4.0
+#
+# fail-closed 版阶段2 回归(实例 <TEST_INSTANCE_ID>, us-west-2, 2026-08-10)
+# 同步 fail-closed dlp_guardrail.py + marker-aware test_gateway.py,重启 litellm 后复跑套件 1/2/3/5。
+# 命令: bash testing/remote/ssm_exec.sh host_stage2_gateway.sh
+# (原始 SSM stdout 摘录;RTT 含上游 Bedrock llama-3.1-8b 生成时间)
+
+========================================================================================================
+ID        套件  期望                        HTTP                                        ✓     RTT ms
+--------------------------------------------------------------------------------------------------------
+S1-01     1   block                     400/blocked                                 ✓      713.5
+S1-02     1   block                     400/blocked                                 ✓      193.3
+S1-03     1   block                     400/blocked                                 ✓      197.6
+S1-04     1   block                     400/blocked                                 ✓       35.8
+S1-05     1   block                     400/blocked                                 ✓      216.6
+S1-06     1   block                     400/blocked                                 ✓      198.6
+S1-07     1   block                     400/blocked                                 ✓       32.0
+S1-08     1   block                     400/blocked                                 ✓       31.8
+S1-09     1   redact                    200                                         ✓      338.3
+S1-10     1   redact                    200                                         ✓      269.4
+S1-11     1   redact                    200                                         ✓      316.5
+S2-01     2   pass                      200                                         ✓      317.5
+S2-02     2   pass                      200                                         ✓      318.4
+S2-03     2   pass                      200                                         ✓      250.0
+S2-04     2   pass                      200                                         ✓      375.9
+S2-05     2   pass                      200                                         ✓      253.7
+S2-06     2   pass                      200                                         ✓      292.6
+S2-07     2   pass                      200                                         ✓      477.0
+S2-08     2   pass                      200                                         ✓      363.3
+S2-09     2   pass                      200                                         ✓      365.2
+S2-10     2   pass                      200                                         ✓      301.0
+S2-11     2   pass                      200                                         ✓      207.6
+S2-12     2   pass                      200                                         ✓      276.7
+S2-13     2   pass                      200                                         ✓      342.3
+S2-14     2   pass                      200                                         ✓      307.4
+S2-15     2   pass                      200                                         ✓      312.7
+S2-16     2   pass                      200                                         ✓      285.4
+S3-01     3   block                     400/blocked                                 ✓       37.8
+S3-02     3   block                     400/blocked                                 ✓       34.1
+S3-03     3   block                     400/blocked                                 ✓       32.2
+S3-04     3   block                     400/blocked                                 ✓       33.3
+S3-05     3   block                     400/blocked                                 ✓       30.2
+S3-06     3   block                     400/blocked                                 ✓       31.7
+S3-07     3   block                     400/blocked                                 ✓       34.9
+S3-08     3   block                     400/blocked                                 ✓       32.0
+S3-09     3   redact                    400/blocked→fail-closed(redaction_ineffective)✓       30.1
+S3-10     3   block                     400/blocked                                 ✓       32.1
+S5-01     5   block                     400/blocked                                 ✓       44.2
+S5-02     5   block                     400/blocked                                 ✓       53.6
+S5-03     5   redact                    200                                         ✓      267.2
+S5-04     5   block                     400/blocked                                 ✓       49.9
+S5-05     5   redact                    400/blocked→fail-closed(redaction_ineffective)✓       40.2
+S5-06     5   block                     400/blocked                                 ✓       42.4
+S5-07     5   pass                      200                                         ✓      371.4
+S5-08     5   pass                      200                                         ✓      199.1
+S5-09     5   block                     400/blocked                                 ✓       51.2
+========================================================================================================
+经网关: pass=46 fail=0 skip(mcp)=0
+GW_EXIT=0
+
+=== 指标复核:verdict 分布 + 网关内扫描延迟(n=59) ===
+总记录 59
+('l4_alert', 'proprietary-source', '') 2
+('pre_call', 'block', '') 22
+('pre_call', 'block', 'redaction_ineffective') 2      ← S3-09 / S5-05,D4 收紧(top=L0)
+('pre_call', 'pass', '') 27
+('pre_call', 'redact', '') 4
+('pre_mcp_call', 'pass', '') 2
+--- forced_block 明细 ---
+pre_call block forced=redaction_ineffective top=L0
+pre_call block forced=redaction_ineffective top=L0
+pre_call scan total ms: p50=17.8 p95=182.5 mean=35.2 n=55
+
+结论:fail-closed 版仍 46/46(漏拦 0 / 误报 0);两条脱敏落空 redact 向量(S3-09 中文数字
+身份证、S5-05 session_window 拼接身份证)按规格 D4 由 redact/200 收紧为 400 forced_block=
+redaction_ineffective;引擎离线仍判 redact(阶段1 56/56 不变,run_offline.py 只读 verdict)。

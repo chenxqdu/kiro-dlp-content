@@ -1,0 +1,30 @@
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: CC-BY-4.0
+#
+# 停 Presidio 专项(fail-closed 核心验证,规格 D4 / 03 §9.4)
+# 实例 <TEST_INSTANCE_ID>, us-west-2, 2026-08-10
+# 命令: bash testing/remote/ssm_exec.sh host_stop_presidio_probe.sh
+#
+# probe = 信用卡号 4539578763621486(公开 Luhn 合成串):健康时 top=L3,仅 Presidio
+# NER 可检(本地层 L0/L1/L2/L3.5 判不出)——正是 fail-open 会静默泄漏、fail-closed 要
+# 堵死的那一类。裁决以网关 metrics jsonl 的 verdict/forced_block 为准(权威信号)。
+
+=== 1) Presidio 健康 → 期望 verdict=redact top=L3 ===
+presidio-analyzer Up About a minute (healthy)
+  [presidio-up] HTTP=200 verdict=redact top=L3 forced=-
+=== 2) 停 presidio(默认 fail-closed)→ 期望 HTTP=400 verdict=block forced=l3_unavailable ===
+presidio: 已停
+  [down-failclosed] HTTP=400 verdict=block top=None forced=l3_unavailable
+=== 3) 恢复 presidio → 期望 verdict=redact top=L3(自愈)===
+presidio healthy ~6x3s
+  [restored] HTTP=200 verdict=redact top=L3 forced=-
+=== 专项完成(裁决以 metrics verdict 为准)===
+
+结论:
+- 三态全绿。第 2 步是本轮改造关键闭环:旧 fail-open 版此处会 verdict=PASS 把卡号明文
+  发往上游(静默泄漏);fail-closed 版据 notes 强制 BLOCK(l3_unavailable),请求不出网关。
+- L3-only 敏感数据在 Presidio 过载/宕机时的明文泄漏率 = 0。
+- keep 对照组(复现旧 fail-open)的『明文外发量化』须经 echo 假上游观测(§9 实验 D
+  fake_upstream.py);本专项以 verdict 裁决闭合逻辑通道,足证 fail-closed 生效。
+- 复跑毕实例已还原:DLP_L3_UNAVAILABLE_ACTION unset→block(默认 fail-closed)、
+  DLP_L4_BEDROCK=0、presidio healthy、litellm live。

@@ -18,8 +18,10 @@ KEY="kiro-dlp/gateway_perf_sync_$(date +%s).tgz"
 
 STAGE=$(mktemp -d)
 mkdir -p "$STAGE/gateway" "$STAGE/testing/perf" "$STAGE/docker"
-# fail-closed 版网关代码
-cp "$PLAN1_ROOT/gateway/dlp_guardrail.py" "$STAGE/gateway/"
+# fail-closed 版网关代码 + 配套的 marker-aware 阶段2 harness
+# (S3-09/S5-05 在 fail-closed 下由 redact 收紧为 400 forced_block=redaction_ineffective,
+#  旧 harness 会误判为 fail;test_gateway.py 已按 D4 放宽,必须同步)
+cp "$PLAN1_ROOT/gateway/dlp_guardrail.py" "$PLAN1_ROOT/gateway/test_gateway.py" "$STAGE/gateway/"
 # 性能测试资产
 cp "$PLAN1_ROOT/testing/perf/"*.py "$PLAN1_ROOT/testing/perf/"*.js \
    "$PLAN1_ROOT/testing/perf/"*.json "$PLAN1_ROOT/testing/perf/"*.yaml \
