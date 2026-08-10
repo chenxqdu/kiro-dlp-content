@@ -8,10 +8,11 @@
 #   a  tier_a_smoke    : §4 Tier A 直连 DLP /inspect 三态 + 脱敏字段不外泄
 #   b  tier_b_wire     : §4 Tier B wire-byte 铁证(PASS/REDACT/BLOCK 发往上游的字节)
 #   c  tier_c_real     : §4 Tier C 真实上游交叉核对(PASS 到 AWS / BLOCK 我方短路)
+#   d  tier_d_relayer  : §4 Tier D 逐层探针经真实链路重验 L0–L3.5(verdict + top_layer 双断言)
 #   f  tier_fail_modes : §5 fail 模式四子测(不可达吃策略 / HTTP503 恒 closed)
 #
 # 用法（在 proxy 本机 SSM 会话内）：
-#   ./run_all.sh            # 跑全部(0 a b c f)
+#   ./run_all.sh            # 跑全部(0 a b c d f)
 #   ./run_all.sh 0 a b      # 只跑指定层(空格分隔)
 #   ./run_all.sh --list     # 列出层
 #
@@ -19,6 +20,8 @@
 #
 # ★ 全程只打 127.0.0.1（loopback，无公网 443）；生产 SNI 透传节点绝不涉及。
 # ★ 期望结论见 TEST-PLAN.md（oracle）；实测结论见 方案二-03-测试报告.md。
+# ★ 需 bash ≥ 4（用了 `declare -A` 关联数组）。验证节点 AL2023 是 bash 5，没问题；
+#   但 macOS 自带 bash 3.2 会报 `line 34: a: unbound variable` —— 那是本机 shell 太老，不是脚本坏了。
 #############################################
 set -uo pipefail
 
@@ -29,11 +32,12 @@ PASSTHRU=codewhisperer.us-east-1.amazonaws.com
 LOGDIR=/tmp/kiro-mitm-tests
 mkdir -p "$LOGDIR"
 
-ALL_TIERS=(0 a b c f)
+ALL_TIERS=(0 a b c d f)
 declare -A SCRIPT_OF=(
   [a]="tier_a_smoke.sh"
   [b]="tier_b_wire.sh"
   [c]="tier_c_real_upstream.sh"
+  [d]="tier_d_relayer_layers.sh"
   [f]="tier_fail_modes.sh"
 )
 declare -A NAME_OF=(
@@ -41,6 +45,7 @@ declare -A NAME_OF=(
   [a]="§4 Tier A: DLP /inspect 三态 + 无泄漏"
   [b]="§4 Tier B: wire-byte 铁证"
   [c]="§4 Tier C: 真实上游交叉核对"
+  [d]="§4 Tier D: 逐层探针经真实链路(L0–L3.5)"
   [f]="§5 fail 模式四子测"
 )
 
@@ -122,7 +127,7 @@ tier0_inline () {
 for t in "${TIERS[@]}"; do
   case "$t" in
     0) run_and_grade 0 tier0_inline ;;
-    a|b|c|f)
+    a|b|c|d|f)
       s="${SCRIPT_OF[$t]}"
       if [[ ! -f "$SCRIPT_DIR/$s" ]]; then
         echo "❌ 缺脚本 $SCRIPT_DIR/$s，跳过层 $t"; RESULT[$t]="MISSING"; echo; continue

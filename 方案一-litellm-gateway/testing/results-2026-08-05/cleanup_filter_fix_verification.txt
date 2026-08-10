@@ -1,0 +1,35 @@
+# 清理过滤器修正的实测验证(只读探针,未删任何容器)
+# 执行: 2026-08-05,远程 SSM,DLP 主机 <TEST_INSTANCE_ID>(m7i.2xlarge, us-west-2)
+#
+# 背景: host_stage5_layers.sh 原先裸用
+#         sudo docker ps -q --filter ancestor=kiro-dlp-engine:latest | xargs -r sudo docker rm -f
+#       ancestor= 匹配的是【镜像】。方案二常驻的 kiro-dlp-http(172.31.27.174:9000 inspect 服务)
+#       跑的正是同一个 kiro-dlp-engine:latest —— 本次重跑阶段5 时它被一并 force-remove,
+#       而方案一自身三段全绿、exit 全 0(故障【静默】,不看方案二发现不了)。已 compose 复原。
+#
+# 修正: 改为按【名字白名单】排除常驻服务,只清 `docker run --rm` 留下的随机名孤儿:
+#         KEEP_RE='^(kiro-dlp-http|litellm|litellm-nodlp|presidio-analyzer)$'
+#         sudo docker ps --filter ancestor=kiro-dlp-engine:latest --format '{{.ID}} {{.Names}}' \
+#           | awk -v keep="$KEEP_RE" '$2 !~ keep {print $1}' | xargs -r sudo docker rm -f
+#
+# 本探针的作用: 在真机上【同时】跑旧写法与新写法的【选择逻辑】(只打印,不删),
+#       证明旧写法确实会杀 kiro-dlp-http、新写法确实不会 —— 而不是只在文档里断言修好了。
+# 结论: 旧写法命中 kiro-dlp-http(=事故重现);新写法命中为空;服务 health 200 未受影响。
+#
+# ↓↓↓ ssm_exec.sh 取回的 stdout 原文,逐字节未加工 ↓↓↓
+=== 全部以 kiro-dlp-engine:latest 为 ancestor 的容器 ===
+35ff4834e7b1 kiro-dlp-http Up 11 minutes (healthy)
+
+=== 旧写法(裸 ancestor)【会】删掉的容器 ===
+  35ff4834e7b1 /kiro-dlp-http
+
+=== 新写法(白名单排除)【会】删掉的容器(应为空或仅随机名孤儿) ===
+  <空 —— 无孤儿,常驻服务全部保留 ✓>
+
+=== kiro-dlp-http 存活复核 ===
+{"status": "ok", "engine": "ready", "pool": 4} [http=200]
+probe done (只读,未删任何容器)
+
+# 附注: 上面这个容器 ID 35ff4834e7b1 是【复原后】新起的实例。
+#       事故当时被删掉的那个是 884ee06ea82f —— 它就打印在我自己那轮重跑 stdout 的第一行
+#       (清理步骤的输出),证据当时就在眼前,只是没人会去核对一个"清理孤儿"步骤的输出。

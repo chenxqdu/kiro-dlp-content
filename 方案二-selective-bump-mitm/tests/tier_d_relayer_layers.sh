@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 #############################################
-# 逐层探针 · 通过【真实代理链路】重验 L0–L3.5(在验证节点 EC2 上执行)
+# Tier D —— 逐层探针 · 通过【真实代理链路】重验 L0–L3.5(在验证节点 EC2 上执行)
 #
-# 与 stage5(import dlp 直连引擎单测)的本质区别:本脚本每个探针都【穿过真实
-# mitmproxy addon → HTTP → VPC 内 DLP inspect 服务(9000)】,再由 echo 上游做
-# 字节级取证。证明的是【部署链路 + addon + 引擎】联动,而非仅引擎函数。
+# 定位:Tier B 只用 PASS/REDACT/BLOCK 三条语料证明"裁决作用在 wire 字节上";
+#      本层把这条同样的真实链路【按引擎层拆开】,每层至少一条探针,双断言 verdict + top_layer。
+#
+# 与方案一 stage5(engine/tests/run_layers.py,`import dlp` 直调各层 scan() 单测)的本质区别:
+#      本脚本每个探针都【穿过真实 mitmproxy addon → HTTP → VPC 内 DLP inspect 服务(9000)】,
+#      再由 echo 上游做字节级取证。证明的是【部署链路 + addon + 引擎】联动,而非仅引擎函数。
+#      → stage5 证明"规则对";本层证明"规则在真链路上仍然对"。两者互补,都要跑。
 #
 # 拓扑(与生产 443→8443 完全隔离,绝不干扰已验证链路):
 #   curl(信任 root, --resolve bump 域:9443:127.0.0.1)
@@ -198,8 +202,10 @@ run_case () {
       ;;
   esac
 
-  echo "upstream=$upstream_state  got_top=${got_top:-N/A}  verdict_judged=$got_verdict  => $fp"
-  echo "$name|expect=$ev/${et:-NA}|http=$http_code|top=${got_top:-NA}|upstream=$upstream_state|$fp" >> "$RESULTS"
+  # ★ 失败必须打 ❌:run_all.sh 用 `grep -qE '❌|FATAL'` 判层,只写 "FAIL" 字样会被判成 PASS。
+  local mark; [[ "$fp" == "OK" ]] && mark="✓ OK" || mark="❌ FAIL"
+  echo "upstream=$upstream_state  got_top=${got_top:-N/A}  verdict_judged=$got_verdict  => $mark"
+  echo "$name|expect=$ev/${et:-NA}|http=$http_code|top=${got_top:-NA}|upstream=$upstream_state|$mark" >> "$RESULTS"
   if [[ "$fp" == "OK" ]]; then PASS_CNT=$((PASS_CNT+1)); else FAIL_CNT=$((FAIL_CNT+1)); fi
   echo
 }
@@ -214,6 +220,7 @@ echo "=================== 逐层链路重验 汇总 ==================="
 cat "$RESULTS"
 echo "-------------------------------------------------------"
 echo "PASS=$PASS_CNT  FAIL=$FAIL_CNT  TOTAL=$((PASS_CNT+FAIL_CNT))"
+if [[ "$FAIL_CNT" -gt 0 ]]; then echo "Tier D 总判: ❌ 有探针未通过"; else echo "Tier D 总判: ✓ 全绿"; fi
 echo
 
 ############## 6. 拆除临时实例(生产 8443 不受影响) ##############

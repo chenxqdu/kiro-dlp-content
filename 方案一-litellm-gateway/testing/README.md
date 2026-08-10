@@ -1,6 +1,7 @@
 # 方案一测试复现手册（testing/）
 
-本目录汇总 2026-07-30 四阶段实测 + 2026-08-04 阶段5 分层完备测试用到的**全部脚本、执行方法与原始输出**，供复现验证与分析。
+本目录汇总 2026-07-30 四阶段实测 + 2026-08-04 阶段5 分层完备测试 + 2026-08-05 阶段5 按当前引擎重跑用到的
+**全部脚本、执行方法与原始输出**，供复现验证与分析。
 实测结论与完整矩阵见 [../方案一-03-测试方案.md](../方案一-03-测试方案.md) §8；本 README 只讲"怎么跑出来的、怎么再跑一遍、结果怎么读"。
 
 ## 目录结构
@@ -21,7 +22,8 @@ testing/
 │   ├── probe_presidio_variants.py  按引擎变体展开逐变体×逐语言归因误报
 │   └── test_l3_weak_ner_replay.py  本地 mock 回放回归（不依赖实例，秒级）
 ├── results-2026-07-30/        ← 四阶段原始实测输出（未加工，含失败轮次）
-└── results-2026-08-04/        ← 阶段5 分层完备测试原始输出
+├── results-2026-08-04/        ← 阶段5 分层完备测试原始输出（人工转录压缩版）
+└── results-2026-08-05/        ← 阶段5 按【当前引擎】重跑 + 与 08-04 逐条 DIFF（逐字节原文）
 ```
 
 测试代码本体在仓库其它目录（本目录的脚本调用它们）：
@@ -116,6 +118,17 @@ python3 probes/test_l3_weak_ner_replay.py
 
 1. **孤儿容器抢核**：`ssm cancel-command` 不杀容器；残留的 kiro-dlp-engine 容器会抢 presidio 单核，把延迟计时打飞到 14–29s/条。每次跑测前清理（host 脚本已内置）：
    `sudo docker ps -q --filter ancestor=kiro-dlp-engine:latest | xargs -r sudo docker rm -f`
+   > ⚠️ **这条清理会跨方案杀服务（2026-08-05 亲踩）**：`--filter ancestor=` 匹配的是**镜像**，而方案二的常驻
+   > `kiro-dlp-http`（`:9000` inspect 服务）**跑的正是同一个 `kiro-dlp-engine:latest`**——于是
+   > [`host_stage5_layers.sh:15`](remote/host_stage5_layers.sh) 会把它一并 `rm -f`。症状是方案二验证节点上
+   > `curl 172.31.27.174:9000` 变成 `Failed to connect`，而**方案一自己的测试全绿、毫无异常**，极易漏判。
+   > 复原（在 DLP 主机上）：
+   > ```
+   > cd /home/ec2-user/kiro-dlp && sudo docker compose -f docker-compose.dlp-http.yml up -d
+   > ```
+   > 复原后必须复核三件事：`/health` 返回 `{"status":"ok","engine":"ready"}`、容器内 L4 五个 env 仍在
+   > （`DLP_RUN_ASYNC_L4`/`DLP_L4_SYNC_BLOCK`/`DLP_USE_BEDROCK_L4`/`DLP_L4_MODEL_KEY`/`DLP_L4_BLOCK_MIN_CONFIDENCE`）、
+   > 经 `/inspect` 打一轮三态自检。**方案二在跑（或将要跑）时，别在同一台主机跑阶段5。**
 2. **SSM 传参**：`--parameters` shorthand 对含空格/引号/中文的 commands 会 ValidationException。只能整体 base64（`ssm_exec.sh` 已封装）；大文件走 S3 presigned URL（`sync_engine.sh`）。
 3. **SSM 会话结束杀后台进程**：`nohup ... &` 落盘 0 行。长任务前台跑 + 调大 `executionTimeout`。
 4. **Bedrock Converse tool 序列三连约束**（阶段2 flowback 用例曾连栽两轮，均非 DLP 问题）：
@@ -146,5 +159,24 @@ python3 probes/test_l3_weak_ner_replay.py
 | 文件 | 内容 | 状态 |
 |---|---|---|
 | `stage5_layers_78.txt` | 阶段5 分层完备测试三段全量（Presidio 全量 74/78 + L3 隔离 9/9 + `--bedrock` 8/8） | ✅ 三段 exit=0 |
+
+## results-2026-08-05/ 原始输出索引
+
+| 文件 | 内容 | 状态 |
+|---|---|---|
+| `stage5_layers_78_rerun.txt` | 阶段5 **按当前引擎重跑**（含 `4f155bd` 引入的 `l4_sync_block` + 全角 `×`）三段全量，**逐字节 stdout 原文** | ✅ 三段 exit=0（74/78 skip=4 / L3 9/9 / L4-BR 8/8） |
+| `DIFF-vs-2026-08-04.md` | 与 08-04 那轮**逐条比对**：版本对齐（三份 sha256）、段②78 vs 78 + 段③8 vs 8、层/状态差异 = **零**、归档形态差异说明、覆盖缺口 | ✅ 无回归 |
+| `cleanup_filter_fix_verification.txt` | 已知坑 #1 修正的**真机验证**（只读探针：同时跑旧/新写法的选择逻辑，证明旧写法确实命中 `kiro-dlp-http`、新写法命中为空） | ✅ 修正生效 |
+
+**为什么要重跑**：08-04 那轮跑在 `7333451`，之后 `4f155bd` 改了引擎（`engine.scan()` 加 L4 同步阻断、
+`l4_semantic` 加全角 `×` 加权系数识别）。重跑前先探 sha256 证明实例上的 `engine.py`/`l4_semantic.py`/`server.py`
+与本地逐字节一致（故**故意不跑 `sync_engine.sh`**，避免引入无关变更），再跑——所以这轮确实打的是当前引擎。
+
+> ⚠️ **「全绿」的准确含义**：78 条向量里**没有任何一条**覆盖 `4f155bd` 的两项新行为——
+> `l4_sync_block` 在 `engine.scan()` **聚合层**，而 `run_layers.py` 直调各层 `scan()`，**结构上到不了**（它属于
+> `run_offline.py` 的辖区）；全角 `×` 则是 `l4.json` 里没有含 `×` 的语料。故重跑只证明
+> **「新代码没打坏旧行为」**，不证明**「新行为正确」**。新行为的实证在别处：`l4_sync_block` 的真链路证据见
+> 方案二 [Tier D 原始输出](../../方案二-selective-bump-mitm/results-2026-08-05/tier_d_relayer_layers.txt)
+> 里 BLOCK 探针的 `notes=['L4 同步阻断(测试期/Bedrock)…']`。缺口的补法写在 DIFF 文档 §5。
 
 **阶段5 与阶段1 的关系**：阶段1（`run_offline`）验的是"整机裁决"——56 条场景经 `engine.scan()` 全链路聚合出 verdict/top_layer；阶段5（`run_layers`）验的是"每层每条规则"——直接调 `l0_regex.scan()`/`l1_secrets.scan()`/… 逐规则断言正例、豁免（FP-01..12 白名单逐条独立成向量）、边界。阶段1 过不代表每条规则被触达（覆盖审计发现 L1 7 条签名、L3.5 5 条术语、EGRESS 全部变体在 56 条场景里为零覆盖），阶段5 补齐了这块。改任一层规则后两个 harness 都要跑。

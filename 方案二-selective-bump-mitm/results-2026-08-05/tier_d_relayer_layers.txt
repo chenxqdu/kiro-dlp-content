@@ -1,0 +1,79 @@
+# Tier D —— 逐层探针经【真实代理链路】重验 L0–L3.5(原始 stdout)
+# 执行: 2026-08-05,远程 SSM,验证节点 <VERIFY_INSTANCE_ID>(c6g.large/aarch64, us-west-2)
+# 脚本: tests/tier_d_relayer_layers.sh(经方案一 testing/remote/ssm_exec.sh 投递)
+# 拓扑: curl → 临时 mitmdump 127.0.0.1:9443(生产同款 kiro_addon.py, reverse→127.0.0.1:18080 echo)
+#        → addon 解密 → POST 明文 body 到 172.31.27.174:9000/inspect → 三态裁决 → echo 落盘字节取证
+#        生产 443→8443 链路全程不受影响(收尾复核 kiro-mitm=active)。
+# 断言: 每条探针双断言 —— 期望 verdict(PASS 逐字节一致 / REDACT 明文消失 / BLOCK 上游零命中 + client 400)
+#        + 期望 top_layer(取自 addon 决策日志 KIRO-BLOCK/REDACT top=Lx,即引擎聚合的"最低有效层")。
+# 结论: PASS=8 FAIL=0 TOTAL=8,八层探针(PASS/L0×2/L1/L2/L3/L3.5×2)全绿。
+# 缘由(为何本次才归档): 本脚本 2026-08-04 由 4f155bd 引入时被误放进方案一 testing/remote/,
+#        且从未归档输出、未登记进任何 README。本次迁入方案二 tests/ 并正名 Tier D,同时补跑补档。
+#
+# ↓↓↓ ssm_exec.sh 取回的 stdout 原文,逐字节未加工 ↓↓↓
+===== PRECHECK: DLP inspect health =====
+{"status": "ok", "engine": "ready", "pool": 4} [http=200]
+
+generated 8 cases
+===== relayer mitmdump boot log (tail) =====
+[12:58:57.004] Loading script /etc/mitm/kiro_addon.py
+[12:58:57.018] reverse proxy to http://127.0.0.1:18080 listening at 127.0.0.1:9443.
+[12:58:57.022] [DLP] 上游 runtime.us-east-1.kiro.dev 解析自检 OK resolved=['18.205.204.45', '3.223.172.117', '32.194.23.146', '52.44.112.244', '52.86.117.184', '54.86.50.221'] local=['172.31.16.219']
+[12:58:57.022] [DLP] addon started url=http://172.31.27.174:9000/inspect bump=runtime.us-east-1.kiro.dev fail=closed timeout=8.0s max_body=8388608 backend=httpx
+
+=================== PASS_quicksort (expect verdict=PASS top=N/A) ===================
+client_http_code=200
+addon_decision: <none (PASS 或未打印)>
+upstream=HIT(len=145)  got_top=N/A  verdict_judged=PASS  => ✓ OK
+
+=================== L0_BLOCK_aws_ak (expect verdict=BLOCK top=L0) ===================
+client_http_code=400
+addon_decision: [12:59:00.212] [DLP] KIRO-BLOCK top=L0 rules=[{'layer': 'L0', 'rule': 'aws_access_key', 'entity': 'AWS_ACCESS_KEY', 'field_path': 'conversationState.currentMessage.userInputMessage.content', 'confidence': 1.0, 'action': 'block'}, {'layer': 'L4', 'rule': 'l4_semantic:none', 'entity': 'NONE', 'field_path': None, 'confidence': 0.95, 'action': 'block'}] notes=['L4 同步阻断(测试期/Bedrock):none conf=0.95≥0.7 → BLOCK']
+upstream=NONE(短路)  got_top=L0  verdict_judged=BLOCK  => ✓ OK
+
+=================== L0_REDACT_cn_phone (expect verdict=REDACT top=L0) ===================
+client_http_code=200
+addon_decision: [12:59:00.821] [DLP] KIRO-REDACT top=L0 rules=[{'layer': 'L0', 'rule': 'cn_phone', 'entity': 'CN_PHONE', 'field_path': 'conversationState.currentMessage.userInputMessage.content', 'confidence': 1.0, 'action': 'redact'}]
+upstream=HIT(len=157)  got_top=L0  verdict_judged=REDACT  => ✓ OK
+
+=================== L1_BLOCK_pem_privkey (expect verdict=BLOCK top=L1) ===================
+client_http_code=400
+addon_decision: [12:59:01.439] [DLP] KIRO-BLOCK top=L1 rules=[{'layer': 'L1', 'rule': 'pem_private_key', 'entity': 'PRIVATE_KEY', 'field_path': 'conversationState.currentMessage.userInputMessage.content', 'confidence': 1.0, 'action': 'block'}, {'layer': 'L4', 'rule': 'l4_semantic:proprietary-source', 'entity': 'PROPRIETARY_SOURCE', 'field_path': None, 'confidence': 0.9, 'action': 'block'}] notes=['L4 同步阻断(测试期/Bedrock):proprietary-source conf=0.90≥0.7 → BLOCK']
+upstream=NONE(短路)  got_top=L1  verdict_judged=BLOCK  => ✓ OK
+
+=================== L2_BLOCK_high_entropy (expect verdict=BLOCK top=L2) ===================
+client_http_code=400
+addon_decision: [12:59:02.022] [DLP] KIRO-BLOCK top=L2 rules=[{'layer': 'L2', 'rule': 'high_entropy_secret', 'entity': 'GENERIC_SECRET', 'field_path': 'conversationState.currentMessage.userInputMessage.content', 'confidence': 0.8333333333333334, 'action': 'block'}, {'layer': 'L4', 'rule': 'l4_semantic:proprietary-source', 'entity': 'PROPRIETARY_SOURCE', 'field_path': None, 'confidence': 0.9, 'action': 'block'}] notes=['L4 同步阻断(测试期/Bedrock):proprietary-source conf=0.90≥0.7 → BLOCK']
+upstream=NONE(短路)  got_top=L2  verdict_judged=BLOCK  => ✓ OK
+
+=================== L3_REDACT_credit_card (expect verdict=REDACT top=L3) ===================
+client_http_code=200
+addon_decision: [12:59:02.664] [DLP] KIRO-REDACT top=L3 rules=[{'layer': 'L3', 'rule': 'presidio:credit_card', 'entity': 'CREDIT_CARD', 'field_path': 'conversationState.currentMessage.userInputMessage.content', 'confidence': 1.0, 'action': 'redact'}, {'layer': 'L3', 'rule': 'presidio:person', 'entity': 'PERSON', 'field_path': 'conversationState.currentMessage.userInputMessage.content', 'confidence': 0.85, 'action': 'redact'}]
+upstream=HIT(len=158)  got_top=L3  verdict_judged=REDACT  => ✓ OK
+
+=================== L35_BLOCK_glossary (expect verdict=BLOCK top=L3.5) ===================
+client_http_code=400
+addon_decision: [12:59:03.453] [DLP] KIRO-BLOCK top=L3.5 rules=[{'layer': 'L3.5', 'rule': 'glossary:Project Nightingale', 'entity': 'PROPRIETARY_TERM', 'field_path': 'conversationState.currentMessage.userInputMessage.content', 'confidence': 1.0, 'action': 'block'}, {'layer': 'L4', 'rule': 'l4_semantic:business_strategy', 'entity': 'BUSINESS_STRATEGY', 'field_path': None, 'confidence': 0.85, 'action': 'block'}] notes=['L4 同步阻断(测试期/Bedrock):business_strategy conf=0.85≥0.7 → BLOCK']
+upstream=NONE(短路)  got_top=L3.5  verdict_judged=BLOCK  => ✓ OK
+
+=================== L35_REDACT_ticket (expect verdict=REDACT top=L3.5) ===================
+client_http_code=200
+addon_decision: [12:59:04.132] [DLP] KIRO-REDACT top=L3.5 rules=[{'layer': 'L3.5', 'rule': 'ticket_id', 'entity': 'PROPRIETARY_TERM', 'field_path': 'conversationState.currentMessage.userInputMessage.content', 'confidence': 1.0, 'action': 'redact'}]
+upstream=HIT(len=153)  got_top=L3.5  verdict_judged=REDACT  => ✓ OK
+
+=================== 逐层链路重验 汇总 ===================
+PASS_quicksort|expect=PASS/NA|http=200|top=NA|upstream=HIT(len=145)|✓ OK
+L0_BLOCK_aws_ak|expect=BLOCK/L0|http=400|top=L0|upstream=NONE(短路)|✓ OK
+L0_REDACT_cn_phone|expect=REDACT/L0|http=200|top=L0|upstream=HIT(len=157)|✓ OK
+L1_BLOCK_pem_privkey|expect=BLOCK/L1|http=400|top=L1|upstream=NONE(短路)|✓ OK
+L2_BLOCK_high_entropy|expect=BLOCK/L2|http=400|top=L2|upstream=NONE(短路)|✓ OK
+L3_REDACT_credit_card|expect=REDACT/L3|http=200|top=L3|upstream=HIT(len=158)|✓ OK
+L35_BLOCK_glossary|expect=BLOCK/L3.5|http=400|top=L3.5|upstream=NONE(短路)|✓ OK
+L35_REDACT_ticket|expect=REDACT/L3.5|http=200|top=L3.5|upstream=HIT(len=153)|✓ OK
+-------------------------------------------------------
+PASS=8  FAIL=0  TOTAL=8
+Tier D 总判: ✓ 全绿
+
+prod kiro-mitm still: active
+relayer-layers done.
+

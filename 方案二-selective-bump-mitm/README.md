@@ -4,7 +4,7 @@
 > **选择性中间人**：`ssl_preread` 读明文 SNI 做四层路由，**仅** `runtime.us-east-1.kiro.dev`
 > 一条被解密送 VPC 内 DLP 引擎裁决（`PASS / REDACT / BLOCK`），**其余 SNI 一律 L4 透传永不解密**。
 >
-> 2026-07-30 已在专用**验证节点**部署，四层测试**全绿**。本目录自成一体，与方案一
+> 2026-07-30 已在专用**验证节点**部署，各层测试**全绿**（Tier D 逐层探针 2026-08-05 补齐）。本目录自成一体，与方案一
 > （[`方案一-litellm-gateway/`](../方案一-litellm-gateway/)，opt-in LiteLLM 网关）在仓库里**平级并列**，
 > 共用根部的 [`engine/`](../engine/) 引擎。整体思路见 [00 总览](../00-总览/)：
 > [01 宣传](../00-总览/01-方案介绍-宣传.md) / [02 技术博客](../00-总览/02-技术博客.md)。
@@ -35,7 +35,8 @@
 | [`kiro_addon.py`](kiro_addon.py) | mitmproxy 联动 addon（`KiroDLP`：gate→调 DLP→PASS/REDACT/BLOCK 三态 + fail 分流 + 反自环） |
 | [`cleanup.sh`](cleanup.sh) | 逆序拆除（先撤 SG 联动规则再删 proxy SG；仅删本次创建资源，复用网络保留） |
 | `http_service/` + [`docker-compose.dlp-http.yml`](docker-compose.dlp-http.yml) | DLP 判定薄服务（`dlp_http.server`，复用 `kiro-dlp-engine` 镜像） |
-| [`tests/`](tests/) | 四层测试脚本 + [`run_all.sh`](tests/run_all.sh) 一键运行器 |
+| [`tests/`](tests/) | 各层测试脚本（Tier A/B/C/**D**/fail）+ [`run_all.sh`](tests/run_all.sh) 一键运行器 |
+| [`results-2026-08-05/`](results-2026-08-05/) | Tier D 逐层探针经真实链路的**原始 stdout**（逐字节未加工） |
 | `.deploy-state.env` | 本次资源清单（git-ignored，供 cleanup 逆序拆除） |
 | `client-hosts.txt` | 客户端 hosts 映射（各 Kiro 域→proxy EIP；**EC2 本机绝不改 hosts** 否则自环） |
 
@@ -53,7 +54,7 @@ cd /Users/chenxqdu/cowork/kiro-dlp-content/方案二-selective-bump-mitm && ./de
 > 测试脚本不随 user-data 上 EC2（受 25600 字节限制，只内嵌了 gen-ca.sh + kiro_addon.py）。
 > 先把本目录 `tests/` 经 SSM 推到验证节点家目录（例：`~/tests/`），再运行：
 ```bash
-cd ~/tests && ./run_all.sh                       # 跑全部层：0 a b c f
+cd ~/tests && ./run_all.sh                       # 跑全部层：0 a b c d f
 ```
 ```bash
 ./run_all.sh --list        # 列出各层
@@ -69,9 +70,15 @@ cd ~/tests && ./run_all.sh                       # 跑全部层：0 a b c f
 | `a` | [`tier_a_smoke.sh`](tests/tier_a_smoke.sh) | §4 Tier A：直连 DLP `/inspect` 三态裁决 + 脱敏字段不外泄 |
 | `b` | [`tier_b_wire.sh`](tests/tier_b_wire.sh) | §4 Tier B：wire-byte 铁证（发往上游的字节：PASS 逐字节一致 / REDACT PII 消失 / BLOCK 上游零命中） |
 | `c` | [`tier_c_real_upstream.sh`](tests/tier_c_real_upstream.sh) | §4 Tier C：真实上游交叉核对（PASS 到 AWS / BLOCK 我方短路，来源域可区分） |
+| `d` | [`tier_d_relayer_layers.sh`](tests/tier_d_relayer_layers.sh) | §4.4 Tier D：把 Tier B 那条真实链路**按引擎层拆开**，L0/L1/L2/L3/L3.5 各层探针，双断言 verdict + `top_layer`（8/8，[原始输出](results-2026-08-05/tier_d_relayer_layers.txt)） |
 | `f` | [`tier_fail_modes.sh`](tests/tier_fail_modes.sh) | §5 fail 模式四子测（不可达吃策略 / HTTP503 恒 closed，D3/D4） |
 
-> Tier B/C/fail 脚本各自起**临时** mitmdump（9443）或走**生产** 443，绝不干扰彼此；全程只打 127.0.0.1。
+> Tier B/C/D/fail 脚本各自起**临时** mitmdump（9443）或走**生产** 443，绝不干扰彼此；全程只打 127.0.0.1。
+>
+> **Tier D ≠ 方案一 stage5 的 78 条**：stage5（[`engine/tests/run_layers.py`](../engine/tests/run_layers.py)）是
+> `import dlp` **直调各层 `scan()`** 的单测——不经引擎聚合、不经任何代理，证明「规则本身对」；
+> Tier D 每条探针都**穿过真实 addon → HTTP → `:9000`** 再由 echo 上游做字节取证，证明「规则在真链路上仍然对」。
+> 两者互补，**stage5 全绿不替 Tier D 背书**（addon 的字段定位/改包/短路全在 stage5 覆盖之外）。详见 [03 §4.4](方案二-03-测试报告.md)。
 
 ### 一键回滚（不拆机器，退化为透传）
 ```bash
@@ -100,6 +107,8 @@ cd /Users/chenxqdu/cowork/kiro-dlp-content/方案二-selective-bump-mitm && ./cl
 ## 📌 当前状态
 
 - ✅ 已部署验证节点 `<VERIFY_INSTANCE_ID>`（c6g.large arm64, us-west-2, EIP <VERIFY_NODE_EIP>）
-- ✅ 四层测试全绿（§2 bump / §3 透传红线 / §4 Tier A·B·C / §5 fail 四子测）
+- ✅ 各层测试全绿（§2 bump / §3 透传红线 / §4 Tier A·B·C / §5 fail 四子测）
+- ✅ **Tier D 逐层探针经真实代理链路**重验 L0–L3.5（2026-08-05 补测，`verdict` + `top_layer` 双断言 **8/8**，
+  收尾复核生产 `kiro-mitm` 未受影响）——见 [03 §4.4](方案二-03-测试报告.md) 与 [原始 stdout](results-2026-08-05/tier_d_relayer_layers.txt)
 - ✅ **真实 Kiro 桌面端端到端三态全绿**（2026-08-03：装 root CA + hosts override + SG 白名单；PASS 正常回答 / REDACT 手机号链路遮蔽 / BLOCK 真密钥 `CorpDLPBlockedException`）——过程中修复六个真机坑，见 [方案二-04-真机踩坑实录.md](方案二-04-真机踩坑实录.md)
 - ⏸ 遗留：REDACT 邮箱规则覆盖（引擎规则问题非联动 bug）、presidio 中文 NER 噪声调优、04 §9 残留清单

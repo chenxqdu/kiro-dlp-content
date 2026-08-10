@@ -7,7 +7,8 @@
 > 网关内挂 `CorpDLPGuardrail`(LiteLLM 的 `pre_call_hook` + `pre_mcp_call` 两个钩子),
 > 把 prompt / flowback / MCP 调用同步送共享 DLP 引擎裁决(`PASS / REDACT / BLOCK`),
 > 内容全程不出 VPC。2026-07-30 在 us-west-2 单机(m7i.2xlarge)实测:离线 56/56、
-> 网关端到端 46/46,漏拦 0 / 误报 0。
+> 网关端到端 46/46,漏拦 0 / 误报 0;2026-08-04 分层完备测试 78 条(每层每规则)三段全绿,
+> 2026-08-05 按最新引擎重跑零差异。
 
 ---
 
@@ -20,7 +21,7 @@
 | [**方案一-03-测试方案.md**](方案一-03-测试方案.md) | 四阶段实测方法与完整矩阵(离线 harness / 网关集成 / 压测归因 / L4 标定 / 分层完备)+ §8 全部实测数字 |
 | [**方案一-04-实测踩坑实录.md**](方案一-04-实测踩坑实录.md) | 四阶段踩坑复盘(症状→证据→根因→修法):引擎弱 NER 误报、"某版本更绿"测量假象、孤儿抢核、Bedrock Converse 约束、长文本单核瓶颈、SSM 投递三坑、L4 红线还原 |
 | [`gateway/`](gateway/) | 网关本体:[`litellm_config.yaml`](gateway/litellm_config.yaml)(挂 guardrail)、[`dlp_guardrail.py`](gateway/dlp_guardrail.py)(`CorpDLPGuardrail`,两 hook)、[`test_gateway.py`](gateway/test_gateway.py) 端到端、[`bench_gateway.py`](gateway/bench_gateway.py) 压测、`litellm_config_nodlp.yaml` 对照组 |
-| [`testing/`](testing/) | 实测复现三件套:[README](testing/README.md)(怎么跑)、`remote/`(SSM 远程执行脚本)、`probes/`(诊断探针)、`results-2026-07-30/` + `results-2026-08-04/`(原始输出,含失败轮次) |
+| [`testing/`](testing/) | 实测复现三件套:[README](testing/README.md)(怎么跑)、`remote/`(SSM 远程执行脚本)、`probes/`(诊断探针)、`results-2026-07-30/` + `results-2026-08-04/` + `results-2026-08-05/`(原始输出,含失败轮次与逐条 DIFF) |
 
 ## 🔗 依赖的共享组件(在仓库根,不在本目录)
 

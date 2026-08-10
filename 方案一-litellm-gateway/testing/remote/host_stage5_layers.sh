@@ -12,7 +12,15 @@
 set -uo pipefail
 cd /home/ec2-user/kiro-dlp
 
-sudo docker ps -q --filter ancestor=kiro-dlp-engine:latest | xargs -r sudo docker rm -f
+# ★ 清孤儿容器 —— 必须【按名字排除常驻服务】,绝不能裸用 --filter ancestor=。
+#   ancestor= 匹配的是【镜像】,而方案二常驻的 kiro-dlp-http(:9000 inspect 服务)跑的正是同一镜像
+#   kiro-dlp-engine:latest —— 2026-08-05 裸用该 filter 把它一并 rm -f 了,而本阶段测试【全绿无异常】,
+#   只有去看方案二才发现 :9000 不可达(复原:docker compose -f docker-compose.dlp-http.yml up -d)。
+#   真正的孤儿来自 `docker run --rm`(随机名),按名字白名单排除常驻服务即可精确清理。
+KEEP_RE='^(kiro-dlp-http|litellm|litellm-nodlp|presidio-analyzer)$'
+sudo docker ps --filter ancestor=kiro-dlp-engine:latest --format '{{.ID}} {{.Names}}' \
+  | awk -v keep="$KEEP_RE" '$2 !~ keep {print $1}' \
+  | xargs -r sudo docker rm -f
 
 echo '### ① presidio-analyzer health 探测 ###'
 sudo docker run --rm --network docker_default kiro-dlp-engine:latest \
