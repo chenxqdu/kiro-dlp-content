@@ -52,7 +52,7 @@ kiro-dlp-content/
 └── 方案二-selective-bump-mitm/   【不能改 base_url】选择性 bump MITM（有真实代价）
     ├── 方案二-01-设计与架构.md      02-部署指南 / 03-测试报告 / 04-真机踩坑实录
     ├── deploy.sh / gen-ca.sh / cleanup.sh / kiro_addon.py
-    └── http_service/ + tests/     DLP 判定薄服务 + 四层测试
+    └── http_service/ + tests/     DLP 判定薄服务 + 分层测试（Tier A–E + fail + 压测）
 ```
 
 > **为什么 `engine/` 和 `docker/` 不塞进某个方案**：两套方案共用同一个 DLP 引擎和镜像 ——
@@ -98,6 +98,9 @@ DLP → 真实上游）：三态全绿 —— PASS 正常回答 / REDACT 手机�
 [原始输出](方案二-selective-bump-mitm/results-2026-08-05/tier_d_relayer_layers.txt)）——它与上面方案一那 78 条
 **不是同一件事**：78 条是 `import dlp` 直调各层函数的单测，Tier D 每条探针都穿过真实 addon → HTTP → `:9000`
 再由上游做字节取证，**前者全绿不替后者背书**。
+2026-08-11 又经 **Tier E**（`tests/tier_e_l4_modes.sh`，DLP 主机切 compose env 运行、刻意不入 `run_all.sh`）
+真机验证 `:9000` 的 **`DLP_L4_MODE` 三态**：off/async 不改 verdict、sync 高置信阻断 + 超时降级放行，
+五子测全绿（Bedrock qwen3-32b），见 [方案二-03 §4.5](方案二-selective-bump-mitm/方案二-03-测试报告.md)。
 
 **压测已完成（两方案）**：负载下的**拦截成功率**（高并发时 BLOCK/REDACT 是否仍 100% 正确）
 与**拦截路径延迟分位**均已实测——方案一见 [方案一-03-测试方案.md](方案一-litellm-gateway/方案一-03-测试方案.md) §9（网关口径，拐点 ≈80 req/s）、

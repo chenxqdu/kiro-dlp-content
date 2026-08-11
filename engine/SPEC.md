@@ -229,7 +229,7 @@ def expand(text: str) -> list[str]: ...            # = [text, normalize(text), *
 | **`async`** | 立即返回(只 L0–L3.5) | **否** | 是(后台完成) | ✅ + `DLP_USE_BEDROCK_L4=true` ⚠出 VPC |
 | `sync` | 带墙钟等 L4 | 是(≥`DLP_L4_BLOCK_MIN_CONFIDENCE`→BLOCK) | 是 | — |
 
-- **sink 脱敏**:JSONL 只出 `category/confidence/model/rationale[:200]`,**绝不落 `context`(原文片段)/matched/span/原始 body**。
+- **sink 脱敏**:JSONL 只出 `ts/kind(=l4_alert)/mode/category/confidence/model`,外加可选 `rationale[:200]`(由 `DLP_L4_SINK_RATIONALE` 门控,默认 `true`——⚠ Bedrock 自由文本 rationale 可能回显输入片段,知情接受;置 `false` 为严档零回显),**绝不落 `context`(原文片段)/matched/span/原始 body**。
 - **sync 超时降级(Q3-b)**:超 `DLP_L4_TIMEOUT_MS` → 不 cancel future(后台跑完仍补落 sink)、响应按 L0–L3.5 **放行**,L4 超时**绝不阻断合法请求**。
 - ⚠ **committed 演示默认 `async`+Bedrock=内容出 VPC**,是**知情的演示/标定 shipped default**,刻意违反下方红线;生产**必须** `DLP_USE_BEDROCK_L4=false` 切自托管 VPC-local(GPU+vLLM)。config/compose/启动日志/文档多处刺眼标注。
 

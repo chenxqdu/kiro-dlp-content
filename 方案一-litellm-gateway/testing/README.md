@@ -127,8 +127,10 @@ python3 probes/test_l3_weak_ner_replay.py
    > ```
    > cd /home/ec2-user/kiro-dlp && sudo docker compose -f docker-compose.dlp-http.yml up -d
    > ```
-   > 复原后必须复核三件事：`/health` 返回 `{"status":"ok","engine":"ready"}`、容器内 L4 五个 env 仍在
-   > （`DLP_RUN_ASYNC_L4`/`DLP_L4_SYNC_BLOCK`/`DLP_USE_BEDROCK_L4`/`DLP_L4_MODEL_KEY`/`DLP_L4_BLOCK_MIN_CONFIDENCE`）、
+   > 复原后必须复核三件事：`/health` 返回 `{"status":"ok","engine":"ready"}`、容器内 L4 env 集齐全
+   > （2026-08-11 起为 `DLP_L4_MODE`（默认 `async`）/`DLP_USE_BEDROCK_L4`/`DLP_L4_MODEL_KEY`/
+   > `DLP_L4_BLOCK_MIN_CONFIDENCE`/`DLP_L4_TIMEOUT_MS`/`DLP_L4_EXECUTOR_WORKERS`/`DLP_L4_QUEUE_MAX`；
+   > 旧 `DLP_RUN_ASYNC_L4`/`DLP_L4_SYNC_BLOCK` 已弃用、由 `DLP_L4_MODE` 取代，不应再出现在容器内）、
    > 经 `/inspect` 打一轮三态自检。**方案二在跑（或将要跑）时，别在同一台主机跑阶段5。**
 2. **SSM 传参**：`--parameters` shorthand 对含空格/引号/中文的 commands 会 ValidationException。只能整体 base64（`ssm_exec.sh` 已封装）；大文件走 S3 presigned URL（`sync_engine.sh`）。
 3. **SSM 会话结束杀后台进程**：`nohup ... &` 落盘 0 行。长任务前台跑 + 调大 `executionTimeout`。
@@ -176,8 +178,11 @@ python3 probes/test_l3_weak_ner_replay.py
 > ⚠️ **「全绿」的准确含义**：78 条向量里**没有任何一条**覆盖 `4f155bd` 的两项新行为——
 > `l4_sync_block` 在 `engine.scan()` **聚合层**，而 `run_layers.py` 直调各层 `scan()`，**结构上到不了**（它属于
 > `run_offline.py` 的辖区）；全角 `×` 则是 `l4.json` 里没有含 `×` 的语料。故重跑只证明
-> **「新代码没打坏旧行为」**，不证明**「新行为正确」**。新行为的实证在别处：`l4_sync_block` 的真链路证据见
+> **「新代码没打坏旧行为」**，不证明**「新行为正确」**。新行为的实证在别处：`l4_sync_block` 当时的真链路证据见
 > 方案二 [Tier D 原始输出](../../方案二-selective-bump-mitm/results-2026-08-05/tier_d_relayer_layers.txt)
 > 里 BLOCK 探针的 `notes=['L4 同步阻断(测试期/Bedrock)…']`。缺口的补法写在 DIFF 文档 §5。
+> **更新（2026-08-11）**：方案二已改用部署层三态开关 `DLP_L4_MODE`（引擎池恒 `run_async_l4=False`、
+> `l4_sync_block=False`，sync 阻断由 `:9000` server 层合成）——引擎级 `l4_sync_block` 不再被方案二真链路
+> 使用；现行实证指向方案二 `tests/tier_e_l4_modes.sh`（Tier E）与 方案二-03 §4.5，上述 Tier D 输出为历史证据。
 
 **阶段5 与阶段1 的关系**：阶段1（`run_offline`）验的是"整机裁决"——56 条场景经 `engine.scan()` 全链路聚合出 verdict/top_layer；阶段5（`run_layers`）验的是"每层每条规则"——直接调 `l0_regex.scan()`/`l1_secrets.scan()`/… 逐规则断言正例、豁免（FP-01..12 白名单逐条独立成向量）、边界。阶段1 过不代表每条规则被触达（覆盖审计发现 L1 7 条签名、L3.5 5 条术语、EGRESS 全部变体在 56 条场景里为零覆盖），阶段5 补齐了这块。改任一层规则后两个 harness 都要跑。

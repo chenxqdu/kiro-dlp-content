@@ -264,6 +264,29 @@ sudo tail -n 20 /var/log/nginx/sni.log
 
 判据：**400 + `blocked_by_corp_dlp` + mitm 日志 KIRO-BLOCK + 无上游连接** 四者同时成立才算 BLOCK 真生效。仅凭状态码判定 = 不合格。
 
+### Tier E —— L4 语义三态开关（`DLP_L4_MODE ∈ {off, async, sync}`，部署层）
+
+> **运行位置与方式特殊**：脚本 [`tests/tier_e_l4_modes.sh`](tests/tier_e_l4_modes.sh) 在 **DLP 主机**（非 proxy 节点）
+> 经 SSM 运行，**刻意不接入 `run_all.sh`**——它要逐态写临时 compose override 重建 `kiro-dlp-http`
+> （绝不改 committed 的 `docker-compose.dlp-http.yml`，收尾恢复默认）。三态编排在 server 层、引擎之外
+> （引擎恒 `run_async_l4=False`）。相关 env（`DLP_L4_MODE` / `DLP_L4_BLOCK_MIN_CONFIDENCE=0.7` /
+> `DLP_L4_TIMEOUT_MS=4000` / `DLP_L4_SINK_PATH` / `DLP_L4_SINK_RATIONALE`）配置在 DLP 主机的
+> `docker-compose.dlp-http.yml`，说明见 [方案二-02 §7](方案二-02-部署指南.md)。
+
+驱动语料 = **无签名语义敏感内容**（未公开定价/风控加权公式，L0–L3.5 结构上检不到）。五子测期望（oracle）：
+
+| 子测 | 配置 | 期望 |
+|---|---|---|
+| **(i) async** | `DLP_L4_MODE=async` | HTTP `verdict=PASS`、`top_layer` 非 L4（绝不改 verdict）；秒级后 sink 出 `"kind": "l4_alert"` 行（含 category/confidence/model） |
+| **(ii) sync BLOCK** | `sync` + `DLP_L4_TIMEOUT_MS=6000` | `verdict=BLOCK`、`top_layer=L4`（server 层合成，**预期非红线**）、rules 含 `l4_semantic:*`、无 `redacted_body`；sink 亦出行 |
+| **(iii) sync 超时降级** | `sync` + `DLP_L4_TIMEOUT_MS=50` | 响应按 L0–L3.5 **放行**（非 BLOCK，超时绝不阻断）；数秒后 sink **补出**告警行 |
+| **(iv) sink 结构契约** | 前三态累积行 | 逐行 JSON 解析：绝无 `matched`/`span`/`context` 字段；明文片段**只可能**出现在 `rationale`（默认档知情接受） |
+| **(v) 严档零回显** | `async` + `DLP_L4_SINK_RATIONALE=false` | sink 行**无** `rationale` 字段、明文探针片段全无（零回显可彻底做到） |
+
+> ★ sink 行由 `json.dumps` 生成，冒号后**带一个空格**（`"kind": "l4_alert"`）——grep 必须冒号空格容错
+> （`:[[:space:]]*`），绝不写死无空格模式。经 `docker logs` 捞行还带日志前缀，解析须从首个 `{` 起截取。
+> 实测结果（2026-08-11，真机 Bedrock qwen3-32b，五子测全绿）见 [方案二-03 §4.5](方案二-03-测试报告.md)。
+
 ---
 
 ## 5. fail 策略验证（规格 D4）
@@ -321,7 +344,7 @@ sudo docker start kiro-dlp-http           # 恢复
 - [ ] §2 bump 域 issuer=我方中间 CA、Verify=0
 - [ ] §3 透传域 issuer=Amazon（红线：绝不为我方 CA）
 - [ ] §4 Tier A 三态 verdict/top_layer 正确、响应无 matched/span、同步腿无 L4（off/async 口径）
-- [ ] §4 Tier E L4 三态（off/async/sync）：async 放行+落 sink / sync BLOCK / sync 超时降级放行+补落 sink / sink 无原文
+- [ ] §4 Tier E L4 三态（off/async/sync）五子测 i–v：async 放行+落 sink / sync BLOCK / sync 超时降级放行+补落 sink / sink 结构契约（无 matched/span/context，明文仅可能落 rationale）/ 严档 `DLP_L4_SINK_RATIONALE=false` 零回显
 - [ ] §4 Tier B 字节证据：PASS 未改写 / REDACT 脱敏且信封完整 / BLOCK echo 未收到
 - [ ] §4 Tier C BLOCK 四重交叉（400 + 响应体 + 日志 + 无上游）
 - [ ] §5 fail-closed 短路 503、fail-open 放行、慢路径并发不阻塞、恢复回绿

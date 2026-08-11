@@ -13,8 +13,12 @@
 
 ## 与方案一 perf 的本质差异（决定断言口径）
 
-方案二被测对象是 **`/inspect` 纯裁决薄服务**（`http_service/server.py`）——**不转发上游、不接 LLM**，
-恒返回 `HTTP 200 + verdict JSON`（错误路径才 503/413/400）。由此两点与方案一不同：
+方案二被测对象是 **`/inspect` 纯裁决薄服务**（`http_service/server.py`）的 **prod-default 口径
+（`DLP_L4_MODE=off`，2026-08-11 实跑用 `:9001` 并行实例）**——该口径下**不转发上游、不接 LLM**，
+恒返回 `HTTP 200 + verdict JSON`（错误路径才 503/413/400）。
+⚠ 注意与线上 `:9000` 的 committed 默认（`DLP_L4_MODE=async` + Bedrock）不同：默认态会在裁决之外
+**后台异步**调 LLM（`sync` 态更会把 Bedrock RTT 计入响应）——压测复跑时须用 L4-off 实例，
+否则分位数被 L4 腿污染且内容出 VPC。由此两点与方案一不同：
 
 1. **拦截判据看返回 JSON 的 `verdict`**（`BLOCK`/`REDACT`/`PASS`），不是方案一的 HTTP 400。
    测的是**引擎裁决延迟本身**，不含网关 + 假上游成本 → 比方案一更纯，故**无假上游、无 litellm 配置切换**两步。
@@ -72,3 +76,6 @@ TASKSET_CPUS=0,1 bash run_inspect_perf.sh A
    Tier D 的**定性**证据（`verdict`+`top_layer` 双断言），不是分位数。
 3. 单副本 Presidio 单核瓶颈（承接方案一 §8.6）：长文本高并发下 L3 会成为吞吐上限。
 4. 次选同机部署含负载生成器抢核噪声，尾延迟偏高；拦截正确性结论（泄漏=0/误杀=0）不受影响。
+5. **压测为 prod-default L4-off 口径**：分位数**不含 L4 语义腿**（committed 默认 `async`+Bedrock 的
+   后台告警链路、`sync` 态的 Bedrock RTT 均不在内）。L4 三态功能由
+   [`tests/tier_e_l4_modes.sh`](../tier_e_l4_modes.sh) 专测（方案二-03 §4.5）。

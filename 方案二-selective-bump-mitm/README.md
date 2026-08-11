@@ -17,7 +17,7 @@
 |---|---|---|
 | 1 | [**方案二-01-设计与架构.md**](方案二-01-设计与架构.md) | 为什么「选择性」bump、认证模型决定哪条腿可改包、拓扑、组件职责、CA 三级信任 + 两个证书坑、fail 语义、9 条安全红线、与方案一对比 |
 | 2 | [**方案二-02-部署指南.md**](方案二-02-部署指南.md) | 前置条件、`config.env` 变量、单命令部署、八步编排详解、CA 分发（各 TLS 栈）、状态与回滚/拆除 |
-| 3 | [**方案二-03-测试报告.md**](方案二-03-测试报告.md) | 四层**实测全绿**结果 + wire-byte 铁证 + Tier C 交叉核对 + fail 四子测 + 两坑复盘 + DoD |
+| 3 | [**方案二-03-测试报告.md**](方案二-03-测试报告.md) | 各层**实测全绿**结果 + wire-byte 铁证 + Tier C 交叉核对 + Tier E L4 三态（off/async/sync）实测（§4.5）+ fail 四子测 + §8 压测 + 两坑复盘 + DoD |
 | 4 | [**方案二-04-真机踩坑实录.md**](方案二-04-真机踩坑实录.md) | **真实 Kiro 桌面端端到端**:合成全绿后真机连翻三轮的六个坑（工具目录 L2 误报 / 历史重扫 / 协议字段 NER 误判 / 脱敏跨字段污染…）+ 修复清单 F0–F6 + 残留与教训 |
 | — | [TEST-PLAN.md](TEST-PLAN.md) | 测试**计划**（oracle/期望值，`应该怎样`）——与 03（`实际怎样`）配套 |
 
@@ -35,7 +35,7 @@
 | [`kiro_addon.py`](kiro_addon.py) | mitmproxy 联动 addon（`KiroDLP`：gate→调 DLP→PASS/REDACT/BLOCK 三态 + fail 分流 + 反自环） |
 | [`cleanup.sh`](cleanup.sh) | 逆序拆除（先撤 SG 联动规则再删 proxy SG；仅删本次创建资源，复用网络保留） |
 | `http_service/` + [`docker-compose.dlp-http.yml`](docker-compose.dlp-http.yml) | DLP 判定薄服务（`dlp_http.server`，复用 `kiro-dlp-engine` 镜像） |
-| [`tests/`](tests/) | 各层测试脚本（Tier A/B/C/**D**/fail）+ [`run_all.sh`](tests/run_all.sh) 一键运行器 |
+| [`tests/`](tests/) | 各层测试脚本（Tier A/B/C/**D**/**E**/fail）+ [`run_all.sh`](tests/run_all.sh) 一键运行器（跑 0 a b c d f；**Tier E 刻意不入 run_all**，见下） |
 | [`results-2026-08-05/`](results-2026-08-05/) | Tier D 逐层探针经真实链路的**原始 stdout**（逐字节未加工） |
 | `.deploy-state.env` | 本次资源清单（git-ignored，供 cleanup 逆序拆除） |
 | `client-hosts.txt` | 客户端 hosts 映射（各 Kiro 域→proxy EIP；**EC2 本机绝不改 hosts** 否则自环） |
@@ -72,7 +72,12 @@ cd ~/tests && ./run_all.sh                       # 跑全部层：0 a b c d f
 | `c` | [`tier_c_real_upstream.sh`](tests/tier_c_real_upstream.sh) | §4 Tier C：真实上游交叉核对（PASS 到 AWS / BLOCK 我方短路，来源域可区分） |
 | `d` | [`tier_d_relayer_layers.sh`](tests/tier_d_relayer_layers.sh) | §4.4 Tier D：把 Tier B 那条真实链路**按引擎层拆开**，L0/L1/L2/L3/L3.5 各层探针，双断言 verdict + `top_layer`（8/8，[原始输出](results-2026-08-05/tier_d_relayer_layers.txt)） |
 | `f` | [`tier_fail_modes.sh`](tests/tier_fail_modes.sh) | §5 fail 模式四子测（不可达吃策略 / HTTP503 恒 closed，D3/D4） |
+| `e`* | [`tier_e_l4_modes.sh`](tests/tier_e_l4_modes.sh) | §4.5 Tier E：L4 语义三态 `DLP_L4_MODE ∈ {off,async,sync}` 五子测 i–v（async 放行+落 sink / sync 高置信 BLOCK / sync 超时降级 / sink 结构契约 / 严档零回显） |
 
+> \* **Tier E 刻意不接入 `run_all.sh`**：run_all 跑在 **proxy 验证节点**，而 Tier E 须在 **DLP 主机**上运行——
+> 它要切换 `docker-compose.dlp-http.yml` 的 env（写临时 override 重建 `kiro-dlp-http`）。真机 Bedrock 五子测
+> 全绿（2026-08-11），见 [03 §4.5](方案二-03-测试报告.md)。
+>
 > Tier B/C/D/fail 脚本各自起**临时** mitmdump（9443）或走**生产** 443，绝不干扰彼此；全程只打 127.0.0.1。
 >
 > **Tier D ≠ 方案一 stage5 的 78 条**：stage5（[`engine/tests/run_layers.py`](../engine/tests/run_layers.py)）是
@@ -115,7 +120,7 @@ cd /Users/chenxqdu/cowork/kiro-dlp-content/方案二-selective-bump-mitm && ./cl
 3. **mitm 只绑 `127.0.0.1:8443`**：绝不 0.0.0.0；外部只能经 nginx。
 4. **透传腿绝不解密**：透传域 issuer 若出现我方 CA = 误 bump，立即停止回滚。
 5. **绝不 `NODE_TLS_REJECT_UNAUTHORIZED=0` / `rejectUnauthorized:false`**：pinning 判定失败就回滚，绝不禁校验绕过。
-6. **同步腿绝不触 L4**：`top_layer=L4` 是红线告警；L4 语义永远异步，且只用 VPC 内 LLM，绝不第三方 LLM。
+6. **引擎同步腿绝不触 L4 + 生产 L4 必须 VPC-local**：引擎 `scan()` 恒 `run_async_l4=False`；`DLP_L4_MODE=off/async` 口径下响应出现 `top_layer=L4` = 红线告警。**例外**：`sync` 显式阻断态下由 `:9000` server 层就地合成 `top_layer=L4` 的 BLOCK 属**预期**（超时则降级为异步告警 + 按 L0–L3.5 放行）。生产 L4 只用 VPC 内 LLM、绝不第三方 LLM；⚠ 当前 committed 默认 `DLP_USE_BEDROCK_L4=true` 为**知情演示/标定 shipped default（内容出 VPC，非生产）**，生产必须置 `false` 切自托管 VPC-local。详见 [01 §6 红线7](方案二-01-设计与架构.md)。
 7. **绝不碰生产 SNI 透传节点**（us-east-1，实例 ID / EIP 见内部部署记录）：方案二是独立验证节点。
 
 ---
@@ -127,4 +132,5 @@ cd /Users/chenxqdu/cowork/kiro-dlp-content/方案二-selective-bump-mitm && ./cl
 - ✅ **Tier D 逐层探针经真实代理链路**重验 L0–L3.5（2026-08-05 补测，`verdict` + `top_layer` 双断言 **8/8**，
   收尾复核生产 `kiro-mitm` 未受影响）——见 [03 §4.4](方案二-03-测试报告.md) 与 [原始 stdout](results-2026-08-05/tier_d_relayer_layers.txt)
 - ✅ **真实 Kiro 桌面端端到端三态全绿**（2026-08-03：装 root CA + hosts override + SG 白名单；PASS 正常回答 / REDACT 手机号链路遮蔽 / BLOCK 真密钥 `CorpDLPBlockedException`）——过程中修复六个真机坑，见 [方案二-04-真机踩坑实录.md](方案二-04-真机踩坑实录.md)
+- ✅ **Tier E L4 语义三态**（`DLP_L4_MODE=off/async/sync`）五子测 i–v **真机 Bedrock 全绿**（2026-08-11，qwen3-32b，DLP 主机跑 [`tests/tier_e_l4_modes.sh`](tests/tier_e_l4_modes.sh)）——见 [03 §4.5](方案二-03-测试报告.md)
 - ⏸ 遗留：REDACT 邮箱规则覆盖（引擎规则问题非联动 bug）、presidio 中文 NER 噪声调优、04 §9 残留清单
