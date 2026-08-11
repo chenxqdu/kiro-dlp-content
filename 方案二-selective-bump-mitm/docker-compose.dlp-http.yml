@@ -29,18 +29,32 @@ services:
       DLP_PRESIDIO_TIMEOUT_MS: "2000"       # L3 单次调用超时（引擎 EngineConfig.l3_timeout）
       DLP_PRESIDIO_LANGS: "en,zh"           # 与现有 presidio-analyzer-zh 对齐
       DLP_L3_UNAVAILABLE_ACTION: block      # 规格 D4：L3 不可达 -> 强制 BLOCK（fail-closed 打底）
-      # ---- L4 语义（★测试期配置：同步阻断 + Bedrock 后端；默认全注释=不启用）----
-      # ⚠ 默认关闭 = 保持“L4 永不改 verdict”铁律、内容不出 VPC。三开关须【一起】取消注释才生效：
-      #   DLP_RUN_ASYNC_L4    同步腿真正调 L4（否则 scan 连 L4 都不跑）
-      #   DLP_L4_SYNC_BLOCK   让高置信 L4 告警合成 BLOCK Hit、升级 verdict（刻意打破铁律）
-      #   DLP_USE_BEDROCK_L4  L4 后端用 Bedrock —— ⚠ 内容会出 VPC 至 Bedrock，仅限测试；
-      #                       生产必须换 VPC-local 模型后再启用（届时此项保持 false）。
-      # 需要容器内 boto3（镜像已含）+ 宿主实例角色可 bedrock:InvokeModel/Converse（已实测 qwen.qwen3-32b-v1:0）。
-      # DLP_RUN_ASYNC_L4: "true"
-      # DLP_L4_SYNC_BLOCK: "true"
-      # DLP_USE_BEDROCK_L4: "true"
-      # DLP_L4_MODEL_KEY: main                # main=Qwen3-32B / control=Llama-3.1-8B
-      # DLP_L4_BLOCK_MIN_CONFIDENCE: "0.7"    # L4 告警置信 >= 此值才阻断
+      # ══════════════════════════════════════════════════════════════════════════
+      # ⚠⚠⚠  L4 语义拦截 —— 本 compose 的【committed 演示/标定 shipped default】  ⚠⚠⚠
+      # ══════════════════════════════════════════════════════════════════════════
+      # 三态开关 DLP_L4_MODE ∈ {off, async, sync}：
+      #   off   —— 同步腿只 L0–L3.5，完全不跑 L4，内容不出 VPC。
+      #   async —— (本默认) 同步腿只 L0–L3.5、立即返回；后台异步跑 L4、命中落 sink，
+      #            【绝不改 verdict】。保持 “L4 永不进入同步裁决” 铁律。
+      #   sync  —— 显式阻断态：请求线程带墙钟等 L4；高置信(≥min_conf)→ 就地合成 BLOCK
+      #            (top_layer=L4)；超时→降级为异步告警 + 按 L0–L3.5 放行(Q3-b)。
+      #
+      # ⚠ 本默认 DLP_USE_BEDROCK_L4=true：待判内容会【出 VPC】发往 Bedrock(us-west-2)。
+      #   这是【知情的演示/标定 shipped default】，刻意违反仓库红线(生产 L4 须 VPC-local)。
+      #   ★ 生产部署【必须】置 DLP_USE_BEDROCK_L4="false" 并切自托管 VPC-local(GPU+vLLM)。
+      #   需容器内 boto3(镜像已含) + 宿主实例角色可 bedrock:InvokeModel/Converse
+      #   (已实测 qwen.qwen3-32b-v1:0)。启动横幅会再次刺眼提示。
+      # ──────────────────────────────────────────────────────────────────────────
+      DLP_L4_MODE: "async"                  # off | async(默认) | sync
+      DLP_USE_BEDROCK_L4: "true"            # ⚠ 内容出 VPC 至 Bedrock；生产必须置 false 切 VPC-local
+      DLP_L4_MODEL_KEY: main                # main=Qwen3-32B / control=Llama-3.1-8B
+      DLP_L4_BLOCK_MIN_CONFIDENCE: "0.7"    # sync 模式：L4 告警置信 >= 此值才合成 BLOCK
+      DLP_L4_TIMEOUT_MS: "4000"             # sync 墙钟上限 + 透传 boto read_timeout；超时降级放行
+      DLP_L4_EXECUTOR_WORKERS: "2"          # L4 后台线程池大小
+      DLP_L4_QUEUE_MAX: "32"                # L4 背压上限（在跑+排队满则丢弃，绝不阻塞主链路）
+      # DLP_L4_SINK_PATH: "/var/log/dlp-l4-alerts.jsonl"  # 可选：告警 JSONL 追加写此文件(默认仅 stdout)
+      # 旧 flag 已弃用，由 DLP_L4_MODE 取代（仍兼容：未设 DLP_L4_MODE 时从下列推导 + warn）：
+      #   DLP_RUN_ASYNC_L4 / DLP_L4_SYNC_BLOCK
       PYTHONUNBUFFERED: "1"
     volumes:
       # 把判定服务代码以只读方式挂进镜像的包根旁（dlp_http 与 dlp 同在 /app，命名空间包可 import）。

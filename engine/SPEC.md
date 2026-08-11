@@ -9,7 +9,8 @@
 ## 0. 范围与铁律(实现时不可违背)
 
 1. **同步链路只放 L0–L3.5**(确定性、亚秒)。`scan()` 返回的 `verdict` 只由 L0–L3.5 决定。
-2. **L4 永不进入同步 verdict**。L4 仅产出**异步告警对象**(`AsyncAlert`),`scan()` 同步返回时 L4 尚未跑完;凡设计稿中 `dlp_layer=L4` 的场景,其**同步 `expected_verdict` 必为 `pass`**,只验异步告警。
+2. **引擎 `scan()` 里 L4 永不进入同步 verdict**。L4 仅产出**异步告警对象**(`AsyncAlert`),`scan()` 同步返回时 L4 尚未跑完;凡设计稿中 `dlp_layer=L4` 的场景,其**同步 `expected_verdict` 必为 `pass`**,只验异步告警。
+   > ⚠ **部署层例外(不破本铁律)**:方案二 `:9000` 判定服务提供**显式可选**的 `DLP_L4_MODE=sync` 阻断态——此时高置信 L4 告警会在 **server 层(引擎之外)** 就地合成 `BLOCK`(`top_layer=L4`)。引擎自身仍恒 `run_async_l4=False`/`l4_sync_block=False`,`scan()` 永不因 L4 改 verdict;`sync` 只是调用方在引擎之上叠的部署策略,且超时即降级为异步告警放行(见 §L4)。committed 演示默认是 `async`(不改 verdict),非 `sync`。
 3. **best-effort 检测,非硬预防**。通道级外带(套件4)、专有源码(套件6)结构上检不到——这些场景的"期望"是**通道管控/异步告警口径**,不是内容引擎能给的 block。
 4. **不伪造实测**。harness 输出的是"实际 verdict vs oracle"的比对矩阵,不手写数字。
 5. **redact 后结构必须仍合法**:JSON 入参 redact 后仍是合法 JSON(MCP-06);测试断言字面量(保留域名/示例值)不被改写(FP-06)。
@@ -211,13 +212,28 @@ def expand(text: str) -> list[str]: ...            # = [text, normalize(text), *
 - 命中→ action 视术语类别:代号/项目名默认 BLOCK(L35-12);出现在 commit/工单里可 REDACT(MCP-04)。术语表每条带 `action` 字段。
 - 术语表初始条目(从设计稿):`Project Nightingale`、`KunlunPay`、`region-cn-shadow`、`PROJECT-TITAN`、`Falcon`(仅专有语境)、`internal-margin-formula`、`SEV2-48213`/`SEV\d-\d+`(工单号模式)。**`*.corp.example.net` 内部域名**也在此层或 L0。
 
-### L4 语义 LLM(`dlp/l4_semantic.py`)—— 秒级,**仅异步告警**
+### L4 语义 LLM(`dlp/l4_semantic.py`)—— 秒级,**引擎侧仅异步告警**
 
 - 后端:Bedrock(us-west-2)**Qwen3-32B(主)+ Llama-3.1-8B(对照)**,**功能验证标定,非生产**(报告必写)。
 - 输入待扫文本,输出 1-token 判定(敏感/不敏感)+ 置信度 + 简短理由 → `AsyncAlert(category, confidence, rationale, ...)`。
-- **绝不写入 verdict**。`run_async_l4=True` 时同步等待仅为**单测断言**方便,生产是队列异步。
+- **引擎绝不写入 verdict**。`run_async_l4=True` 时同步等待仅为**单测断言**方便,生产是队列异步。
+- `analyze(text, use_bedrock=False, model_key="main", timeout_s=None)`:`timeout_s` 仅在 `use_bedrock=True` 时透传给 boto(`read_timeout=timeout_s`、`connect_timeout=min(2,timeout_s)`);`None`(默认)保持历来硬编码 2/5,现有调用点零改动。
 - 识别:专有源码(EVA-05 定价引擎伪装注释)、自研业务逻辑(L4-14 风控权重、MCP-11 排序权重、L4-15 定价算法)。
 - **控告警疲劳**:通用/开源风格代码(CTRL-19 快排、L4-16 debounce)→ 不产 proprietary 告警。
+
+**部署层三态编排(方案二 `:9000`,引擎之外)**:判定服务用 `DLP_L4_MODE ∈ {off, async, sync}` 在 `scan()` 之后自持后台线程池直调 `analyze`——
+
+| mode | 请求线程 | verdict 可被 L4 改 | 落 sink | committed 默认 |
+|---|---|---|---|---|
+| `off` | 不跑 L4 | 否 | 否 | — |
+| **`async`** | 立即返回(只 L0–L3.5) | **否** | 是(后台完成) | ✅ + `DLP_USE_BEDROCK_L4=true` ⚠出 VPC |
+| `sync` | 带墙钟等 L4 | 是(≥`DLP_L4_BLOCK_MIN_CONFIDENCE`→BLOCK) | 是 | — |
+
+- **sink 脱敏**:JSONL 只出 `category/confidence/model/rationale[:200]`,**绝不落 `context`(原文片段)/matched/span/原始 body**。
+- **sync 超时降级(Q3-b)**:超 `DLP_L4_TIMEOUT_MS` → 不 cancel future(后台跑完仍补落 sink)、响应按 L0–L3.5 **放行**,L4 超时**绝不阻断合法请求**。
+- ⚠ **committed 演示默认 `async`+Bedrock=内容出 VPC**,是**知情的演示/标定 shipped default**,刻意违反下方红线;生产**必须** `DLP_USE_BEDROCK_L4=false` 切自托管 VPC-local(GPU+vLLM)。config/compose/启动日志/文档多处刺眼标注。
+
+> **红线(保留):L4 语义模型生产必须本地自建或部署在自有 VPC 内。** 用第三方托管 LLM 审查外发内容 = 把要保护的内容再发出去一次,是第二条泄漏通道。上述 Bedrock 默认仅为**打开即可端到端验证功能**的演示例外,非生产配置。
 
 ---
 

@@ -147,7 +147,9 @@ done
 | redact | `REDACT` | `L3` | 有 `redacted_body`（完整 JSON 串）；**响应 rules 里绝无 `matched`/`span` 字段** |
 | block | `BLOCK` | `L1` | rules 含 secrets 类命中 |
 
-**红线**：任一响应 `top_layer` 为 `L4` = 同步腿误触 Bedrock（应 `run_async_l4=False`），停止排查。
+**红线（仅限 `DLP_L4_MODE=off`/`async` 口径）**：这两态下任一响应 `top_layer` 为 `L4` = 引擎同步腿误触 Bedrock
+（引擎恒 `run_async_l4=False`），停止排查。**例外**：`DLP_L4_MODE=sync` 显式阻断态下高置信 L4 命中会由 server 层
+就地合成 `top_layer=L4` 的 BLOCK，这是**预期**而非红线（见 Tier E / 方案二-03 §4.5）。
 **脱敏字段泄漏检查**：`curl ... | grep -E '"matched"|"span"'` 必须**无输出**（规格：原始敏感子串绝不出服务）。
 
 > **逐条延迟 / 批量归档 oracle**：上面这套「手 curl 三态」的批量化版本 = `inspect_cases --via-http`——
@@ -318,7 +320,8 @@ sudo docker start kiro-dlp-http           # 恢复
 - [ ] §1 前置全绿（含 addon 自环自检 OK、判定服务 healthy + 可达 presidio）
 - [ ] §2 bump 域 issuer=我方中间 CA、Verify=0
 - [ ] §3 透传域 issuer=Amazon（红线：绝不为我方 CA）
-- [ ] §4 Tier A 三态 verdict/top_layer 正确、响应无 matched/span、无 L4
+- [ ] §4 Tier A 三态 verdict/top_layer 正确、响应无 matched/span、同步腿无 L4（off/async 口径）
+- [ ] §4 Tier E L4 三态（off/async/sync）：async 放行+落 sink / sync BLOCK / sync 超时降级放行+补落 sink / sink 无原文
 - [ ] §4 Tier B 字节证据：PASS 未改写 / REDACT 脱敏且信封完整 / BLOCK echo 未收到
 - [ ] §4 Tier C BLOCK 四重交叉（400 + 响应体 + 日志 + 无上游）
 - [ ] §5 fail-closed 短路 503、fail-open 放行、慢路径并发不阻塞、恢复回绿

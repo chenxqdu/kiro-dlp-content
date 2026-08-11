@@ -1,6 +1,8 @@
 """DLP 分层引擎 —— 顶层数据结构(SPEC §1)。
 
-同步链路只放 L0–L3.5;L4 仅产 AsyncAlert,永不写入 verdict。
+同步链路只放 L0–L3.5;引擎 scan() 里 L4 仅产 AsyncAlert,永不写入 verdict。
+(部署层例外:方案二 :9000 的 DLP_L4_MODE=sync 可在【引擎之外】就地把高置信 L4
+ 告警合成 BLOCK;引擎本身不变。见 SPEC §L4。)
 """
 from __future__ import annotations
 

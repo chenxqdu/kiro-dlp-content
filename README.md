@@ -73,7 +73,7 @@ kiro-dlp-content/
 
 | 路径 | 内容 |
 |---|---|
-| [`engine/`](engine/) | ★两方案共享：分层 DLP 引擎 L0–L4（正则 → detect-secrets → 熵 → Presidio → 术语表/EDM → 异步本地 LLM）＋ [`SPEC.md`](engine/SPEC.md) ＋ 测试与 fixture |
+| [`engine/`](engine/) | ★两方案共享：分层 DLP 引擎 L0–L4（正则 → detect-secrets → 熵 → Presidio → 术语表/EDM → L4 语义 LLM）＋ [`SPEC.md`](engine/SPEC.md) ＋ 测试与 fixture。引擎 `scan()` 里 L4 恒异步、绝不改 verdict；生产 L4 须 VPC-local（红线）。方案二 `:9000` 另有部署层三态开关 `DLP_L4_MODE`（off/async/sync），committed 演示默认 `async`+Bedrock（⚠内容出 VPC、非生产），详见方案二文档与 [`SPEC.md`](engine/SPEC.md) §L4 |
 | [`docker/`](docker/) | ★两方案共享：引擎镜像 `Dockerfile.engine`、Presidio 中文 NER `Dockerfile.presidio-zh`、base `docker-compose.yml`；方案一网关叠加层 `docker-compose.gateway.yml`（与 base 强耦合，须同处一目录：`-f docker-compose.yml -f docker-compose.gateway.yml`，override 相对路径按 base 目录解析） |
 
 ## 实测状态

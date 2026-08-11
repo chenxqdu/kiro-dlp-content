@@ -4,6 +4,10 @@
 **功能验证标定,非生产**(报告必写:生产 L4 须自托管/VPC-only)。
 绝不写入 verdict。run_async_l4=True 时同步等待仅为单测断言方便。
 
+超时:analyze/`_bedrock_alert` 接受可选 `timeout_s`——None(默认)保持历来硬编码
+(connect 2s/read 5s),不改方案一/单测行为;调用方(如方案二 :9000 sync 模式)传入
+显式墙钟预算时,据此派生 boto connect/read_timeout,让 Bedrock 调用不显著超出该预算。
+
 识别:专有源码(定价引擎伪装注释)、自研业务逻辑(风控权重/排序权重/定价算法)。
 控告警疲劳:通用/开源风格代码(快排/debounce)→ 不产 proprietary 告警。
 """
@@ -68,8 +72,15 @@ def _heuristic_alert(text: str) -> AsyncAlert | None:
     return None
 
 
-def _bedrock_alert(text: str, model_key: str) -> AsyncAlert | None:
-    """调 Bedrock Converse 做 1-token 判定。失败则返回 None(交回退)。"""
+def _bedrock_alert(
+    text: str, model_key: str, timeout_s: float | None = None
+) -> AsyncAlert | None:
+    """调 Bedrock Converse 做 1-token 判定。失败则返回 None(交回退)。
+
+    timeout_s: 显式墙钟预算(秒)。None -> 保持硬编码 connect=2/read=5(历来行为,
+    方案一同步腿/离线单测不受影响);非 None -> read_timeout=timeout_s、
+    connect_timeout=min(2.0, timeout_s),让 boto 不显著超出调用方给定的预算。
+    """
     try:
         import boto3  # 延迟导入:离线环境无 boto3 也不阻塞
     except ImportError:
@@ -97,12 +108,19 @@ def _bedrock_alert(text: str, model_key: str) -> AsyncAlert | None:
         #   也不拖爆 addon 8s 线(拖爆 → fail-closed 503 → Kiro 反复重试)。
         from botocore.config import Config as _BotoConfig
 
+        # timeout_s=None -> 历来硬编码 2/5;非 None -> 依调用方墙钟预算派生,
+        # read 用满预算、connect 收敛到 min(2, 预算),retries 恒 1 次(宁可回退启发式)。
+        if timeout_s is None:
+            _connect_to, _read_to = 2, 5
+        else:
+            _read_to = max(0.1, timeout_s)
+            _connect_to = min(2.0, _read_to)
         client = boto3.client(
             "bedrock-runtime",
             region_name="us-west-2",
             config=_BotoConfig(
-                connect_timeout=2,
-                read_timeout=5,
+                connect_timeout=_connect_to,
+                read_timeout=_read_to,
                 retries={"max_attempts": 1, "mode": "standard"},
             ),
         )
@@ -122,11 +140,21 @@ def _bedrock_alert(text: str, model_key: str) -> AsyncAlert | None:
                       text[:200], f"bedrock:{model_key}:{model_id}")
 
 
-def analyze(text: str, use_bedrock: bool = False, model_key: str = "main") -> list[AsyncAlert]:
-    """产出 0..1 条 AsyncAlert。use_bedrock=False 时走离线启发式(标定/单测)。"""
+def analyze(
+    text: str,
+    use_bedrock: bool = False,
+    model_key: str = "main",
+    timeout_s: float | None = None,
+) -> list[AsyncAlert]:
+    """产出 0..1 条 AsyncAlert。use_bedrock=False 时走离线启发式(标定/单测)。
+
+    timeout_s 仅在 use_bedrock=True 时透传给 `_bedrock_alert` 作墙钟预算;
+    None(默认)保持历来行为,现有调用点(engine.py/gateway/run_layers/
+    inspect_cases/l4_calibration)零改动。
+    """
     alert = None
     if use_bedrock:
-        alert = _bedrock_alert(text, model_key)
+        alert = _bedrock_alert(text, model_key, timeout_s)
     if alert is None:
         alert = _heuristic_alert(text)
     return [alert] if alert else []
