@@ -1,0 +1,232 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: inspect_perf.js
+        output: -
+
+     scenarios: (100.00%) 2 scenarios, 1200 max VUs, 1m15s max duration (incl. graceful stop):
+              * attack_l3: 30.00 iterations/s for 45s (maxVUs: 150-600, exec: attackL3, gracefulStop: 30s)
+              * attack_local: 30.00 iterations/s for 45s (maxVUs: 150-600, exec: attackLocal, gracefulStop: 30s)
+
+
+running (0m00.8s), 0000/0300 VUs, 50 complete and 0 interrupted iterations
+attack_l3      [   2% ] 000/150 VUs  00.8s/45s  30.00 iters/s
+attack_local   [   2% ] 000/150 VUs  00.8s/45s  30.00 iters/s
+
+running (0m01.8s), 0000/0300 VUs, 110 complete and 0 interrupted iterations
+attack_l3      [   4% ] 000/150 VUs  01.8s/45s  30.00 iters/s
+attack_local   [   4% ] 000/150 VUs  01.8s/45s  30.00 iters/s
+
+running (0m02.8s), 0000/0300 VUs, 170 complete and 0 interrupted iterations
+attack_l3      [   6% ] 000/150 VUs  02.8s/45s  30.00 iters/s
+attack_local   [   6% ] 000/150 VUs  02.8s/45s  30.00 iters/s
+
+running (0m03.8s), 0000/0300 VUs, 230 complete and 0 interrupted iterations
+attack_l3      [   9% ] 000/150 VUs  03.8s/45s  30.00 iters/s
+attack_local   [   9% ] 000/150 VUs  03.8s/45s  30.00 iters/s
+
+running (0m04.8s), 0000/0300 VUs, 290 complete and 0 interrupted iterations
+attack_l3      [  11% ] 000/150 VUs  04.8s/45s  30.00 iters/s
+attack_local   [  11% ] 000/150 VUs  04.8s/45s  30.00 iters/s
+
+running (0m05.8s), 0000/0300 VUs, 350 complete and 0 interrupted iterations
+attack_l3      [  13% ] 000/150 VUs  05.8s/45s  30.00 iters/s
+attack_local   [  13% ] 000/150 VUs  05.8s/45s  30.00 iters/s
+
+running (0m06.8s), 0000/0300 VUs, 410 complete and 0 interrupted iterations
+attack_l3      [  15% ] 000/150 VUs  06.8s/45s  30.00 iters/s
+attack_local   [  15% ] 000/150 VUs  06.8s/45s  30.00 iters/s
+
+running (0m07.8s), 0000/0300 VUs, 470 complete and 0 interrupted iterations
+attack_l3      [  17% ] 000/150 VUs  07.8s/45s  30.00 iters/s
+attack_local   [  17% ] 000/150 VUs  07.8s/45s  30.00 iters/s
+
+running (0m08.8s), 0000/0300 VUs, 530 complete and 0 interrupted iterations
+attack_l3      [  20% ] 000/150 VUs  08.8s/45s  30.00 iters/s
+attack_local   [  20% ] 000/150 VUs  08.8s/45s  30.00 iters/s
+
+running (0m09.8s), 0000/0300 VUs, 590 complete and 0 interrupted iterations
+attack_l3      [  22% ] 000/150 VUs  09.8s/45s  30.00 iters/s
+attack_local   [  22% ] 000/150 VUs  09.8s/45s  30.00 iters/s
+
+running (0m10.8s), 0000/0300 VUs, 650 complete and 0 interrupted iterations
+attack_l3      [  24% ] 000/150 VUs  10.8s/45s  30.00 iters/s
+attack_local   [  24% ] 000/150 VUs  10.8s/45s  30.00 iters/s
+
+running (0m11.8s), 0000/0300 VUs, 710 complete and 0 interrupted iterations
+attack_l3      [  26% ] 000/150 VUs  11.8s/45s  30.00 iters/s
+attack_local   [  26% ] 000/150 VUs  11.8s/45s  30.00 iters/s
+
+running (0m12.8s), 0000/0300 VUs, 770 complete and 0 interrupted iterations
+attack_l3      [  29% ] 000/150 VUs  12.8s/45s  30.00 iters/s
+attack_local   [  29% ] 000/150 VUs  12.8s/45s  30.00 iters/s
+
+running (0m13.8s), 0000/0300 VUs, 830 complete and 0 interrupted iterations
+attack_l3      [  31% ] 000/150 VUs  13.8s/45s  30.00 iters/s
+attack_local   [  31% ] 000/150 VUs  13.8s/45s  30.00 iters/s
+
+running (0m14.8s), 0000/0300 VUs, 890 complete and 0 interrupted iterations
+attack_l3      [  33% ] 000/150 VUs  14.8s/45s  30.00 iters/s
+attack_local   [  33% ] 000/150 VUs  14.8s/45s  30.00 iters/s
+
+running (0m15.8s), 0000/0300 VUs, 950 complete and 0 interrupted iterations
+attack_l3      [  35% ] 000/150 VUs  15.8s/45s  30.00 iters/s
+attack_local   [  35% ] 000/150 VUs  15.8s/45s  30.00 iters/s
+
+running (0m16.8s), 0000/0300 VUs, 1010 complete and 0 interrupted iterations
+attack_l3      [  37% ] 000/150 VUs  16.8s/45s  30.00 iters/s
+attack_local   [  37% ] 000/150 VUs  16.8s/45s  30.00 iters/s
+
+running (0m17.8s), 0000/0300 VUs, 1070 complete and 0 interrupted iterations
+attack_l3      [  40% ] 000/150 VUs  17.8s/45s  30.00 iters/s
+attack_local   [  40% ] 000/150 VUs  17.8s/45s  30.00 iters/s
+
+running (0m18.8s), 0000/0300 VUs, 1130 complete and 0 interrupted iterations
+attack_l3      [  42% ] 000/150 VUs  18.8s/45s  30.00 iters/s
+attack_local   [  42% ] 000/150 VUs  18.8s/45s  30.00 iters/s
+
+running (0m19.8s), 0000/0300 VUs, 1190 complete and 0 interrupted iterations
+attack_l3      [  44% ] 000/150 VUs  19.8s/45s  30.00 iters/s
+attack_local   [  44% ] 000/150 VUs  19.8s/45s  30.00 iters/s
+
+running (0m20.8s), 0000/0300 VUs, 1250 complete and 0 interrupted iterations
+attack_l3      [  46% ] 000/150 VUs  20.8s/45s  30.00 iters/s
+attack_local   [  46% ] 000/150 VUs  20.8s/45s  30.00 iters/s
+
+running (0m21.8s), 0000/0300 VUs, 1310 complete and 0 interrupted iterations
+attack_l3      [  49% ] 000/150 VUs  21.8s/45s  30.00 iters/s
+attack_local   [  49% ] 000/150 VUs  21.8s/45s  30.00 iters/s
+
+running (0m22.8s), 0000/0300 VUs, 1370 complete and 0 interrupted iterations
+attack_l3      [  51% ] 000/150 VUs  22.8s/45s  30.00 iters/s
+attack_local   [  51% ] 000/150 VUs  22.8s/45s  30.00 iters/s
+
+running (0m23.8s), 0000/0300 VUs, 1430 complete and 0 interrupted iterations
+attack_l3      [  53% ] 000/150 VUs  23.8s/45s  30.00 iters/s
+attack_local   [  53% ] 000/150 VUs  23.8s/45s  30.00 iters/s
+
+running (0m24.8s), 0000/0300 VUs, 1490 complete and 0 interrupted iterations
+attack_l3      [  55% ] 000/150 VUs  24.8s/45s  30.00 iters/s
+attack_local   [  55% ] 000/150 VUs  24.8s/45s  30.00 iters/s
+
+running (0m25.8s), 0000/0300 VUs, 1550 complete and 0 interrupted iterations
+attack_l3      [  57% ] 000/150 VUs  25.8s/45s  30.00 iters/s
+attack_local   [  57% ] 000/150 VUs  25.8s/45s  30.00 iters/s
+
+running (0m26.8s), 0000/0300 VUs, 1610 complete and 0 interrupted iterations
+attack_l3      [  60% ] 000/150 VUs  26.8s/45s  30.00 iters/s
+attack_local   [  60% ] 000/150 VUs  26.8s/45s  30.00 iters/s
+
+running (0m27.8s), 0000/0300 VUs, 1670 complete and 0 interrupted iterations
+attack_l3      [  62% ] 000/150 VUs  27.8s/45s  30.00 iters/s
+attack_local   [  62% ] 000/150 VUs  27.8s/45s  30.00 iters/s
+
+running (0m28.8s), 0000/0300 VUs, 1730 complete and 0 interrupted iterations
+attack_l3      [  64% ] 000/150 VUs  28.8s/45s  30.00 iters/s
+attack_local   [  64% ] 000/150 VUs  28.8s/45s  30.00 iters/s
+
+running (0m29.8s), 0000/0300 VUs, 1790 complete and 0 interrupted iterations
+attack_l3      [  66% ] 000/150 VUs  29.8s/45s  30.00 iters/s
+attack_local   [  66% ] 000/150 VUs  29.8s/45s  30.00 iters/s
+
+running (0m30.8s), 0000/0300 VUs, 1850 complete and 0 interrupted iterations
+attack_l3      [  69% ] 000/150 VUs  30.8s/45s  30.00 iters/s
+attack_local   [  69% ] 000/150 VUs  30.8s/45s  30.00 iters/s
+
+running (0m31.8s), 0000/0300 VUs, 1910 complete and 0 interrupted iterations
+attack_l3      [  71% ] 000/150 VUs  31.8s/45s  30.00 iters/s
+attack_local   [  71% ] 000/150 VUs  31.8s/45s  30.00 iters/s
+
+running (0m32.8s), 0000/0300 VUs, 1970 complete and 0 interrupted iterations
+attack_l3      [  73% ] 000/150 VUs  32.8s/45s  30.00 iters/s
+attack_local   [  73% ] 000/150 VUs  32.8s/45s  30.00 iters/s
+
+running (0m33.8s), 0000/0300 VUs, 2030 complete and 0 interrupted iterations
+attack_l3      [  75% ] 000/150 VUs  33.8s/45s  30.00 iters/s
+attack_local   [  75% ] 000/150 VUs  33.8s/45s  30.00 iters/s
+
+running (0m34.8s), 0000/0300 VUs, 2090 complete and 0 interrupted iterations
+attack_l3      [  77% ] 000/150 VUs  34.8s/45s  30.00 iters/s
+attack_local   [  77% ] 000/150 VUs  34.8s/45s  30.00 iters/s
+
+running (0m35.8s), 0000/0300 VUs, 2150 complete and 0 interrupted iterations
+attack_l3      [  80% ] 000/150 VUs  35.8s/45s  30.00 iters/s
+attack_local   [  80% ] 000/150 VUs  35.8s/45s  30.00 iters/s
+
+running (0m36.8s), 0000/0300 VUs, 2210 complete and 0 interrupted iterations
+attack_l3      [  82% ] 000/150 VUs  36.8s/45s  30.00 iters/s
+attack_local   [  82% ] 000/150 VUs  36.8s/45s  30.00 iters/s
+
+running (0m37.8s), 0000/0300 VUs, 2270 complete and 0 interrupted iterations
+attack_l3      [  84% ] 000/150 VUs  37.8s/45s  30.00 iters/s
+attack_local   [  84% ] 000/150 VUs  37.8s/45s  30.00 iters/s
+
+running (0m38.8s), 0000/0300 VUs, 2330 complete and 0 interrupted iterations
+attack_l3      [  86% ] 000/150 VUs  38.8s/45s  30.00 iters/s
+attack_local   [  86% ] 000/150 VUs  38.8s/45s  30.00 iters/s
+
+running (0m39.8s), 0000/0300 VUs, 2390 complete and 0 interrupted iterations
+attack_l3      [  89% ] 000/150 VUs  39.8s/45s  30.00 iters/s
+attack_local   [  89% ] 000/150 VUs  39.8s/45s  30.00 iters/s
+
+running (0m40.8s), 0000/0300 VUs, 2450 complete and 0 interrupted iterations
+attack_l3      [  91% ] 000/150 VUs  40.8s/45s  30.00 iters/s
+attack_local   [  91% ] 000/150 VUs  40.8s/45s  30.00 iters/s
+
+running (0m41.8s), 0000/0300 VUs, 2510 complete and 0 interrupted iterations
+attack_l3      [  93% ] 000/150 VUs  41.8s/45s  30.00 iters/s
+attack_local   [  93% ] 000/150 VUs  41.8s/45s  30.00 iters/s
+
+running (0m42.8s), 0000/0300 VUs, 2570 complete and 0 interrupted iterations
+attack_l3      [  95% ] 000/150 VUs  42.8s/45s  30.00 iters/s
+attack_local   [  95% ] 000/150 VUs  42.8s/45s  30.00 iters/s
+
+running (0m43.8s), 0000/0300 VUs, 2630 complete and 0 interrupted iterations
+attack_l3      [  97% ] 000/150 VUs  43.8s/45s  30.00 iters/s
+attack_local   [  97% ] 000/150 VUs  43.8s/45s  30.00 iters/s
+
+running (0m44.8s), 0000/0300 VUs, 2690 complete and 0 interrupted iterations
+attack_l3      [ 100% ] 000/150 VUs  44.8s/45s  30.00 iters/s
+attack_local   [ 100% ] 000/150 VUs  44.8s/45s  30.00 iters/s
+
+===== 方案二 /inspect 性能测试 [EXP=A RATE=30 BG=20 ATK=5 DUR=45s URL=http://172.31.27.174:9001] =====
+      ✓ CNID-REDACT REDACT脱敏生效
+      ✓ L3-CARD REDACT脱敏生效
+      ✓ GCP-BLOCK block→BLOCK
+      ✓ L3-EMAIL REDACT脱敏生效
+      ✓ EMAIL-REDACT REDACT脱敏生效
+      ✓ L3-IP REDACT脱敏生效
+      ✓ SK-BLOCK block→BLOCK
+      ✓ AK-BLOCK block→BLOCK
+      ✓ PHONE-REDACT REDACT脱敏生效
+
+      atk_l3_handled.................: 100.00% ✓ 1351      ✗ 0    
+      atk_local_handled..............: 100.00% ✓ 1351      ✗ 0    
+      checks.........................: 100.00% ✓ 2702      ✗ 0    
+      data_received..................: 2.1 MB  47 kB/s
+      data_sent......................: 685 kB  15 kB/s
+      http_req_blocked...............: avg=161.72µs min=1.89µs  med=4.73µs  p(95)=149.74µs p(99)=205.22µs p(99.9)=62.4ms   max=98.65ms 
+      http_req_connecting............: avg=152.7µs  min=0s      med=0s      p(95)=107.66µs p(99)=140.3µs  p(99.9)=62.37ms  max=98.62ms 
+      http_req_duration..............: avg=14.96ms  min=11.25ms med=14.51ms p(95)=18.72ms  p(99)=20.86ms  p(99.9)=30.68ms  max=32.81ms 
+        { expected_response:true }...: avg=14.96ms  min=11.25ms med=14.51ms p(95)=18.72ms  p(99)=20.86ms  p(99.9)=30.68ms  max=32.81ms 
+      http_req_failed................: 0.00%   ✓ 0         ✗ 2702 
+      http_req_receiving.............: avg=64.74µs  min=10.71µs med=41.57µs p(95)=195.66µs p(99)=505.52µs p(99.9)=893.45µs max=1.02ms  
+      http_req_sending...............: avg=19.27µs  min=5.93µs  med=15.77µs p(95)=44.81µs  p(99)=60.14µs  p(99.9)=91.39µs  max=233.67µs
+      http_req_tls_handshaking.......: avg=0s       min=0s      med=0s      p(95)=0s       p(99)=0s       p(99.9)=0s       max=0s      
+      http_req_waiting...............: avg=14.88ms  min=11.19ms med=14.43ms p(95)=18.62ms  p(99)=20.77ms  p(99.9)=30.58ms  max=32.66ms 
+      http_reqs......................: 2702    60.023103/s
+      inspect_block_ms...............: avg=15.31ms  min=11.84ms med=14.78ms p(95)=19.64ms  p(99)=20.97ms  p(99.9)=22.26ms  max=22.92ms 
+      inspect_redact_ms..............: avg=14.85ms  min=11.25ms med=14.41ms p(95)=18.46ms  p(99)=20.75ms  p(99.9)=30.87ms  max=32.81ms 
+      iteration_duration.............: avg=15.34ms  min=11.46ms med=14.76ms p(95)=18.99ms  p(99)=21.16ms  p(99.9)=83.84ms  max=122.14ms
+      iterations.....................: 2702    60.023103/s
+      vus............................: 0       min=0       max=0  
+      vus_max........................: 300     min=300     max=300
+running (0m45.0s), 0000/0300 VUs, 2702 complete and 0 interrupted iterations
+attack_l3    ✓ [ 100% ] 000/150 VUs  45s  30.00 iters/s
+attack_local ✓ [ 100% ] 000/150 VUs  45s  30.00 iters/s

@@ -20,7 +20,7 @@ run_layers 有分层 ms 无 verdict 值/输入原文；输入原文只存在于 
 
 ★ 延迟口径：卡片上的 ms 一律「示意·单次」——
   本地冷跑离线时 L3 会把 Presidio 连接超时计入（非真 NER）；via-http 是真引擎单发耗时。
-  基准分位数以 k6 压测为准（方案一 results-2026-08-10/perf/ 03 §9；方案二 03 测试报告压测节）。
+  基准分位数以 k6 压测为准（方案一 results-2026-08-10/perf/ 03 §9；方案二 03 测试报告 §8）。
 
 ★ 不外泄：命中明细只回 layer/rule/entity/field_path/confidence/action，绝不含 matched(原始敏感
   子串)/span —— 与方案二 /inspect 契约一致。REDACT 的脱敏后文本本就安全，照录。
@@ -443,7 +443,7 @@ def _write_report(cards: list[Card], prefix: Path, argv: str) -> None:
           f"- 生成: {stamp}\n- 命令: `python3 -m tests.inspect_cases {argv}`\n",
           "- 延迟(ms)为**示意·单次**（本地冷跑离线 L3 计入 Presidio 连接超时；"
           "via-http 为真引擎单发）；**基准分位以 k6 压测为准**"
-          "（方案一 `results-2026-08-10/perf/` 03 §9；方案二 03 测试报告压测节）。\n",
+          "（方案一 `results-2026-08-10/perf/` 03 §9；方案二 03 测试报告 §8）。\n",
           "- 命中明细仅含 layer/rule/entity/action/source，**无 matched/span**（与 /inspect 契约一致）。\n"]
     cur = None
     for c in cards:

@@ -150,6 +150,11 @@ done
 **红线**：任一响应 `top_layer` 为 `L4` = 同步腿误触 Bedrock（应 `run_async_l4=False`），停止排查。
 **脱敏字段泄漏检查**：`curl ... | grep -E '"matched"|"span"'` 必须**无输出**（规格：原始敏感子串绝不出服务）。
 
+> **逐条延迟 / 批量归档 oracle**：上面这套「手 curl 三态」的批量化版本 = `inspect_cases --via-http`——
+> 逐条出 verdict/top_layer/rules + `latency_ms`（含 server 追加的 `http_total`），一次跑完所有 fixture 生成三合一报告。
+> 见 [`../00-总览/03-手动复现指南-逐条三合一.md`](../00-总览/03-手动复现指南-逐条三合一.md) §4。
+> **延迟口径**：那是**单发示意**；负载下的基准分位见 [`方案二-03-测试报告.md`](方案二-03-测试报告.md) §8 压测。
+
 ### Tier B —— 本地假上游（免 token，改写/短路的线缆字节硬证据）
 
 起一个 echo 服务（把收到的 body 落盘）+ 一个测试 mitmdump 挂同一 addon，reverse 到 echo：

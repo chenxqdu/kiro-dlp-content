@@ -1,0 +1,400 @@
+{
+  "root_group": {
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": [],
+    "checks": [
+        {
+          "fails": 0,
+          "name": "LEGAL-4 合法→非BLOCK",
+          "path": "::LEGAL-4 合法→非BLOCK",
+          "id": "15b02c7d88137a030bc1a7cd2991ba07",
+          "passes": 344
+        },
+        {
+          "id": "bcd61af12e606c2197f679515a19a76a",
+          "passes": 59,
+          "fails": 0,
+          "name": "L3-CARD REDACT脱敏生效",
+          "path": "::L3-CARD REDACT脱敏生效"
+        },
+        {
+          "name": "LEGAL-3 合法→非BLOCK",
+          "path": "::LEGAL-3 合法→非BLOCK",
+          "id": "9122df83f9f3879d027dc6b253199dd1",
+          "passes": 319,
+          "fails": 0
+        },
+        {
+          "name": "LEGAL-7 合法→非BLOCK",
+          "path": "::LEGAL-7 合法→非BLOCK",
+          "id": "072fc9443385e6d67f2868aa336394b6",
+          "passes": 354,
+          "fails": 0
+        },
+        {
+          "name": "LEGAL-1 合法→非BLOCK",
+          "path": "::LEGAL-1 合法→非BLOCK",
+          "id": "78b52f102a4af9ccb965415c88499961",
+          "passes": 330,
+          "fails": 0
+        },
+        {
+          "name": "LEGAL-8 合法→非BLOCK",
+          "path": "::LEGAL-8 合法→非BLOCK",
+          "id": "c838f311da8cdee67c0c7121795a0ca3",
+          "passes": 347,
+          "fails": 0
+        },
+        {
+          "fails": 0,
+          "name": "PHONE-REDACT REDACT脱敏生效",
+          "path": "::PHONE-REDACT REDACT脱敏生效",
+          "id": "89883daa2198c863aba64adb1724d1d1",
+          "passes": 39
+        },
+        {
+          "name": "LEGAL-2 合法→非BLOCK",
+          "path": "::LEGAL-2 合法→非BLOCK",
+          "id": "6c802aa074063979ee3bfc7aea1ee455",
+          "passes": 348,
+          "fails": 0
+        },
+        {
+          "id": "cb4fad0433758b039023ea58c36f75cd",
+          "passes": 55,
+          "fails": 0,
+          "name": "L3-IP REDACT脱敏生效",
+          "path": "::L3-IP REDACT脱敏生效"
+        },
+        {
+          "name": "GCP-BLOCK block→BLOCK",
+          "path": "::GCP-BLOCK block→BLOCK",
+          "id": "df82e5ca8b35f2dcc623787f8fd90e99",
+          "passes": 49,
+          "fails": 0
+        },
+        {
+          "id": "5f280bf5149ef0af23d53417f01b227b",
+          "passes": 58,
+          "fails": 0,
+          "name": "AK-BLOCK block→BLOCK",
+          "path": "::AK-BLOCK block→BLOCK"
+        },
+        {
+          "name": "LEGAL-5 合法→非BLOCK",
+          "path": "::LEGAL-5 合法→非BLOCK",
+          "id": "25e28ddf2e58061bbccec2f0d1157840",
+          "passes": 353,
+          "fails": 0
+        },
+        {
+          "name": "LEGAL-6 合法→非BLOCK",
+          "path": "::LEGAL-6 合法→非BLOCK",
+          "id": "c8bc5b068c11217963bd83379224aeea",
+          "passes": 306,
+          "fails": 0
+        },
+        {
+          "path": "::L3-EMAIL REDACT脱敏生效",
+          "id": "15a2ba1693589d6e73f61732c07badc5",
+          "passes": 44,
+          "fails": 0,
+          "name": "L3-EMAIL REDACT脱敏生效"
+        },
+        {
+          "name": "EMAIL-REDACT REDACT脱敏生效",
+          "path": "::EMAIL-REDACT REDACT脱敏生效",
+          "id": "9195f49bece57e02e4e480faffd5aa72",
+          "passes": 49,
+          "fails": 0
+        },
+        {
+          "name": "SK-BLOCK block→BLOCK",
+          "path": "::SK-BLOCK block→BLOCK",
+          "id": "5891fc50943d1d4e434d460ef7e71758",
+          "passes": 45,
+          "fails": 0
+        },
+        {
+          "name": "CNID-REDACT REDACT脱敏生效",
+          "path": "::CNID-REDACT REDACT脱敏生效",
+          "id": "88d684e31e01f7f6541670377bfc5443",
+          "passes": 53,
+          "fails": 0
+        }
+      ]
+  },
+  "options": {
+    "summaryTrendStats": [
+      "avg",
+      "min",
+      "med",
+      "p(95)",
+      "p(99)",
+      "p(99.9)",
+      "max"
+    ],
+    "summaryTimeUnit": "",
+    "noColor": false
+  },
+  "state": {
+    "isStdOutTTY": false,
+    "isStdErrTTY": false,
+    "testRunDurationMs": 45014.540029
+  },
+  "metrics": {
+    "iterations": {
+      "values": {
+        "count": 3152,
+        "rate": 70.02181957139553
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "atk_local_handled": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "passes": 293,
+        "fails": 0,
+        "rate": 1
+      }
+    },
+    "http_req_failed": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "passes": 0,
+        "fails": 3152
+      }
+    },
+    "http_req_tls_handshaking": {
+      "values": {
+        "p(99)": 0,
+        "p(99.9)": 0,
+        "max": 0,
+        "avg": 0,
+        "min": 0,
+        "med": 0,
+        "p(95)": 0
+      },
+      "type": "trend",
+      "contains": "time"
+    },
+    "http_req_duration": {
+      "contains": "time",
+      "values": {
+        "p(99)": 19.862684530000003,
+        "p(99.9)": 95.16468820900062,
+        "max": 106.285848,
+        "avg": 14.55399576364217,
+        "min": 10.379418,
+        "med": 13.8247205,
+        "p(95)": 18.381582299999998
+      },
+      "type": "trend"
+    },
+    "data_received": {
+      "values": {
+        "count": 1379447,
+        "rate": 30644.476187278822
+      },
+      "type": "counter",
+      "contains": "data"
+    },
+    "atk_l3_handled": {
+      "contains": "default",
+      "values": {
+        "rate": 1,
+        "passes": 158,
+        "fails": 0
+      },
+      "type": "rate"
+    },
+    "vus_max": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "max": 300,
+        "value": 300,
+        "min": 300
+      }
+    },
+    "http_reqs": {
+      "contains": "default",
+      "values": {
+        "count": 3152,
+        "rate": 70.02181957139553
+      },
+      "type": "counter"
+    },
+    "http_req_sending": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(99)": 0.06101711999999991,
+        "p(99.9)": 0.07878127000000035,
+        "max": 0.159647,
+        "avg": 0.018609259200507607,
+        "min": 0.004626,
+        "med": 0.015731500000000002,
+        "p(95)": 0.03955914999999999
+      }
+    },
+    "legal_false_positive": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "passes": 0,
+        "fails": 2701
+      }
+    },
+    "iteration_duration": {
+      "contains": "time",
+      "values": {
+        "p(99.9)": 98.16272299900041,
+        "max": 106.491505,
+        "avg": 14.864975933692925,
+        "min": 10.547128,
+        "med": 14.044426000000001,
+        "p(95)": 18.657206549999994,
+        "p(99)": 20.313520149999967
+      },
+      "type": "trend"
+    },
+    "http_req_blocked": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 0.10728086230964522,
+        "min": 0.00186,
+        "med": 0.0046435,
+        "p(95)": 0.13783735,
+        "p(99)": 0.23484535999999984,
+        "p(99.9)": 41.03723824600056,
+        "max": 85.110679
+      }
+    },
+    "http_req_receiving": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(95)": 0.30135109999999987,
+        "p(99)": 0.5551220699999978,
+        "p(99.9)": 0.9899337700000093,
+        "max": 1.412836,
+        "avg": 0.0827061748096446,
+        "min": 0.012673,
+        "med": 0.0476035
+      }
+    },
+    "inspect_pass_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "min": 10.379418,
+        "med": 13.639719,
+        "p(95)": 18.10633,
+        "p(99)": 19.585262,
+        "p(99.9)": 96.52374740000046,
+        "max": 106.285848,
+        "avg": 14.333068004072606
+      }
+    },
+    "data_sent": {
+      "contains": "data",
+      "values": {
+        "count": 817104,
+        "rate": 18152.001541581718
+      },
+      "type": "counter"
+    },
+    "checks": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 1,
+        "passes": 3152,
+        "fails": 0
+      }
+    },
+    "http_req_connecting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 0.09924210628172589,
+        "min": 0,
+        "med": 0,
+        "p(95)": 0.09971514999999996,
+        "p(99)": 0.18643007999999933,
+        "p(99.9)": 41.00229757100056,
+        "max": 85.06597
+      }
+    },
+    "http_req_waiting": {
+      "contains": "time",
+      "values": {
+        "p(95)": 18.265120800000002,
+        "p(99)": 19.738479859999998,
+        "p(99.9)": 95.08472970700063,
+        "max": 106.220179,
+        "avg": 14.45268032963199,
+        "min": 10.328237,
+        "med": 13.743078
+      },
+      "type": "trend"
+    },
+    "http_req_duration{expected_response:true}": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(99.9)": 95.16468820900062,
+        "max": 106.285848,
+        "avg": 14.55399576364217,
+        "min": 10.379418,
+        "med": 13.8247205,
+        "p(95)": 18.381582299999998,
+        "p(99)": 19.862684530000003
+      }
+    },
+    "inspect_redact_ms": {
+      "contains": "time",
+      "values": {
+        "max": 24.617102,
+        "avg": 15.815865508361208,
+        "min": 10.97484,
+        "med": 15.693932,
+        "p(95)": 18.9753226,
+        "p(99)": 20.544405759999993,
+        "p(99.9)": 23.582336932000192
+      },
+      "type": "trend"
+    },
+    "inspect_block_ms": {
+      "contains": "time",
+      "values": {
+        "max": 20.665916,
+        "avg": 15.997593296052631,
+        "min": 12.642497,
+        "med": 15.682708,
+        "p(95)": 19.1428734,
+        "p(99)": 20.526749940000002,
+        "p(99.9)": 20.652410862
+      },
+      "type": "trend"
+    },
+    "vus": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 0,
+        "min": 0,
+        "max": 2
+      }
+    }
+  }
+}

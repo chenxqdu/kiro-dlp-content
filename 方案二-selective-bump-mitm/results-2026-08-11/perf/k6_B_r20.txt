@@ -1,0 +1,137 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: inspect_perf.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 800 max VUs, 1m0s max duration (incl. graceful stop):
+              * background_legal: 20.00 iterations/s for 30s (maxVUs: 200-800, exec: legal, gracefulStop: 30s)
+
+
+running (0m00.9s), 000/200 VUs, 18 complete and 0 interrupted iterations
+background_legal   [   3% ] 000/200 VUs  00.9s/30s  20.00 iters/s
+
+running (0m01.9s), 000/200 VUs, 38 complete and 0 interrupted iterations
+background_legal   [   6% ] 000/200 VUs  01.9s/30s  20.00 iters/s
+
+running (0m02.9s), 001/200 VUs, 57 complete and 0 interrupted iterations
+background_legal   [  10% ] 001/200 VUs  02.9s/30s  20.00 iters/s
+
+running (0m03.9s), 000/200 VUs, 78 complete and 0 interrupted iterations
+background_legal   [  13% ] 000/200 VUs  03.9s/30s  20.00 iters/s
+
+running (0m04.9s), 000/200 VUs, 98 complete and 0 interrupted iterations
+background_legal   [  16% ] 000/200 VUs  04.9s/30s  20.00 iters/s
+
+running (0m05.9s), 000/200 VUs, 118 complete and 0 interrupted iterations
+background_legal   [  20% ] 000/200 VUs  05.9s/30s  20.00 iters/s
+
+running (0m06.9s), 000/200 VUs, 138 complete and 0 interrupted iterations
+background_legal   [  23% ] 000/200 VUs  06.9s/30s  20.00 iters/s
+
+running (0m07.9s), 000/200 VUs, 158 complete and 0 interrupted iterations
+background_legal   [  26% ] 000/200 VUs  07.9s/30s  20.00 iters/s
+
+running (0m08.9s), 000/200 VUs, 178 complete and 0 interrupted iterations
+background_legal   [  30% ] 000/200 VUs  08.9s/30s  20.00 iters/s
+
+running (0m09.9s), 000/200 VUs, 198 complete and 0 interrupted iterations
+background_legal   [  33% ] 000/200 VUs  09.9s/30s  20.00 iters/s
+
+running (0m10.9s), 000/200 VUs, 218 complete and 0 interrupted iterations
+background_legal   [  36% ] 000/200 VUs  10.9s/30s  20.00 iters/s
+
+running (0m11.9s), 000/200 VUs, 238 complete and 0 interrupted iterations
+background_legal   [  40% ] 000/200 VUs  11.9s/30s  20.00 iters/s
+
+running (0m12.9s), 000/200 VUs, 258 complete and 0 interrupted iterations
+background_legal   [  43% ] 000/200 VUs  12.9s/30s  20.00 iters/s
+
+running (0m13.9s), 000/200 VUs, 278 complete and 0 interrupted iterations
+background_legal   [  46% ] 000/200 VUs  13.9s/30s  20.00 iters/s
+
+running (0m14.9s), 000/200 VUs, 298 complete and 0 interrupted iterations
+background_legal   [  50% ] 000/200 VUs  14.9s/30s  20.00 iters/s
+
+running (0m15.9s), 000/200 VUs, 318 complete and 0 interrupted iterations
+background_legal   [  53% ] 000/200 VUs  15.9s/30s  20.00 iters/s
+
+running (0m16.9s), 000/200 VUs, 338 complete and 0 interrupted iterations
+background_legal   [  56% ] 000/200 VUs  16.9s/30s  20.00 iters/s
+
+running (0m17.9s), 000/200 VUs, 358 complete and 0 interrupted iterations
+background_legal   [  60% ] 000/200 VUs  17.9s/30s  20.00 iters/s
+
+running (0m18.9s), 000/200 VUs, 378 complete and 0 interrupted iterations
+background_legal   [  63% ] 000/200 VUs  18.9s/30s  20.00 iters/s
+
+running (0m19.9s), 000/200 VUs, 398 complete and 0 interrupted iterations
+background_legal   [  66% ] 000/200 VUs  19.9s/30s  20.00 iters/s
+
+running (0m20.9s), 000/200 VUs, 418 complete and 0 interrupted iterations
+background_legal   [  70% ] 000/200 VUs  20.9s/30s  20.00 iters/s
+
+running (0m21.9s), 000/200 VUs, 438 complete and 0 interrupted iterations
+background_legal   [  73% ] 000/200 VUs  21.9s/30s  20.00 iters/s
+
+running (0m22.9s), 000/200 VUs, 458 complete and 0 interrupted iterations
+background_legal   [  76% ] 000/200 VUs  22.9s/30s  20.00 iters/s
+
+running (0m23.9s), 000/200 VUs, 478 complete and 0 interrupted iterations
+background_legal   [  80% ] 000/200 VUs  23.9s/30s  20.00 iters/s
+
+running (0m24.9s), 000/200 VUs, 498 complete and 0 interrupted iterations
+background_legal   [  83% ] 000/200 VUs  24.9s/30s  20.00 iters/s
+
+running (0m25.9s), 000/200 VUs, 518 complete and 0 interrupted iterations
+background_legal   [  86% ] 000/200 VUs  25.9s/30s  20.00 iters/s
+
+running (0m26.9s), 000/200 VUs, 538 complete and 0 interrupted iterations
+background_legal   [  90% ] 000/200 VUs  26.9s/30s  20.00 iters/s
+
+running (0m27.9s), 000/200 VUs, 558 complete and 0 interrupted iterations
+background_legal   [  93% ] 000/200 VUs  27.9s/30s  20.00 iters/s
+
+running (0m28.9s), 000/200 VUs, 578 complete and 0 interrupted iterations
+background_legal   [  96% ] 000/200 VUs  28.9s/30s  20.00 iters/s
+
+running (0m29.9s), 000/200 VUs, 598 complete and 0 interrupted iterations
+background_legal   [ 100% ] 000/200 VUs  29.9s/30s  20.00 iters/s
+
+===== 方案二 /inspect 性能测试 [EXP=B RATE=20 BG=20 ATK=5 DUR=30s URL=http://172.31.27.174:9001] =====
+      ✓ LEGAL-1 合法→非BLOCK
+      ✓ LEGAL-7 合法→非BLOCK
+      ✓ LEGAL-6 合法→非BLOCK
+      ✓ LEGAL-4 合法→非BLOCK
+      ✓ LEGAL-2 合法→非BLOCK
+      ✓ LEGAL-3 合法→非BLOCK
+      ✓ LEGAL-8 合法→非BLOCK
+      ✓ LEGAL-5 合法→非BLOCK
+
+      checks.........................: 100.00% ✓ 601     ✗ 0    
+      data_received..................: 232 kB  7.7 kB/s
+      data_sent......................: 156 kB  5.2 kB/s
+      http_req_blocked...............: avg=580.96µs min=3.76µs  med=5.56µs  p(95)=274.05µs p(99)=340.73µs p(99.9)=99.73ms  max=105.84ms
+      http_req_connecting............: avg=558.82µs min=0s      med=0s      p(95)=207.71µs p(99)=292.54µs p(99.9)=99.67ms  max=105.79ms
+      http_req_duration..............: avg=14.92ms  min=11.46ms med=14.27ms p(95)=18.6ms   p(99)=20.52ms  p(99.9)=83.82ms  max=84.77ms 
+        { expected_response:true }...: avg=14.92ms  min=11.46ms med=14.27ms p(95)=18.6ms   p(99)=20.52ms  p(99.9)=83.82ms  max=84.77ms 
+      http_req_failed................: 0.00%   ✓ 0       ✗ 601  
+      http_req_receiving.............: avg=69.41µs  min=28.74µs med=49.92µs p(95)=120.55µs p(99)=472.39µs p(99.9)=517.62µs max=517.67µs
+      http_req_sending...............: avg=33.91µs  min=13.02µs med=19.59µs p(95)=78.38µs  p(99)=87.68µs  p(99.9)=101.15µs max=104.78µs
+      http_req_tls_handshaking.......: avg=0s       min=0s      med=0s      p(95)=0s       p(99)=0s       p(99.9)=0s       max=0s      
+      http_req_waiting...............: avg=14.81ms  min=11.4ms  med=14.18ms p(95)=18.45ms  p(99)=20.34ms  p(99.9)=83.69ms  max=84.67ms 
+      http_reqs......................: 601     20.0238/s
+      inspect_pass_ms................: avg=14.92ms  min=11.46ms med=14.27ms p(95)=18.6ms   p(99)=20.52ms  p(99.9)=83.82ms  max=84.77ms 
+      iteration_duration.............: avg=15.75ms  min=11.65ms med=14.54ms p(95)=18.99ms  p(99)=21.85ms  p(99.9)=146.76ms max=179.19ms
+      iterations.....................: 601     20.0238/s
+      legal_false_positive...........: 0.00%   ✓ 0       ✗ 601  
+      vus............................: 0       min=0     max=1  
+      vus_max........................: 200     min=200   max=200
+running (0m30.0s), 000/200 VUs, 601 complete and 0 interrupted iterations
+background_legal ✓ [ 100% ] 000/200 VUs  30s  20.00 iters/s

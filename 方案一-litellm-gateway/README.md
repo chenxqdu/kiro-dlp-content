@@ -21,7 +21,7 @@
 | [**方案一-03-测试方案.md**](方案一-03-测试方案.md) | 四阶段实测方法与完整矩阵(离线 harness / 网关集成 / 压测归因 / L4 标定 / 分层完备)+ §8 全部实测数字 |
 | [**方案一-04-实测踩坑实录.md**](方案一-04-实测踩坑实录.md) | 四阶段踩坑复盘(症状→证据→根因→修法):引擎弱 NER 误报、"某版本更绿"测量假象、孤儿抢核、Bedrock Converse 约束、长文本单核瓶颈、SSM 投递三坑、L4 红线还原 |
 | [`gateway/`](gateway/) | 网关本体:[`litellm_config.yaml`](gateway/litellm_config.yaml)(挂 guardrail)、[`dlp_guardrail.py`](gateway/dlp_guardrail.py)(`CorpDLPGuardrail`,两 hook)、[`test_gateway.py`](gateway/test_gateway.py) 端到端、[`bench_gateway.py`](gateway/bench_gateway.py) 压测、`litellm_config_nodlp.yaml` 对照组 |
-| [`testing/`](testing/) | 实测复现三件套:[README](testing/README.md)(怎么跑)、`remote/`(SSM 远程执行脚本)、`probes/`(诊断探针)、`results-2026-07-30/` + `results-2026-08-04/` + `results-2026-08-05/`(原始输出,含失败轮次与逐条 DIFF) |
+| [`testing/`](testing/) | 实测复现三件套:[README](testing/README.md)(怎么跑)、`remote/`(SSM 远程执行脚本)、`probes/`(诊断探针)、`results-2026-07-30/` + `results-2026-08-04/` + `results-2026-08-05/` + `results-2026-08-10/`(原始输出,含失败轮次、逐条 DIFF 与 `perf/` k6 压测) |
 
 ## 🔗 依赖的共享组件(在仓库根,不在本目录)
 
