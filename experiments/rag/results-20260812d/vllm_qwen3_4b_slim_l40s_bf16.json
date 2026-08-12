@@ -1,0 +1,13 @@
+{
+  "backend": "vllm-slim-l40s-bf16",
+  "model": "Qwen/Qwen3-4B-Instruct-2507",
+  "category_exact": "4/4",
+  "latency_ms": {
+    "p50": 256.1,
+    "p95": 269.4,
+    "min": 220.0,
+    "max": 270.5
+  },
+  "completion_tokens_median": 20,
+  "note": "精简输出契约与 vllm_slim.py 逐字一致(max_tokens=64,temp=0,每例8次);GPU 型号见同目录 env.txt;对照 L4 卡 BF16 的 695ms"
+}
