@@ -18,7 +18,10 @@
 from __future__ import annotations
 
 import json
+import os
 import re
+import urllib.error
+import urllib.request
 
 from .types import AsyncAlert, Layer
 
@@ -29,6 +32,63 @@ CALIBRATION_MODELS = {
     "main": "qwen.qwen3-32b-v1:0",
     "control": "meta.llama3-1-8b-instruct-v1:0",
 }
+
+# 分类 prompt(Bedrock 与 vLLM 后端共用),避免两处漂移。
+_CLASSIFIER_PROMPT = (
+    "You are a corporate data-leak classifier. The content below is about to be "
+    "sent to an EXTERNAL cloud LLM. Decide if it exposes company-internal "
+    "sensitive information in one of these categories:\n"
+    "- proprietary-source: proprietary source code (incl. disguised as comments/docs)\n"
+    "- proprietary-business-logic: self-developed pricing/risk/ranking weights, "
+    "formulas, thresholds\n"
+    "- proprietary_tech: internal architecture/algorithm details of self-built systems\n"
+    "- business_strategy: non-public plans (market/channel/cost/expansion strategy)\n"
+    "- financial_nonpublic: unpublished financials (forecasts, unreleased results)\n"
+    "Generic/open-source algorithms, public knowledge, and mundane daily requests "
+    "are NOT sensitive. Answer strictly as JSON: {\"sensitive\":true|false,"
+    "\"category\":\"proprietary-source|proprietary-business-logic|proprietary_tech|"
+    "business_strategy|financial_nonpublic|none\","
+    "\"confidence\":0-1,\"reason\":\"...\"}\n\nCONTENT:\n"
+)
+
+
+def _parse_classifier_json(out: str, text: str, model_tag: str) -> AsyncAlert | None:
+    """把分类器 JSON 文本解析成 AsyncAlert;非敏感/解析失败 → None。"""
+    try:
+        data = json.loads(re.search(r"\{.*\}", out, re.DOTALL).group(0))
+    except Exception:
+        return None
+    if not data.get("sensitive"):
+        return None
+    return AsyncAlert(Layer.L4, data.get("category", "proprietary-source"),
+                      float(data.get("confidence", 0.5)), data.get("reason", ""),
+                      text[:200], model_tag)
+
+
+def _vllm_alert(text: str, timeout_s: float | None = None) -> AsyncAlert | None:
+    """VPC-local L4 后端:调 vLLM(OpenAI 兼容 /v1/chat/completions)做分类。
+
+    与 Bedrock 后端【同一 prompt、同一 JSON 契约】,只换传输——urllib 调 VPC 内自托管
+    小模型(如 Qwen2.5-7B/14B),内容【不出 VPC】,符合红线。env:
+      DLP_L4_VLLM_URL   默认 http://127.0.0.1:8000/v1/chat/completions
+      DLP_L4_VLLM_MODEL 默认 Qwen/Qwen2.5-7B-Instruct
+    model 标签 vllm:<model>,与 l4_calibration 的 via-backend 哨兵(startswith)对齐。
+    """
+    url = os.environ.get("DLP_L4_VLLM_URL", "http://127.0.0.1:8000/v1/chat/completions")
+    model = os.environ.get("DLP_L4_VLLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+    payload = json.dumps({
+        "model": model,
+        "messages": [{"role": "user", "content": _CLASSIFIER_PROMPT + text[:4000]}],
+        "max_tokens": 200, "temperature": 0.0,
+    }).encode("utf-8")
+    req = urllib.request.Request(url, data=payload,
+                                 headers={"Content-Type": "application/json"}, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=(timeout_s or 30.0)) as resp:
+            out = json.loads(resp.read().decode("utf-8"))["choices"][0]["message"]["content"]
+    except (urllib.error.URLError, OSError, ValueError, KeyError, TimeoutError):
+        return None
+    return _parse_classifier_json(out, text, f"vllm:{model}")
 
 # —— 离线启发式回退(Bedrock 不可达/未开启时,harness 仍能验"该不该告警"的方向)——
 # 专有信号:业务领域词 + 权重/公式/阈值等"自研逻辑"特征
@@ -90,22 +150,7 @@ def _bedrock_alert(
     except ImportError:
         return None
     model_id = CALIBRATION_MODELS.get(model_key, CALIBRATION_MODELS["main"])
-    prompt = (
-        "You are a corporate data-leak classifier. The content below is about to be "
-        "sent to an EXTERNAL cloud LLM. Decide if it exposes company-internal "
-        "sensitive information in one of these categories:\n"
-        "- proprietary-source: proprietary source code (incl. disguised as comments/docs)\n"
-        "- proprietary-business-logic: self-developed pricing/risk/ranking weights, "
-        "formulas, thresholds\n"
-        "- proprietary_tech: internal architecture/algorithm details of self-built systems\n"
-        "- business_strategy: non-public plans (market/channel/cost/expansion strategy)\n"
-        "- financial_nonpublic: unpublished financials (forecasts, unreleased results)\n"
-        "Generic/open-source algorithms, public knowledge, and mundane daily requests "
-        "are NOT sensitive. Answer strictly as JSON: {\"sensitive\":true|false,"
-        "\"category\":\"proprietary-source|proprietary-business-logic|proprietary_tech|"
-        "business_strategy|financial_nonpublic|none\","
-        "\"confidence\":0-1,\"reason\":\"...\"}\n\nCONTENT:\n" + text[:4000]
-    )
+    prompt = _CLASSIFIER_PROMPT + text[:4000]
     try:
         # ★ 同步阻断路径:Bedrock 调用被计入 addon DLP_TIMEOUT(默认 8s)总预算。
         #   L0–L3 已占一部分,故给 Bedrock 配硬超时 + 有限重试,宁可 L4 失败回退启发式,
@@ -134,14 +179,9 @@ def _bedrock_alert(
             inferenceConfig={"maxTokens": 200, "temperature": 0.0},
         )
         out = resp["output"]["message"]["content"][0]["text"]
-        data = json.loads(re.search(r"\{.*\}", out, re.DOTALL).group(0))
     except Exception:
         return None
-    if not data.get("sensitive"):
-        return None
-    return AsyncAlert(Layer.L4, data.get("category", "proprietary-source"),
-                      float(data.get("confidence", 0.5)), data.get("reason", ""),
-                      text[:200], f"bedrock:{model_key}:{model_id}")
+    return _parse_classifier_json(out, text, f"bedrock:{model_key}:{model_id}")
 
 
 def analyze(
@@ -152,13 +192,20 @@ def analyze(
 ) -> list[AsyncAlert]:
     """产出 0..1 条 AsyncAlert。use_bedrock=False 时走离线启发式(标定/单测)。
 
-    timeout_s 仅在 use_bedrock=True 时透传给 `_bedrock_alert` 作墙钟预算;
-    None(默认)保持历来行为,现有调用点(engine.py/gateway/run_layers/
-    inspect_cases/l4_calibration)零改动。
+    后端选择:
+      - use_bedrock=True 且 env DLP_L4_BACKEND=vllm → 走【VPC-local vLLM】(内容不出 VPC,
+        符合红线;model 标签 vllm:*)。这是生产形态。
+      - use_bedrock=True 且未设 vllm → 走 Bedrock(⚠出 VPC,仅标定,model 标签 bedrock:*)。
+      - use_bedrock=False → 离线启发式(model 标签 heuristic:offline)。
+    timeout_s 仅在 use_bedrock=True 时透传作墙钟预算;None(默认)保持历来行为,
+    现有调用点(engine.py/gateway/run_layers/inspect_cases/l4_calibration)零改动。
     """
     alert = None
     if use_bedrock:
-        alert = _bedrock_alert(text, model_key, timeout_s)
+        if os.environ.get("DLP_L4_BACKEND", "").lower() == "vllm":
+            alert = _vllm_alert(text, timeout_s)     # VPC-local,生产形态
+        else:
+            alert = _bedrock_alert(text, model_key, timeout_s)  # 托管,仅标定
     if alert is None:
         alert = _heuristic_alert(text)
     return [alert] if alert else []

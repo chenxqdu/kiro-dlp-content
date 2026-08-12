@@ -1,0 +1,23 @@
+{"id": "P-risk-syn", "label": 1, "src_doc": "risk-weighting", "rewrite_level": "synonym", "text": "我们的授信评分把逾期表现按 0.62 加权、额度使用按 0.38 加权，加权和超过 0.75 就拒绝放款"}
+{"id": "P-risk-rename", "label": 1, "src_doc": "risk-weighting", "rewrite_level": "rename", "text": "final_score = overdue_factor * 0.62 + credit_factor * 0.38; if final_score >= 0.75: reject_loan()"}
+{"id": "P-risk-mixed", "label": 1, "src_doc": "risk-weighting", "rewrite_level": "mixed", "text": "风控 risk_score = overdue指标 × 0.62 + quota指标 × 0.38，threshold 0.75 触发 reject"}
+{"id": "P-risk-restruct", "label": 1, "src_doc": "risk-weighting", "rewrite_level": "restructure", "text": "拒贷的判断是这样的：先把额度使用乘 0.38、逾期乘 0.62 相加，结果一旦到 0.75 这条线就自动拒。"}
+{"id": "P-pricing-syn", "label": 1, "src_doc": "pricing-expansion", "rewrite_level": "synonym", "text": "下季度渠道扩张的定价打算：把华东区获客成本降到行业平均的六成，并重新编排渠道结构"}
+{"id": "P-pricing-restruct", "label": 1, "src_doc": "pricing-expansion", "rewrite_level": "restructure", "text": "渠道要调整：第三方分销收缩、自营优先，同时华东获客成本目标是行业均值的百分之六十"}
+{"id": "P-reco-rename", "label": 1, "src_doc": "reco-ranking", "rewrite_level": "rename", "text": "推荐系统排序打分 score = 0.5*click_rate + 0.3*stay_time + 0.2*conversion，召回走双塔取前五百"}
+{"id": "P-reco-mixed", "label": 1, "src_doc": "reco-ranking", "rewrite_level": "mixed", "text": "recall 用 two-tower 向量近邻 top500，ranking 融合 ctr/dwell/cvr 三路，权重 0.5/0.3/0.2"}
+{"id": "P-margin-syn", "label": 1, "src_doc": "margin-formula", "rewrite_level": "synonym", "text": "每单毛利怎么算：成交价扣掉渠道返点、履约成本和平台补贴，补贴按用户 LTV 分层、不超过预估 LTV 的 15%"}
+{"id": "P-margin-rename", "label": 1, "src_doc": "margin-formula", "rewrite_level": "rename", "text": "profit = deal_price - channel_rebate - fulfillment_cost - subsidy，subsidy 上限 = 0.15 * estimated_ltv"}
+{"id": "P-churn-syn", "label": 1, "src_doc": "churn-model", "rewrite_level": "synonym", "text": "流失预警：把近30天登录衰减、客诉次数、会员等级代入 sigmoid 算流失概率，超过 0.6 就进挽留队列发券"}
+{"id": "P-churn-mixed", "label": 1, "src_doc": "churn-model", "rewrite_level": "mixed", "text": "churn_prob = sigmoid(-0.8 + 1.2*login_decay + 0.9*complaint - 0.5*vip_level)，prob>0.6 触发 retention"}
+{"id": "N-vocab-risk", "label": 0, "src_doc": null, "rewrite_level": "near-negative", "text": "一般来说风控模型会对多个指标加权求和，再和一个阈值比较来决定是否通过，这是行业常识"}
+{"id": "N-vocab-pricing", "label": 0, "src_doc": null, "rewrite_level": "near-negative", "text": "很多公司都会通过优化渠道结构来降低获客成本，这是市场营销的通用做法"}
+{"id": "N-vocab-reco", "label": 0, "src_doc": null, "rewrite_level": "near-negative", "text": "推荐系统通常分召回和排序两层，排序会综合多个用户行为信号，这是搜广推的标准架构"}
+{"id": "N-vocab-margin", "label": 0, "src_doc": null, "rewrite_level": "near-negative", "text": "毛利就是收入减去各项成本，做补贴的时候要注意别超过用户的长期价值，这是基本的单元经济学"}
+{"id": "N-vocab-churn", "label": 0, "src_doc": null, "rewrite_level": "near-negative", "text": "用户流失预测常用逻辑回归或树模型，输入登录、投诉等特征，输出一个概率再做运营干预"}
+{"id": "N-doc-generic", "label": 0, "src_doc": null, "rewrite_level": "near-negative", "text": "我们的产品文档需要补充一节讲清楚如何配置风控规则和定价参数，方便新同学上手"}
+{"id": "C-quicksort", "label": 0, "src_doc": null, "rewrite_level": "control", "text": "def quicksort(a):\n    if len(a) <= 1: return a\n    p = a[len(a)//2]\n    return quicksort([x for x in a if x < p]) + [x for x in a if x == p] + quicksort([x for x in a if x > p])"}
+{"id": "C-debounce", "label": 0, "src_doc": null, "rewrite_level": "control", "text": "function debounce(fn, wait) { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); }; }"}
+{"id": "C-smalltalk", "label": 0, "src_doc": null, "rewrite_level": "control", "text": "今天天气不错，帮我把这段会议纪要润色一下，语气正式些"}
+{"id": "C-readme", "label": 0, "src_doc": null, "rewrite_level": "control", "text": "This project uses pytest for testing. Run `pytest -q` to execute the suite. Contributions welcome via pull request."}
+{"id": "C-binsearch", "label": 0, "src_doc": null, "rewrite_level": "control", "text": "def binary_search(arr, x):\n    lo, hi = 0, len(arr)-1\n    while lo <= hi:\n        m = (lo+hi)//2\n        if arr[m] == x: return m\n        elif arr[m] < x: lo = m+1\n        else: hi = m-1\n    return -1"}

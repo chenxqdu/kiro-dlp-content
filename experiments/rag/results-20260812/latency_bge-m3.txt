@@ -1,0 +1,8 @@
+# RAG 层单发延迟实测（VPC-local，g5.xlarge A10G 24G，bge-m3，warm，2026-08-12）
+# 口径：含 GPU 编码 query + numpy 精确余弦检索（corpus=5）；HTTP 服务端 ThreadingHTTPServer；
+#       同 VPC（us-west-2a）内私网调用。n=50，warm-up 3 次。
+bge-m3 单发延迟(ms): n=50 p50=17.9 p95=18.3 p99=18.3 max=18.3 mean=17.8
+
+# 结论：RAG 层单发 ≈18ms，与 L0–L3.5 同步腿净成本（薄服务 p50≈14ms / 网关内 p50≈27.5ms）同量级，
+# 可进同步腿（呼应博客 §6.5「若检索够快可进同步」的推测 → 实测支撑）。
+# 注意：corpus 仅 5 条（暴力余弦 O(N) 可忽略）；语料涨到几千条时余弦仍毫秒级，主成本是 GPU 编码。

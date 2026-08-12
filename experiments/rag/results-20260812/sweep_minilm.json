@@ -1,0 +1,441 @@
+{
+  "rag_url": "http://127.0.0.1:8081/rag/query",
+  "n_cases": 23,
+  "n_pos": 12,
+  "n_neg": 11,
+  "metric_backend": "sklearn",
+  "average_precision": 0.8768,
+  "roc_auc": 0.8485,
+  "recommended": {
+    "threshold": 0.3436,
+    "precision": 0.6666666666666666,
+    "recall": 1.0
+  },
+  "recall_target": 1.0,
+  "pr_curve": [
+    {
+      "threshold": 0.0988,
+      "precision": 0.5217391304347826,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.187,
+      "precision": 0.5454545454545454,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.2032,
+      "precision": 0.5714285714285714,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.266,
+      "precision": 0.6,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.2696,
+      "precision": 0.631578947368421,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.3436,
+      "precision": 0.6666666666666666,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.4176,
+      "precision": 0.6470588235294118,
+      "recall": 0.9166666666666666
+    },
+    {
+      "threshold": 0.4422,
+      "precision": 0.6875,
+      "recall": 0.9166666666666666
+    },
+    {
+      "threshold": 0.5065,
+      "precision": 0.7333333333333333,
+      "recall": 0.9166666666666666
+    },
+    {
+      "threshold": 0.5082,
+      "precision": 0.7142857142857143,
+      "recall": 0.8333333333333334
+    },
+    {
+      "threshold": 0.5497,
+      "precision": 0.7692307692307693,
+      "recall": 0.8333333333333334
+    },
+    {
+      "threshold": 0.5639,
+      "precision": 0.75,
+      "recall": 0.75
+    },
+    {
+      "threshold": 0.5652,
+      "precision": 0.7272727272727273,
+      "recall": 0.6666666666666666
+    },
+    {
+      "threshold": 0.5885,
+      "precision": 0.7,
+      "recall": 0.5833333333333334
+    },
+    {
+      "threshold": 0.6169,
+      "precision": 0.7777777777777778,
+      "recall": 0.5833333333333334
+    },
+    {
+      "threshold": 0.6272,
+      "precision": 0.875,
+      "recall": 0.5833333333333334
+    },
+    {
+      "threshold": 0.6839,
+      "precision": 0.8571428571428571,
+      "recall": 0.5
+    },
+    {
+      "threshold": 0.6875,
+      "precision": 1.0,
+      "recall": 0.5
+    },
+    {
+      "threshold": 0.7299,
+      "precision": 1.0,
+      "recall": 0.4166666666666667
+    },
+    {
+      "threshold": 0.7872,
+      "precision": 1.0,
+      "recall": 0.3333333333333333
+    },
+    {
+      "threshold": 0.8121,
+      "precision": 1.0,
+      "recall": 0.25
+    },
+    {
+      "threshold": 0.8773,
+      "precision": 1.0,
+      "recall": 0.16666666666666666
+    },
+    {
+      "threshold": 0.9288,
+      "precision": 1.0,
+      "recall": 0.08333333333333333
+    }
+  ],
+  "roc_curve": [
+    {
+      "threshold": Infinity,
+      "fpr": 0.0,
+      "tpr": 0.0
+    },
+    {
+      "threshold": 0.9288,
+      "fpr": 0.0,
+      "tpr": 0.08333333333333333
+    },
+    {
+      "threshold": 0.6875,
+      "fpr": 0.0,
+      "tpr": 0.5
+    },
+    {
+      "threshold": 0.6839,
+      "fpr": 0.09090909090909091,
+      "tpr": 0.5
+    },
+    {
+      "threshold": 0.6272,
+      "fpr": 0.09090909090909091,
+      "tpr": 0.5833333333333334
+    },
+    {
+      "threshold": 0.5885,
+      "fpr": 0.2727272727272727,
+      "tpr": 0.5833333333333334
+    },
+    {
+      "threshold": 0.5497,
+      "fpr": 0.2727272727272727,
+      "tpr": 0.8333333333333334
+    },
+    {
+      "threshold": 0.5082,
+      "fpr": 0.36363636363636365,
+      "tpr": 0.8333333333333334
+    },
+    {
+      "threshold": 0.5065,
+      "fpr": 0.36363636363636365,
+      "tpr": 0.9166666666666666
+    },
+    {
+      "threshold": 0.4176,
+      "fpr": 0.5454545454545454,
+      "tpr": 0.9166666666666666
+    },
+    {
+      "threshold": 0.3436,
+      "fpr": 0.5454545454545454,
+      "tpr": 1.0
+    },
+    {
+      "threshold": 0.0988,
+      "fpr": 1.0,
+      "tpr": 1.0
+    }
+  ],
+  "per_case": [
+    {
+      "id": "P-risk-syn",
+      "label": 1,
+      "rewrite_level": "synonym",
+      "src_doc": "risk-weighting",
+      "max_sim": 0.5497,
+      "matched_doc": "churn-model"
+    },
+    {
+      "id": "P-risk-rename",
+      "label": 1,
+      "rewrite_level": "rename",
+      "src_doc": "risk-weighting",
+      "max_sim": 0.5065,
+      "matched_doc": "risk-weighting"
+    },
+    {
+      "id": "P-risk-mixed",
+      "label": 1,
+      "rewrite_level": "mixed",
+      "src_doc": "risk-weighting",
+      "max_sim": 0.7299,
+      "matched_doc": "risk-weighting"
+    },
+    {
+      "id": "P-risk-restruct",
+      "label": 1,
+      "rewrite_level": "restructure",
+      "src_doc": "risk-weighting",
+      "max_sim": 0.5639,
+      "matched_doc": "churn-model"
+    },
+    {
+      "id": "P-pricing-syn",
+      "label": 1,
+      "rewrite_level": "synonym",
+      "src_doc": "pricing-expansion",
+      "max_sim": 0.9288,
+      "matched_doc": "pricing-expansion"
+    },
+    {
+      "id": "P-pricing-restruct",
+      "label": 1,
+      "rewrite_level": "restructure",
+      "src_doc": "pricing-expansion",
+      "max_sim": 0.8121,
+      "matched_doc": "pricing-expansion"
+    },
+    {
+      "id": "P-reco-rename",
+      "label": 1,
+      "rewrite_level": "rename",
+      "src_doc": "reco-ranking",
+      "max_sim": 0.6272,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "P-reco-mixed",
+      "label": 1,
+      "rewrite_level": "mixed",
+      "src_doc": "reco-ranking",
+      "max_sim": 0.5652,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "P-margin-syn",
+      "label": 1,
+      "rewrite_level": "synonym",
+      "src_doc": "margin-formula",
+      "max_sim": 0.7872,
+      "matched_doc": "margin-formula"
+    },
+    {
+      "id": "P-margin-rename",
+      "label": 1,
+      "rewrite_level": "rename",
+      "src_doc": "margin-formula",
+      "max_sim": 0.6875,
+      "matched_doc": "margin-formula"
+    },
+    {
+      "id": "P-churn-syn",
+      "label": 1,
+      "rewrite_level": "synonym",
+      "src_doc": "churn-model",
+      "max_sim": 0.8773,
+      "matched_doc": "churn-model"
+    },
+    {
+      "id": "P-churn-mixed",
+      "label": 1,
+      "rewrite_level": "mixed",
+      "src_doc": "churn-model",
+      "max_sim": 0.3436,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "N-vocab-risk",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.5885,
+      "matched_doc": "risk-weighting"
+    },
+    {
+      "id": "N-vocab-pricing",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.6169,
+      "matched_doc": "pricing-expansion"
+    },
+    {
+      "id": "N-vocab-reco",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.4422,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "N-vocab-margin",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.5082,
+      "matched_doc": "pricing-expansion"
+    },
+    {
+      "id": "N-vocab-churn",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.6839,
+      "matched_doc": "churn-model"
+    },
+    {
+      "id": "N-doc-generic",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.4176,
+      "matched_doc": "risk-weighting"
+    },
+    {
+      "id": "C-quicksort",
+      "label": 0,
+      "rewrite_level": "control",
+      "src_doc": null,
+      "max_sim": 0.2696,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "C-debounce",
+      "label": 0,
+      "rewrite_level": "control",
+      "src_doc": null,
+      "max_sim": 0.2032,
+      "matched_doc": "churn-model"
+    },
+    {
+      "id": "C-smalltalk",
+      "label": 0,
+      "rewrite_level": "control",
+      "src_doc": null,
+      "max_sim": 0.0988,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "C-readme",
+      "label": 0,
+      "rewrite_level": "control",
+      "src_doc": null,
+      "max_sim": 0.266,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "C-binsearch",
+      "label": 0,
+      "rewrite_level": "control",
+      "src_doc": null,
+      "max_sim": 0.187,
+      "matched_doc": "reco-ranking"
+    }
+  ],
+  "stratified": {
+    "synonym": {
+      "label1": 4,
+      "label0": 0,
+      "sims": [
+        0.5497,
+        0.9288,
+        0.7872,
+        0.8773
+      ]
+    },
+    "rename": {
+      "label1": 3,
+      "label0": 0,
+      "sims": [
+        0.5065,
+        0.6272,
+        0.6875
+      ]
+    },
+    "mixed": {
+      "label1": 3,
+      "label0": 0,
+      "sims": [
+        0.7299,
+        0.5652,
+        0.3436
+      ]
+    },
+    "restructure": {
+      "label1": 2,
+      "label0": 0,
+      "sims": [
+        0.5639,
+        0.8121
+      ]
+    },
+    "near-negative": {
+      "label1": 0,
+      "label0": 6,
+      "sims": [
+        0.5885,
+        0.6169,
+        0.4422,
+        0.5082,
+        0.6839,
+        0.4176
+      ]
+    },
+    "control": {
+      "label1": 0,
+      "label0": 5,
+      "sims": [
+        0.2696,
+        0.2032,
+        0.0988,
+        0.266,
+        0.187
+      ]
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{"doc_id": "risk-weighting", "chunk_id": "0", "text": "公司内部风控加权模型：风险综合评分 risk_score = 逾期指标 × 0.62 + 额度使用指标 × 0.38，当 risk_score 达到阈值 0.75 时触发自动拒贷。这是未公开的核心授信规则。"}
+{"doc_id": "pricing-expansion", "chunk_id": "0", "text": "未公开定价与渠道扩张策略：下季度计划把华东区的获客成本压到行业均值的六成，同时重排渠道结构，优先扶持自营渠道、收缩第三方分销。"}
+{"doc_id": "reco-ranking", "chunk_id": "0", "text": "自研推荐引擎的召回与排序细节：召回层用双塔向量近邻取 top 500，排序层用 GBDT 融合点击率、停留时长与转化率三路信号，最终分 = 0.5×ctr + 0.3×dwell + 0.2×cvr。"}
+{"doc_id": "margin-formula", "chunk_id": "0", "text": "内部毛利测算公式 internal-margin-formula：单笔毛利 = 成交价 − 渠道返点 − 履约成本 − 平台补贴，其中平台补贴按用户 LTV 分层动态计算，补贴上限不超过预估 LTV 的 15%。"}
+{"doc_id": "churn-model", "chunk_id": "0", "text": "未公开流失预警模型：用户流失概率 = sigmoid(−0.8 + 1.2×近30天登录衰减 + 0.9×客诉次数 − 0.5×会员等级)，概率超 0.6 进入挽留队列，触发定向优惠券。"}
