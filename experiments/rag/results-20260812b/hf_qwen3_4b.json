@@ -1,0 +1,45 @@
+{
+  "backend": "transformers-direct",
+  "model": "Qwen/Qwen3-4B-Instruct-2507",
+  "load_s": 99.8,
+  "n_cases": 4,
+  "repeat": 5,
+  "category_exact": "2/4",
+  "latency_ms_generate": {
+    "p50": 2852.6,
+    "p95": 3410.8,
+    "min": 2147.9,
+    "max": 3410.8
+  },
+  "per_case": [
+    {
+      "id": "S6-01",
+      "expected": "business_strategy",
+      "got": null,
+      "hit": false,
+      "p50_ms": 3402.2
+    },
+    {
+      "id": "S6-02",
+      "expected": "financial_nonpublic",
+      "got": "financial_nonpublic",
+      "hit": true,
+      "p50_ms": 2149.8
+    },
+    {
+      "id": "S6-03",
+      "expected": "proprietary_tech",
+      "got": "proprietary-business-logic",
+      "hit": false,
+      "p50_ms": 2854.4
+    },
+    {
+      "id": "S6-04",
+      "expected": null,
+      "got": null,
+      "hit": true,
+      "p50_ms": 2408.9
+    }
+  ],
+  "note": "transformers 直推,无 vLLM 批处理优化 → 单发延迟是量级上界,非生产 serving 数字"
+}

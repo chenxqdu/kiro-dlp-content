@@ -1,0 +1,57 @@
+{
+  "backend": "vllm",
+  "model": "Qwen/Qwen3-4B-Instruct-2507",
+  "fixtures": "suite6.json",
+  "n_cases": 4,
+  "repeat": 5,
+  "category_exact": "4/4",
+  "latency_ms": {
+    "p50": 2222.2,
+    "p95": 2691.7,
+    "p99": 2691.7,
+    "min": 1618.0,
+    "max": 2691.7
+  },
+  "per_case": [
+    {
+      "id": "S6-01",
+      "expected": "business_strategy",
+      "got": "business_strategy",
+      "via_vllm": true,
+      "hit": true,
+      "p50_ms": 2691.2,
+      "min_ms": 2690.5,
+      "max_ms": 2691.7
+    },
+    {
+      "id": "S6-02",
+      "expected": "financial_nonpublic",
+      "got": "financial_nonpublic",
+      "via_vllm": true,
+      "hit": true,
+      "p50_ms": 2020.1,
+      "min_ms": 2018.8,
+      "max_ms": 2021.9
+    },
+    {
+      "id": "S6-03",
+      "expected": "proprietary_tech",
+      "got": "proprietary_tech",
+      "via_vllm": true,
+      "hit": true,
+      "p50_ms": 2222.6,
+      "min_ms": 2222.2,
+      "max_ms": 2224.1
+    },
+    {
+      "id": "S6-04",
+      "expected": null,
+      "got": null,
+      "via_vllm": false,
+      "hit": true,
+      "p50_ms": 1618.6,
+      "min_ms": 1618.0,
+      "max_ms": 1620.1
+    }
+  ]
+}

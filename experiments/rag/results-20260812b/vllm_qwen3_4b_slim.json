@@ -1,0 +1,13 @@
+{
+  "backend": "vllm-slim",
+  "model": "Qwen/Qwen3-4B-Instruct-2507",
+  "category_exact": "4/4",
+  "latency_ms": {
+    "p50": 695.1,
+    "p95": 729.6,
+    "min": 597.0,
+    "max": 732.0
+  },
+  "completion_tokens_median": 20,
+  "note": "精简输出(无reason字段,max_tokens=64),vLLM serving,CUDA graph,NVIDIA L4 24G(g6.xlarge);对照完整契约版"
+}

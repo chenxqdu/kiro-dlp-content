@@ -1,0 +1,860 @@
+{
+  "rag_url": "http://127.0.0.1:8081/rag/query",
+  "n_cases": 50,
+  "n_pos": 30,
+  "n_neg": 20,
+  "metric_backend": "sklearn",
+  "average_precision": 0.7476,
+  "roc_auc": 0.6042,
+  "recommended": {
+    "threshold": 0.7192,
+    "precision": 0.6,
+    "recall": 1.0
+  },
+  "recall_target": 1.0,
+  "pr_curve": [
+    {
+      "threshold": 0.7192,
+      "precision": 0.6,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.7198,
+      "precision": 0.5918367346938775,
+      "recall": 0.9666666666666667
+    },
+    {
+      "threshold": 0.7336,
+      "precision": 0.6041666666666666,
+      "recall": 0.9666666666666667
+    },
+    {
+      "threshold": 0.7355,
+      "precision": 0.5957446808510638,
+      "recall": 0.9333333333333333
+    },
+    {
+      "threshold": 0.7487,
+      "precision": 0.5869565217391305,
+      "recall": 0.9
+    },
+    {
+      "threshold": 0.7514,
+      "precision": 0.6,
+      "recall": 0.9
+    },
+    {
+      "threshold": 0.7515,
+      "precision": 0.5909090909090909,
+      "recall": 0.8666666666666667
+    },
+    {
+      "threshold": 0.7558,
+      "precision": 0.6046511627906976,
+      "recall": 0.8666666666666667
+    },
+    {
+      "threshold": 0.76,
+      "precision": 0.5952380952380952,
+      "recall": 0.8333333333333334
+    },
+    {
+      "threshold": 0.7613,
+      "precision": 0.6097560975609756,
+      "recall": 0.8333333333333334
+    },
+    {
+      "threshold": 0.7683,
+      "precision": 0.6,
+      "recall": 0.8
+    },
+    {
+      "threshold": 0.7689,
+      "precision": 0.6153846153846154,
+      "recall": 0.8
+    },
+    {
+      "threshold": 0.7823,
+      "precision": 0.6052631578947368,
+      "recall": 0.7666666666666667
+    },
+    {
+      "threshold": 0.7871,
+      "precision": 0.6216216216216216,
+      "recall": 0.7666666666666667
+    },
+    {
+      "threshold": 0.7872,
+      "precision": 0.6388888888888888,
+      "recall": 0.7666666666666667
+    },
+    {
+      "threshold": 0.7875,
+      "precision": 0.6571428571428571,
+      "recall": 0.7666666666666667
+    },
+    {
+      "threshold": 0.7999,
+      "precision": 0.6470588235294118,
+      "recall": 0.7333333333333333
+    },
+    {
+      "threshold": 0.8003,
+      "precision": 0.6363636363636364,
+      "recall": 0.7
+    },
+    {
+      "threshold": 0.8016,
+      "precision": 0.65625,
+      "recall": 0.7
+    },
+    {
+      "threshold": 0.8026,
+      "precision": 0.6451612903225806,
+      "recall": 0.6666666666666666
+    },
+    {
+      "threshold": 0.8027,
+      "precision": 0.6666666666666666,
+      "recall": 0.6666666666666666
+    },
+    {
+      "threshold": 0.8033,
+      "precision": 0.6896551724137931,
+      "recall": 0.6666666666666666
+    },
+    {
+      "threshold": 0.8045,
+      "precision": 0.6785714285714286,
+      "recall": 0.6333333333333333
+    },
+    {
+      "threshold": 0.81,
+      "precision": 0.6666666666666666,
+      "recall": 0.6
+    },
+    {
+      "threshold": 0.8127,
+      "precision": 0.6538461538461539,
+      "recall": 0.5666666666666667
+    },
+    {
+      "threshold": 0.8135,
+      "precision": 0.64,
+      "recall": 0.5333333333333333
+    },
+    {
+      "threshold": 0.8155,
+      "precision": 0.625,
+      "recall": 0.5
+    },
+    {
+      "threshold": 0.8171,
+      "precision": 0.6086956521739131,
+      "recall": 0.4666666666666667
+    },
+    {
+      "threshold": 0.8172,
+      "precision": 0.6363636363636364,
+      "recall": 0.4666666666666667
+    },
+    {
+      "threshold": 0.8195,
+      "precision": 0.6666666666666666,
+      "recall": 0.4666666666666667
+    },
+    {
+      "threshold": 0.8207,
+      "precision": 0.7,
+      "recall": 0.4666666666666667
+    },
+    {
+      "threshold": 0.8212,
+      "precision": 0.7368421052631579,
+      "recall": 0.4666666666666667
+    },
+    {
+      "threshold": 0.8293,
+      "precision": 0.7647058823529411,
+      "recall": 0.43333333333333335
+    },
+    {
+      "threshold": 0.8373,
+      "precision": 0.75,
+      "recall": 0.4
+    },
+    {
+      "threshold": 0.8389,
+      "precision": 0.7333333333333333,
+      "recall": 0.36666666666666664
+    },
+    {
+      "threshold": 0.8402,
+      "precision": 0.7857142857142857,
+      "recall": 0.36666666666666664
+    },
+    {
+      "threshold": 0.8403,
+      "precision": 0.7692307692307693,
+      "recall": 0.3333333333333333
+    },
+    {
+      "threshold": 0.8433,
+      "precision": 0.75,
+      "recall": 0.3
+    },
+    {
+      "threshold": 0.8472,
+      "precision": 0.7272727272727273,
+      "recall": 0.26666666666666666
+    },
+    {
+      "threshold": 0.8473,
+      "precision": 0.7,
+      "recall": 0.23333333333333334
+    },
+    {
+      "threshold": 0.8508,
+      "precision": 0.7777777777777778,
+      "recall": 0.23333333333333334
+    },
+    {
+      "threshold": 0.8538,
+      "precision": 0.875,
+      "recall": 0.23333333333333334
+    },
+    {
+      "threshold": 0.8736,
+      "precision": 1.0,
+      "recall": 0.23333333333333334
+    },
+    {
+      "threshold": 0.8766,
+      "precision": 1.0,
+      "recall": 0.2
+    },
+    {
+      "threshold": 0.8827,
+      "precision": 1.0,
+      "recall": 0.16666666666666666
+    },
+    {
+      "threshold": 0.8909,
+      "precision": 1.0,
+      "recall": 0.13333333333333333
+    },
+    {
+      "threshold": 0.8941,
+      "precision": 1.0,
+      "recall": 0.1
+    },
+    {
+      "threshold": 0.911,
+      "precision": 1.0,
+      "recall": 0.06666666666666667
+    },
+    {
+      "threshold": 0.9288,
+      "precision": 1.0,
+      "recall": 0.03333333333333333
+    }
+  ],
+  "roc_curve": [
+    {
+      "threshold": Infinity,
+      "fpr": 0.0,
+      "tpr": 0.0
+    },
+    {
+      "threshold": 0.9288,
+      "fpr": 0.0,
+      "tpr": 0.03333333333333333
+    },
+    {
+      "threshold": 0.8736,
+      "fpr": 0.0,
+      "tpr": 0.23333333333333334
+    },
+    {
+      "threshold": 0.8473,
+      "fpr": 0.15,
+      "tpr": 0.23333333333333334
+    },
+    {
+      "threshold": 0.8402,
+      "fpr": 0.15,
+      "tpr": 0.36666666666666664
+    },
+    {
+      "threshold": 0.8389,
+      "fpr": 0.2,
+      "tpr": 0.36666666666666664
+    },
+    {
+      "threshold": 0.8293,
+      "fpr": 0.2,
+      "tpr": 0.43333333333333335
+    },
+    {
+      "threshold": 0.8212,
+      "fpr": 0.25,
+      "tpr": 0.4666666666666667
+    },
+    {
+      "threshold": 0.8171,
+      "fpr": 0.45,
+      "tpr": 0.4666666666666667
+    },
+    {
+      "threshold": 0.8033,
+      "fpr": 0.45,
+      "tpr": 0.6666666666666666
+    },
+    {
+      "threshold": 0.8026,
+      "fpr": 0.55,
+      "tpr": 0.6666666666666666
+    },
+    {
+      "threshold": 0.8016,
+      "fpr": 0.55,
+      "tpr": 0.7
+    },
+    {
+      "threshold": 0.8003,
+      "fpr": 0.6,
+      "tpr": 0.7
+    },
+    {
+      "threshold": 0.7875,
+      "fpr": 0.6,
+      "tpr": 0.7666666666666667
+    },
+    {
+      "threshold": 0.7823,
+      "fpr": 0.75,
+      "tpr": 0.7666666666666667
+    },
+    {
+      "threshold": 0.7689,
+      "fpr": 0.75,
+      "tpr": 0.8
+    },
+    {
+      "threshold": 0.7683,
+      "fpr": 0.8,
+      "tpr": 0.8
+    },
+    {
+      "threshold": 0.7613,
+      "fpr": 0.8,
+      "tpr": 0.8333333333333334
+    },
+    {
+      "threshold": 0.76,
+      "fpr": 0.85,
+      "tpr": 0.8333333333333334
+    },
+    {
+      "threshold": 0.7558,
+      "fpr": 0.85,
+      "tpr": 0.8666666666666667
+    },
+    {
+      "threshold": 0.7515,
+      "fpr": 0.9,
+      "tpr": 0.8666666666666667
+    },
+    {
+      "threshold": 0.7514,
+      "fpr": 0.9,
+      "tpr": 0.9
+    },
+    {
+      "threshold": 0.7487,
+      "fpr": 0.95,
+      "tpr": 0.9
+    },
+    {
+      "threshold": 0.7336,
+      "fpr": 0.95,
+      "tpr": 0.9666666666666667
+    },
+    {
+      "threshold": 0.7198,
+      "fpr": 1.0,
+      "tpr": 0.9666666666666667
+    },
+    {
+      "threshold": 0.7192,
+      "fpr": 1.0,
+      "tpr": 1.0
+    }
+  ],
+  "per_case": [
+    {
+      "id": "P-poj-1-0",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-1",
+      "max_sim": 0.7336,
+      "matched_doc": "poj-18"
+    },
+    {
+      "id": "P-poj-1-1",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-1",
+      "max_sim": 0.8155,
+      "matched_doc": "poj-13"
+    },
+    {
+      "id": "P-poj-1-2",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-1",
+      "max_sim": 0.8045,
+      "matched_doc": "poj-13"
+    },
+    {
+      "id": "P-poj-10-0",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-10",
+      "max_sim": 0.8373,
+      "matched_doc": "poj-10"
+    },
+    {
+      "id": "P-poj-10-1",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-10",
+      "max_sim": 0.8736,
+      "matched_doc": "poj-13"
+    },
+    {
+      "id": "P-poj-10-2",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-10",
+      "max_sim": 0.8909,
+      "matched_doc": "poj-10"
+    },
+    {
+      "id": "P-poj-11-0",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-11",
+      "max_sim": 0.7875,
+      "matched_doc": "poj-11"
+    },
+    {
+      "id": "P-poj-11-1",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-11",
+      "max_sim": 0.8433,
+      "matched_doc": "poj-13"
+    },
+    {
+      "id": "P-poj-11-2",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-11",
+      "max_sim": 0.8472,
+      "matched_doc": "poj-11"
+    },
+    {
+      "id": "P-poj-12-0",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-12",
+      "max_sim": 0.8403,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "P-poj-12-1",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-12",
+      "max_sim": 0.81,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "P-poj-12-2",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-12",
+      "max_sim": 0.7613,
+      "matched_doc": "poj-10"
+    },
+    {
+      "id": "P-poj-13-0",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-13",
+      "max_sim": 0.8033,
+      "matched_doc": "poj-15"
+    },
+    {
+      "id": "P-poj-13-1",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-13",
+      "max_sim": 0.9288,
+      "matched_doc": "poj-13"
+    },
+    {
+      "id": "P-poj-13-2",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-13",
+      "max_sim": 0.8293,
+      "matched_doc": "poj-1"
+    },
+    {
+      "id": "P-poj-14-0",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-14",
+      "max_sim": 0.7355,
+      "matched_doc": "poj-15"
+    },
+    {
+      "id": "P-poj-14-1",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-14",
+      "max_sim": 0.7689,
+      "matched_doc": "poj-13"
+    },
+    {
+      "id": "P-poj-14-2",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-14",
+      "max_sim": 0.7192,
+      "matched_doc": "poj-14"
+    },
+    {
+      "id": "P-poj-15-0",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-15",
+      "max_sim": 0.7558,
+      "matched_doc": "poj-15"
+    },
+    {
+      "id": "P-poj-15-1",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-15",
+      "max_sim": 0.8016,
+      "matched_doc": "poj-1"
+    },
+    {
+      "id": "P-poj-15-2",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-15",
+      "max_sim": 0.8402,
+      "matched_doc": "poj-15"
+    },
+    {
+      "id": "P-poj-16-0",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-16",
+      "max_sim": 0.8212,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "P-poj-16-1",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-16",
+      "max_sim": 0.8827,
+      "matched_doc": "poj-16"
+    },
+    {
+      "id": "P-poj-16-2",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-16",
+      "max_sim": 0.911,
+      "matched_doc": "poj-16"
+    },
+    {
+      "id": "P-poj-17-0",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-17",
+      "max_sim": 0.8941,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "P-poj-17-1",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-17",
+      "max_sim": 0.8127,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "P-poj-17-2",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-17",
+      "max_sim": 0.8135,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "P-poj-18-0",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-18",
+      "max_sim": 0.7514,
+      "matched_doc": "poj-18"
+    },
+    {
+      "id": "P-poj-18-1",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-18",
+      "max_sim": 0.7999,
+      "matched_doc": "poj-18"
+    },
+    {
+      "id": "P-poj-18-2",
+      "label": 1,
+      "rewrite_level": "poj-t4",
+      "src_doc": "poj-18",
+      "max_sim": 0.8766,
+      "matched_doc": "poj-18"
+    },
+    {
+      "id": "N-2-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8003,
+      "matched_doc": "poj-10"
+    },
+    {
+      "id": "N-3-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8538,
+      "matched_doc": "poj-13"
+    },
+    {
+      "id": "N-4-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8508,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "N-5-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.7823,
+      "matched_doc": "poj-12"
+    },
+    {
+      "id": "N-6-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8389,
+      "matched_doc": "poj-13"
+    },
+    {
+      "id": "N-7-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.7871,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "N-8-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.7683,
+      "matched_doc": "poj-13"
+    },
+    {
+      "id": "N-9-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8473,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "N-19-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8171,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "N-20-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.7872,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "N-21-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.76,
+      "matched_doc": "poj-18"
+    },
+    {
+      "id": "N-22-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8026,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "N-23-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.7487,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "N-24-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8207,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "N-25-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8212,
+      "matched_doc": "poj-1"
+    },
+    {
+      "id": "N-26-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8195,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "N-27-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.7198,
+      "matched_doc": "poj-16"
+    },
+    {
+      "id": "N-28-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8172,
+      "matched_doc": "poj-17"
+    },
+    {
+      "id": "N-29-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.8027,
+      "matched_doc": "poj-13"
+    },
+    {
+      "id": "N-30-0",
+      "label": 0,
+      "rewrite_level": "poj-negative",
+      "src_doc": null,
+      "max_sim": 0.7515,
+      "matched_doc": "poj-16"
+    }
+  ],
+  "stratified": {
+    "poj-t4": {
+      "label1": 30,
+      "label0": 0,
+      "sims": [
+        0.7336,
+        0.8155,
+        0.8045,
+        0.8373,
+        0.8736,
+        0.8909,
+        0.7875,
+        0.8433,
+        0.8472,
+        0.8403,
+        0.81,
+        0.7613,
+        0.8033,
+        0.9288,
+        0.8293,
+        0.7355,
+        0.7689,
+        0.7192,
+        0.7558,
+        0.8016,
+        0.8402,
+        0.8212,
+        0.8827,
+        0.911,
+        0.8941,
+        0.8127,
+        0.8135,
+        0.7514,
+        0.7999,
+        0.8766
+      ]
+    },
+    "poj-negative": {
+      "label1": 0,
+      "label0": 20,
+      "sims": [
+        0.8003,
+        0.8538,
+        0.8508,
+        0.7823,
+        0.8389,
+        0.7871,
+        0.7683,
+        0.8473,
+        0.8171,
+        0.7872,
+        0.76,
+        0.8026,
+        0.7487,
+        0.8207,
+        0.8212,
+        0.8195,
+        0.7198,
+        0.8172,
+        0.8027,
+        0.7515
+      ]
+    }
+  }
+}

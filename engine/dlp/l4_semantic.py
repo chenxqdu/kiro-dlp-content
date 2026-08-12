@@ -76,10 +76,12 @@ def _vllm_alert(text: str, timeout_s: float | None = None) -> AsyncAlert | None:
     """
     url = os.environ.get("DLP_L4_VLLM_URL", "http://127.0.0.1:8000/v1/chat/completions")
     model = os.environ.get("DLP_L4_VLLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+    # max_tokens=128:分类 JSON(sensitive/category/confidence/短 reason)128 token 足够,
+    #   降生成步数=降单发延迟(实测 200→128 显著降 p50,类别命中不变);同步阻断腿延迟敏感。
     payload = json.dumps({
         "model": model,
         "messages": [{"role": "user", "content": _CLASSIFIER_PROMPT + text[:4000]}],
-        "max_tokens": 200, "temperature": 0.0,
+        "max_tokens": 128, "temperature": 0.0,
     }).encode("utf-8")
     req = urllib.request.Request(url, data=payload,
                                  headers={"Content-Type": "application/json"}, method="POST")

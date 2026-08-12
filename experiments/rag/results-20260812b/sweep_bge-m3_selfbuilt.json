@@ -1,0 +1,421 @@
+{
+  "rag_url": "http://127.0.0.1:8081/rag/query",
+  "n_cases": 23,
+  "n_pos": 12,
+  "n_neg": 11,
+  "metric_backend": "sklearn",
+  "average_precision": 0.9302,
+  "roc_auc": 0.9015,
+  "recommended": {
+    "threshold": 0.6485,
+    "precision": 0.7058823529411765,
+    "recall": 1.0
+  },
+  "recall_target": 1.0,
+  "pr_curve": [
+    {
+      "threshold": 0.4126,
+      "precision": 0.5217391304347826,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.4532,
+      "precision": 0.5454545454545454,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.458,
+      "precision": 0.5714285714285714,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.4708,
+      "precision": 0.6,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.4981,
+      "precision": 0.631578947368421,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.5704,
+      "precision": 0.6666666666666666,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.6485,
+      "precision": 0.7058823529411765,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.6759,
+      "precision": 0.6875,
+      "recall": 0.9166666666666666
+    },
+    {
+      "threshold": 0.6991,
+      "precision": 0.6666666666666666,
+      "recall": 0.8333333333333334
+    },
+    {
+      "threshold": 0.7175,
+      "precision": 0.7142857142857143,
+      "recall": 0.8333333333333334
+    },
+    {
+      "threshold": 0.7241,
+      "precision": 0.7692307692307693,
+      "recall": 0.8333333333333334
+    },
+    {
+      "threshold": 0.726,
+      "precision": 0.75,
+      "recall": 0.75
+    },
+    {
+      "threshold": 0.7344,
+      "precision": 0.9,
+      "recall": 0.75
+    },
+    {
+      "threshold": 0.7365,
+      "precision": 1.0,
+      "recall": 0.75
+    },
+    {
+      "threshold": 0.7662,
+      "precision": 1.0,
+      "recall": 0.6666666666666666
+    },
+    {
+      "threshold": 0.7747,
+      "precision": 1.0,
+      "recall": 0.5833333333333334
+    },
+    {
+      "threshold": 0.779,
+      "precision": 1.0,
+      "recall": 0.5
+    },
+    {
+      "threshold": 0.7805,
+      "precision": 1.0,
+      "recall": 0.4166666666666667
+    },
+    {
+      "threshold": 0.8254,
+      "precision": 1.0,
+      "recall": 0.3333333333333333
+    },
+    {
+      "threshold": 0.847,
+      "precision": 1.0,
+      "recall": 0.25
+    },
+    {
+      "threshold": 0.8968,
+      "precision": 1.0,
+      "recall": 0.16666666666666666
+    },
+    {
+      "threshold": 0.9062,
+      "precision": 1.0,
+      "recall": 0.08333333333333333
+    }
+  ],
+  "roc_curve": [
+    {
+      "threshold": Infinity,
+      "fpr": 0.0,
+      "tpr": 0.0
+    },
+    {
+      "threshold": 0.9062,
+      "fpr": 0.0,
+      "tpr": 0.08333333333333333
+    },
+    {
+      "threshold": 0.7365,
+      "fpr": 0.0,
+      "tpr": 0.75
+    },
+    {
+      "threshold": 0.7344,
+      "fpr": 0.09090909090909091,
+      "tpr": 0.75
+    },
+    {
+      "threshold": 0.726,
+      "fpr": 0.2727272727272727,
+      "tpr": 0.75
+    },
+    {
+      "threshold": 0.7241,
+      "fpr": 0.2727272727272727,
+      "tpr": 0.8333333333333334
+    },
+    {
+      "threshold": 0.6991,
+      "fpr": 0.45454545454545453,
+      "tpr": 0.8333333333333334
+    },
+    {
+      "threshold": 0.6485,
+      "fpr": 0.45454545454545453,
+      "tpr": 1.0
+    },
+    {
+      "threshold": 0.4126,
+      "fpr": 1.0,
+      "tpr": 1.0
+    }
+  ],
+  "per_case": [
+    {
+      "id": "P-risk-syn",
+      "label": 1,
+      "rewrite_level": "synonym",
+      "src_doc": "risk-weighting",
+      "max_sim": 0.7805,
+      "matched_doc": "risk-weighting"
+    },
+    {
+      "id": "P-risk-rename",
+      "label": 1,
+      "rewrite_level": "rename",
+      "src_doc": "risk-weighting",
+      "max_sim": 0.7241,
+      "matched_doc": "risk-weighting"
+    },
+    {
+      "id": "P-risk-mixed",
+      "label": 1,
+      "rewrite_level": "mixed",
+      "src_doc": "risk-weighting",
+      "max_sim": 0.779,
+      "matched_doc": "risk-weighting"
+    },
+    {
+      "id": "P-risk-restruct",
+      "label": 1,
+      "rewrite_level": "restructure",
+      "src_doc": "risk-weighting",
+      "max_sim": 0.7662,
+      "matched_doc": "risk-weighting"
+    },
+    {
+      "id": "P-pricing-syn",
+      "label": 1,
+      "rewrite_level": "synonym",
+      "src_doc": "pricing-expansion",
+      "max_sim": 0.9062,
+      "matched_doc": "pricing-expansion"
+    },
+    {
+      "id": "P-pricing-restruct",
+      "label": 1,
+      "rewrite_level": "restructure",
+      "src_doc": "pricing-expansion",
+      "max_sim": 0.847,
+      "matched_doc": "pricing-expansion"
+    },
+    {
+      "id": "P-reco-rename",
+      "label": 1,
+      "rewrite_level": "rename",
+      "src_doc": "reco-ranking",
+      "max_sim": 0.7747,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "P-reco-mixed",
+      "label": 1,
+      "rewrite_level": "mixed",
+      "src_doc": "reco-ranking",
+      "max_sim": 0.7365,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "P-margin-syn",
+      "label": 1,
+      "rewrite_level": "synonym",
+      "src_doc": "margin-formula",
+      "max_sim": 0.8254,
+      "matched_doc": "margin-formula"
+    },
+    {
+      "id": "P-margin-rename",
+      "label": 1,
+      "rewrite_level": "rename",
+      "src_doc": "margin-formula",
+      "max_sim": 0.6485,
+      "matched_doc": "margin-formula"
+    },
+    {
+      "id": "P-churn-syn",
+      "label": 1,
+      "rewrite_level": "synonym",
+      "src_doc": "churn-model",
+      "max_sim": 0.8968,
+      "matched_doc": "churn-model"
+    },
+    {
+      "id": "P-churn-mixed",
+      "label": 1,
+      "rewrite_level": "mixed",
+      "src_doc": "churn-model",
+      "max_sim": 0.6759,
+      "matched_doc": "churn-model"
+    },
+    {
+      "id": "N-vocab-risk",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.726,
+      "matched_doc": "risk-weighting"
+    },
+    {
+      "id": "N-vocab-pricing",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.6991,
+      "matched_doc": "pricing-expansion"
+    },
+    {
+      "id": "N-vocab-reco",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.726,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "N-vocab-margin",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.7175,
+      "matched_doc": "margin-formula"
+    },
+    {
+      "id": "N-vocab-churn",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.7344,
+      "matched_doc": "churn-model"
+    },
+    {
+      "id": "N-doc-generic",
+      "label": 0,
+      "rewrite_level": "near-negative",
+      "src_doc": null,
+      "max_sim": 0.5704,
+      "matched_doc": "pricing-expansion"
+    },
+    {
+      "id": "C-quicksort",
+      "label": 0,
+      "rewrite_level": "control",
+      "src_doc": null,
+      "max_sim": 0.4708,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "C-debounce",
+      "label": 0,
+      "rewrite_level": "control",
+      "src_doc": null,
+      "max_sim": 0.4981,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "C-smalltalk",
+      "label": 0,
+      "rewrite_level": "control",
+      "src_doc": null,
+      "max_sim": 0.4126,
+      "matched_doc": "pricing-expansion"
+    },
+    {
+      "id": "C-readme",
+      "label": 0,
+      "rewrite_level": "control",
+      "src_doc": null,
+      "max_sim": 0.4532,
+      "matched_doc": "reco-ranking"
+    },
+    {
+      "id": "C-binsearch",
+      "label": 0,
+      "rewrite_level": "control",
+      "src_doc": null,
+      "max_sim": 0.458,
+      "matched_doc": "reco-ranking"
+    }
+  ],
+  "stratified": {
+    "synonym": {
+      "label1": 4,
+      "label0": 0,
+      "sims": [
+        0.7805,
+        0.9062,
+        0.8254,
+        0.8968
+      ]
+    },
+    "rename": {
+      "label1": 3,
+      "label0": 0,
+      "sims": [
+        0.7241,
+        0.7747,
+        0.6485
+      ]
+    },
+    "mixed": {
+      "label1": 3,
+      "label0": 0,
+      "sims": [
+        0.779,
+        0.7365,
+        0.6759
+      ]
+    },
+    "restructure": {
+      "label1": 2,
+      "label0": 0,
+      "sims": [
+        0.7662,
+        0.847
+      ]
+    },
+    "near-negative": {
+      "label1": 0,
+      "label0": 6,
+      "sims": [
+        0.726,
+        0.6991,
+        0.726,
+        0.7175,
+        0.7344,
+        0.5704
+      ]
+    },
+    "control": {
+      "label1": 0,
+      "label0": 5,
+      "sims": [
+        0.4708,
+        0.4981,
+        0.4126,
+        0.4532,
+        0.458
+      ]
+    }
+  }
+}
