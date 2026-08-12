@@ -449,6 +449,41 @@ RAG 层有两个现成的挂载位，取决于它的检索延迟够不够确定�
 
 本文最初「只给方案」，2026-08-12 已在 VPC-local GPU 机上跑了首轮真机实验，数字回填在 §5.3 / §6.4 / §6.5；**2026-08-12b 又补跑了两项改进**——① Qwen3-4B + vLLM serving 低延迟、② 代码专用嵌入 F2LLM + 可靠数据集 POJ-104。本节保留方案设计，并逐条标注**哪些已实测、哪些仍待测**。所有已回填数字取自机器输出、可追溯到 [`experiments/rag/results-20260812/`](../experiments/rag/results-20260812/) 与 [`results-20260812b/`](../experiments/rag/results-20260812b/)，无手写。
 
+### 8.0 测试数据集：全部合成、oracle 先行、按层/按场景两套编制
+
+文中所有实测数字背后是四组数据集，编制原则先说清楚，数字才可信：
+
+1. **全部合成，零真实机密。** 每一条「敏感值」都是数学正确的合成串——身份证过 mod-11 校验、卡号过 Luhn、AKIA 满足格式结构，但都不是真实凭证（生成器 [`gen_fixtures.py`](../engine/tests/gen_fixtures.py) 对每条自检 assert）；同时**刻意避开**引擎白名单（官方示例 key `AKIAIOSFODNN7EXAMPLE`、公开测试卡）以免被静默放行、污染结果。
+2. **oracle 先行，不脑推期望值。** 每条 fixture 的 `expected` 不是拍脑袋写的：生成时对引擎**实跑** `scan()`，期望值与真实行为不一致则报错退出——测试数据本身先过了一道「与被测对象对齐」的关。
+
+四组数据集的构成：
+
+| 数据集 | 规模 | 用途 | 位置 |
+|---|---|---|---|
+| **分层向量**（fixtures_layers） | 78 条（L0×14 / L1×12 / L2×7 / L3×9 / L3.5×10 / EGRESS×11 / NORM×7 / L4×8）+ 后加 L3.7×8 | 每层每条规则的正例/豁免/边界，直调各层 `scan()`（§4 分层延迟即出自这组） | [`engine/tests/fixtures_layers/`](../engine/tests/fixtures_layers/) |
+| **场景 suite**（suite1–7） | 64 条（11/16/10/6/9/4/8） | 端到端注入点×内容形态矩阵；suite6 是 L4 语义语料（§5.3 类别命中即用它） | [`engine/tests/fixtures/`](../engine/tests/fixtures/) |
+| **k6 压测向量** | 攻击（local×3 + redact×3 + l3only×3）+ 合法（短×8 + 长文本） | 吞吐阶梯/误杀率/fail-closed 对账（§4 整机分位与拐点即用它） | 两方案 `*/perf/vectors.json` |
+| **RAG 评测集** | 自建中文机密 23 条 + POJ-104 派生 50 条 + CodeNet Python800 派生 50 条 | L3.7 阈值扫描 / 嵌入模型对比（§6.4） | [`experiments/rag/`](../experiments/rag/)（构建脚本 + 派生集均入库） |
+
+两条示例给个直观感受（均为合成数据原文）。分层向量一条——L0 正例，合成 AKIA 真值必须 BLOCK：
+
+```json
+{"id": "L0-AK-POS", "layer": "L0", "note": "aws_access_key AKIA+16 真值 → BLOCK",
+ "text": "deploy key AKIA1234567890ABCDEF to prod",
+ "must_hit": [{"rule": "aws_access_key", "entity": "AWS_ACCESS_KEY", "action": "block"}]}
+```
+
+场景 suite 一条——suite6 语义敏感语料，无任何正则可抓的特征，同步必须 PASS、异步 L4 必须标出 `business_strategy` 类别（这正是「新写内容无签名漏检」的测法）：
+
+```json
+{"id": "S6-01", "injection_point": "prompt",
+ "content": "我们下个季度计划把华东区的获客成本压到行业均值的六成,渠道结构也要重排。",
+ "expected": {"verdict": "pass", "async_l4_category": "business_strategy"},
+ "invariants": ["经营策略语义敏感,无正则特征 → 同步 PASS,L4 异步告警"]}
+```
+
+RAG 评测集的口径详见 §6.4：自建中文集（5 条合成机密建库 + 12 改写正例 + 6 邻近负例 + 5 阴性对照）测中文自然语言机密；POJ-104 / CodeNet 派生集（各 10 题建库 + 30 同题改写正例 + 20 异题负例，同题 = Type-4 语义克隆）测代码改写，构建脚本确定性派生、原始数据集运行时从 HF 下载不入库。
+
 ### 8.1 VPC 内小模型延迟
 
 - **类别命中 + 单发延迟**：复用现有的 L4 标定 harness（同一套无签名语义敏感语料 + oracle 类别标注），把模型端点从 Bedrock 换成 VPC 内 vLLM 的 7B/14B，计时骨架现成，直接对比「小模型 vs 32B 托管」的类别命中率与单条延迟。
