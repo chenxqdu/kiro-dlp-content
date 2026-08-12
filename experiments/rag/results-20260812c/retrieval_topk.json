@@ -1,0 +1,98 @@
+{
+  "note": "top-1 检索准确率(matched_doc==src_doc) + Wilson 95% CI，防 AP 饱和锚；从 sweep per_case 纯后处理，零新增服务调用",
+  "models": [
+    {
+      "sweep_file": "sweep_f2llm_codenet-py.json",
+      "n_pos": 30,
+      "top1_hits": 30,
+      "top1_accuracy": 1.0,
+      "wilson_95ci": [
+        0.8865,
+        1.0
+      ],
+      "average_precision": 1.0,
+      "misses": [],
+      "ap_saturated": true,
+      "rule_of_three_note": "AP=1.000 为小样本饱和值：n=50 条全对时，真实错误率 95% 上界≈3/50=0.060，即 AP/召回真实下界≈0.940，不可读作'证明完美'。"
+    },
+    {
+      "sweep_file": "sweep_bge-m3_codenet-py.json",
+      "n_pos": 30,
+      "top1_hits": 19,
+      "top1_accuracy": 0.6333,
+      "wilson_95ci": [
+        0.4551,
+        0.7813
+      ],
+      "average_precision": 0.8999,
+      "misses": [
+        {
+          "id": "P-cn-py-p00000-1",
+          "src_doc": "cn-py-p00000",
+          "matched_doc": "cn-py-p00001",
+          "max_sim": 0.8072
+        },
+        {
+          "id": "P-cn-py-p00000-2",
+          "src_doc": "cn-py-p00000",
+          "matched_doc": "cn-py-p00001",
+          "max_sim": 0.7587
+        },
+        {
+          "id": "P-cn-py-p00005-0",
+          "src_doc": "cn-py-p00005",
+          "matched_doc": "cn-py-p00002",
+          "max_sim": 0.7592
+        },
+        {
+          "id": "P-cn-py-p00007-2",
+          "src_doc": "cn-py-p00007",
+          "matched_doc": "cn-py-p02255",
+          "max_sim": 0.8145
+        },
+        {
+          "id": "P-cn-py-p02238-0",
+          "src_doc": "cn-py-p02238",
+          "matched_doc": "cn-py-p02239",
+          "max_sim": 0.7386
+        },
+        {
+          "id": "P-cn-py-p02238-1",
+          "src_doc": "cn-py-p02238",
+          "matched_doc": "cn-py-p02255",
+          "max_sim": 0.7733
+        },
+        {
+          "id": "P-cn-py-p02238-2",
+          "src_doc": "cn-py-p02238",
+          "matched_doc": "cn-py-p02239",
+          "max_sim": 0.7919
+        },
+        {
+          "id": "P-cn-py-p02239-0",
+          "src_doc": "cn-py-p02239",
+          "matched_doc": "cn-py-p02255",
+          "max_sim": 0.7863
+        },
+        {
+          "id": "P-cn-py-p02239-1",
+          "src_doc": "cn-py-p02239",
+          "matched_doc": "cn-py-p02255",
+          "max_sim": 0.7165
+        },
+        {
+          "id": "P-cn-py-p02239-2",
+          "src_doc": "cn-py-p02239",
+          "matched_doc": "cn-py-p02255",
+          "max_sim": 0.7525
+        },
+        {
+          "id": "P-cn-py-p02255-0",
+          "src_doc": "cn-py-p02255",
+          "matched_doc": "cn-py-p00001",
+          "max_sim": 0.7407
+        }
+      ]
+    }
+  ]
+}

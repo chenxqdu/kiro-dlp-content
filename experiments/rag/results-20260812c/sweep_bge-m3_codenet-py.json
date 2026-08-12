@@ -1,0 +1,815 @@
+{
+  "rag_url": "http://127.0.0.1:8081/rag/query",
+  "n_cases": 50,
+  "n_pos": 30,
+  "n_neg": 20,
+  "metric_backend": "sklearn",
+  "average_precision": 0.8999,
+  "roc_auc": 0.845,
+  "recommended": {
+    "threshold": 0.7158,
+    "precision": 0.7317073170731707,
+    "recall": 1.0
+  },
+  "recall_target": 1.0,
+  "pr_curve": [
+    {
+      "threshold": 0.6338,
+      "precision": 0.6,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.6577,
+      "precision": 0.6122448979591837,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.675,
+      "precision": 0.625,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.6879,
+      "precision": 0.6382978723404256,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.6975,
+      "precision": 0.6521739130434783,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.7062,
+      "precision": 0.6666666666666666,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.7103,
+      "precision": 0.6818181818181818,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.713,
+      "precision": 0.6976744186046512,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.7152,
+      "precision": 0.7142857142857143,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.7158,
+      "precision": 0.7317073170731707,
+      "recall": 1.0
+    },
+    {
+      "threshold": 0.7165,
+      "precision": 0.725,
+      "recall": 0.9666666666666667
+    },
+    {
+      "threshold": 0.7171,
+      "precision": 0.717948717948718,
+      "recall": 0.9333333333333333
+    },
+    {
+      "threshold": 0.7212,
+      "precision": 0.7368421052631579,
+      "recall": 0.9333333333333333
+    },
+    {
+      "threshold": 0.7242,
+      "precision": 0.7297297297297297,
+      "recall": 0.9
+    },
+    {
+      "threshold": 0.7279,
+      "precision": 0.75,
+      "recall": 0.9
+    },
+    {
+      "threshold": 0.7386,
+      "precision": 0.7714285714285715,
+      "recall": 0.9
+    },
+    {
+      "threshold": 0.7399,
+      "precision": 0.7647058823529411,
+      "recall": 0.8666666666666667
+    },
+    {
+      "threshold": 0.7407,
+      "precision": 0.7575757575757576,
+      "recall": 0.8333333333333334
+    },
+    {
+      "threshold": 0.7457,
+      "precision": 0.75,
+      "recall": 0.8
+    },
+    {
+      "threshold": 0.7525,
+      "precision": 0.7741935483870968,
+      "recall": 0.8
+    },
+    {
+      "threshold": 0.7536,
+      "precision": 0.7666666666666667,
+      "recall": 0.7666666666666667
+    },
+    {
+      "threshold": 0.7587,
+      "precision": 0.7931034482758621,
+      "recall": 0.7666666666666667
+    },
+    {
+      "threshold": 0.7589,
+      "precision": 0.7857142857142857,
+      "recall": 0.7333333333333333
+    },
+    {
+      "threshold": 0.7592,
+      "precision": 0.7777777777777778,
+      "recall": 0.7
+    },
+    {
+      "threshold": 0.7608,
+      "precision": 0.7692307692307693,
+      "recall": 0.6666666666666666
+    },
+    {
+      "threshold": 0.7641,
+      "precision": 0.8,
+      "recall": 0.6666666666666666
+    },
+    {
+      "threshold": 0.7722,
+      "precision": 0.8333333333333334,
+      "recall": 0.6666666666666666
+    },
+    {
+      "threshold": 0.7728,
+      "precision": 0.8695652173913043,
+      "recall": 0.6666666666666666
+    },
+    {
+      "threshold": 0.7733,
+      "precision": 0.9090909090909091,
+      "recall": 0.6666666666666666
+    },
+    {
+      "threshold": 0.7779,
+      "precision": 0.9047619047619048,
+      "recall": 0.6333333333333333
+    },
+    {
+      "threshold": 0.7863,
+      "precision": 0.9,
+      "recall": 0.6
+    },
+    {
+      "threshold": 0.7865,
+      "precision": 0.8947368421052632,
+      "recall": 0.5666666666666667
+    },
+    {
+      "threshold": 0.7919,
+      "precision": 0.8888888888888888,
+      "recall": 0.5333333333333333
+    },
+    {
+      "threshold": 0.796,
+      "precision": 0.8823529411764706,
+      "recall": 0.5
+    },
+    {
+      "threshold": 0.7973,
+      "precision": 0.875,
+      "recall": 0.4666666666666667
+    },
+    {
+      "threshold": 0.8061,
+      "precision": 0.9333333333333333,
+      "recall": 0.4666666666666667
+    },
+    {
+      "threshold": 0.8072,
+      "precision": 1.0,
+      "recall": 0.4666666666666667
+    },
+    {
+      "threshold": 0.8145,
+      "precision": 1.0,
+      "recall": 0.43333333333333335
+    },
+    {
+      "threshold": 0.8167,
+      "precision": 1.0,
+      "recall": 0.4
+    },
+    {
+      "threshold": 0.8177,
+      "precision": 1.0,
+      "recall": 0.36666666666666664
+    },
+    {
+      "threshold": 0.8206,
+      "precision": 1.0,
+      "recall": 0.3333333333333333
+    },
+    {
+      "threshold": 0.8211,
+      "precision": 1.0,
+      "recall": 0.3
+    },
+    {
+      "threshold": 0.8299,
+      "precision": 1.0,
+      "recall": 0.26666666666666666
+    },
+    {
+      "threshold": 0.8461,
+      "precision": 1.0,
+      "recall": 0.23333333333333334
+    },
+    {
+      "threshold": 0.8567,
+      "precision": 1.0,
+      "recall": 0.2
+    },
+    {
+      "threshold": 0.863,
+      "precision": 1.0,
+      "recall": 0.16666666666666666
+    },
+    {
+      "threshold": 0.8849,
+      "precision": 1.0,
+      "recall": 0.13333333333333333
+    },
+    {
+      "threshold": 0.911,
+      "precision": 1.0,
+      "recall": 0.1
+    },
+    {
+      "threshold": 0.9174,
+      "precision": 1.0,
+      "recall": 0.06666666666666667
+    },
+    {
+      "threshold": 0.9222,
+      "precision": 1.0,
+      "recall": 0.03333333333333333
+    }
+  ],
+  "roc_curve": [
+    {
+      "threshold": Infinity,
+      "fpr": 0.0,
+      "tpr": 0.0
+    },
+    {
+      "threshold": 0.9222,
+      "fpr": 0.0,
+      "tpr": 0.03333333333333333
+    },
+    {
+      "threshold": 0.8072,
+      "fpr": 0.0,
+      "tpr": 0.4666666666666667
+    },
+    {
+      "threshold": 0.7973,
+      "fpr": 0.1,
+      "tpr": 0.4666666666666667
+    },
+    {
+      "threshold": 0.7733,
+      "fpr": 0.1,
+      "tpr": 0.6666666666666666
+    },
+    {
+      "threshold": 0.7608,
+      "fpr": 0.3,
+      "tpr": 0.6666666666666666
+    },
+    {
+      "threshold": 0.7587,
+      "fpr": 0.3,
+      "tpr": 0.7666666666666667
+    },
+    {
+      "threshold": 0.7536,
+      "fpr": 0.35,
+      "tpr": 0.7666666666666667
+    },
+    {
+      "threshold": 0.7525,
+      "fpr": 0.35,
+      "tpr": 0.8
+    },
+    {
+      "threshold": 0.7457,
+      "fpr": 0.4,
+      "tpr": 0.8
+    },
+    {
+      "threshold": 0.7386,
+      "fpr": 0.4,
+      "tpr": 0.9
+    },
+    {
+      "threshold": 0.7242,
+      "fpr": 0.5,
+      "tpr": 0.9
+    },
+    {
+      "threshold": 0.7212,
+      "fpr": 0.5,
+      "tpr": 0.9333333333333333
+    },
+    {
+      "threshold": 0.7171,
+      "fpr": 0.55,
+      "tpr": 0.9333333333333333
+    },
+    {
+      "threshold": 0.7158,
+      "fpr": 0.55,
+      "tpr": 1.0
+    },
+    {
+      "threshold": 0.6338,
+      "fpr": 1.0,
+      "tpr": 1.0
+    }
+  ],
+  "per_case": [
+    {
+      "id": "P-cn-py-p00000-0",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00000",
+      "max_sim": 0.7865,
+      "matched_doc": "cn-py-p00000"
+    },
+    {
+      "id": "P-cn-py-p00000-1",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00000",
+      "max_sim": 0.8072,
+      "matched_doc": "cn-py-p00001"
+    },
+    {
+      "id": "P-cn-py-p00000-2",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00000",
+      "max_sim": 0.7587,
+      "matched_doc": "cn-py-p00001"
+    },
+    {
+      "id": "P-cn-py-p00001-0",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00001",
+      "max_sim": 0.8299,
+      "matched_doc": "cn-py-p00001"
+    },
+    {
+      "id": "P-cn-py-p00001-1",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00001",
+      "max_sim": 0.911,
+      "matched_doc": "cn-py-p00001"
+    },
+    {
+      "id": "P-cn-py-p00001-2",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00001",
+      "max_sim": 0.9222,
+      "matched_doc": "cn-py-p00001"
+    },
+    {
+      "id": "P-cn-py-p00002-0",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00002",
+      "max_sim": 0.8167,
+      "matched_doc": "cn-py-p00002"
+    },
+    {
+      "id": "P-cn-py-p00002-1",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00002",
+      "max_sim": 0.8177,
+      "matched_doc": "cn-py-p00002"
+    },
+    {
+      "id": "P-cn-py-p00002-2",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00002",
+      "max_sim": 0.8211,
+      "matched_doc": "cn-py-p00002"
+    },
+    {
+      "id": "P-cn-py-p00003-0",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00003",
+      "max_sim": 0.8461,
+      "matched_doc": "cn-py-p00003"
+    },
+    {
+      "id": "P-cn-py-p00003-1",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00003",
+      "max_sim": 0.8849,
+      "matched_doc": "cn-py-p00003"
+    },
+    {
+      "id": "P-cn-py-p00003-2",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00003",
+      "max_sim": 0.8567,
+      "matched_doc": "cn-py-p00003"
+    },
+    {
+      "id": "P-cn-py-p00005-0",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00005",
+      "max_sim": 0.7592,
+      "matched_doc": "cn-py-p00002"
+    },
+    {
+      "id": "P-cn-py-p00005-1",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00005",
+      "max_sim": 0.863,
+      "matched_doc": "cn-py-p00005"
+    },
+    {
+      "id": "P-cn-py-p00005-2",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00005",
+      "max_sim": 0.7779,
+      "matched_doc": "cn-py-p00005"
+    },
+    {
+      "id": "P-cn-py-p00007-0",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00007",
+      "max_sim": 0.7212,
+      "matched_doc": "cn-py-p00007"
+    },
+    {
+      "id": "P-cn-py-p00007-1",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00007",
+      "max_sim": 0.796,
+      "matched_doc": "cn-py-p00007"
+    },
+    {
+      "id": "P-cn-py-p00007-2",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p00007",
+      "max_sim": 0.8145,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "P-cn-py-p02233-0",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02233",
+      "max_sim": 0.8206,
+      "matched_doc": "cn-py-p02233"
+    },
+    {
+      "id": "P-cn-py-p02233-1",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02233",
+      "max_sim": 0.7158,
+      "matched_doc": "cn-py-p02233"
+    },
+    {
+      "id": "P-cn-py-p02233-2",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02233",
+      "max_sim": 0.7589,
+      "matched_doc": "cn-py-p02233"
+    },
+    {
+      "id": "P-cn-py-p02238-0",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02238",
+      "max_sim": 0.7386,
+      "matched_doc": "cn-py-p02239"
+    },
+    {
+      "id": "P-cn-py-p02238-1",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02238",
+      "max_sim": 0.7733,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "P-cn-py-p02238-2",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02238",
+      "max_sim": 0.7919,
+      "matched_doc": "cn-py-p02239"
+    },
+    {
+      "id": "P-cn-py-p02239-0",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02239",
+      "max_sim": 0.7863,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "P-cn-py-p02239-1",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02239",
+      "max_sim": 0.7165,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "P-cn-py-p02239-2",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02239",
+      "max_sim": 0.7525,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "P-cn-py-p02255-0",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02255",
+      "max_sim": 0.7407,
+      "matched_doc": "cn-py-p00001"
+    },
+    {
+      "id": "P-cn-py-p02255-1",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02255",
+      "max_sim": 0.7399,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "P-cn-py-p02255-2",
+      "label": 1,
+      "rewrite_level": "codenet-py-t4",
+      "src_doc": "cn-py-p02255",
+      "max_sim": 0.9174,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "N-p02256-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.8061,
+      "matched_doc": "cn-py-p00005"
+    },
+    {
+      "id": "N-p02257-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7152,
+      "matched_doc": "cn-py-p00003"
+    },
+    {
+      "id": "N-p02258-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7728,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "N-p02259-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.6975,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "N-p02260-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7641,
+      "matched_doc": "cn-py-p00002"
+    },
+    {
+      "id": "N-p02261-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.6338,
+      "matched_doc": "cn-py-p00003"
+    },
+    {
+      "id": "N-p02262-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7062,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "N-p02263-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.6577,
+      "matched_doc": "cn-py-p00002"
+    },
+    {
+      "id": "N-p02264-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7279,
+      "matched_doc": "cn-py-p00002"
+    },
+    {
+      "id": "N-p02265-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7457,
+      "matched_doc": "cn-py-p00007"
+    },
+    {
+      "id": "N-p02266-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7973,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "N-p02267-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7722,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "N-p02269-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7608,
+      "matched_doc": "cn-py-p00002"
+    },
+    {
+      "id": "N-p02270-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7536,
+      "matched_doc": "cn-py-p02255"
+    },
+    {
+      "id": "N-p02271-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.675,
+      "matched_doc": "cn-py-p00005"
+    },
+    {
+      "id": "N-p02272-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7242,
+      "matched_doc": "cn-py-p00002"
+    },
+    {
+      "id": "N-p02273-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.6879,
+      "matched_doc": "cn-py-p00002"
+    },
+    {
+      "id": "N-p02314-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7171,
+      "matched_doc": "cn-py-p00000"
+    },
+    {
+      "id": "N-p02379-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.7103,
+      "matched_doc": "cn-py-p00002"
+    },
+    {
+      "id": "N-p02380-0",
+      "label": 0,
+      "rewrite_level": "codenet-py-negative",
+      "src_doc": null,
+      "max_sim": 0.713,
+      "matched_doc": "cn-py-p00002"
+    }
+  ],
+  "stratified": {
+    "codenet-py-t4": {
+      "label1": 30,
+      "label0": 0,
+      "sims": [
+        0.7865,
+        0.8072,
+        0.7587,
+        0.8299,
+        0.911,
+        0.9222,
+        0.8167,
+        0.8177,
+        0.8211,
+        0.8461,
+        0.8849,
+        0.8567,
+        0.7592,
+        0.863,
+        0.7779,
+        0.7212,
+        0.796,
+        0.8145,
+        0.8206,
+        0.7158,
+        0.7589,
+        0.7386,
+        0.7733,
+        0.7919,
+        0.7863,
+        0.7165,
+        0.7525,
+        0.7407,
+        0.7399,
+        0.9174
+      ]
+    },
+    "codenet-py-negative": {
+      "label1": 0,
+      "label0": 20,
+      "sims": [
+        0.8061,
+        0.7152,
+        0.7728,
+        0.6975,
+        0.7641,
+        0.6338,
+        0.7062,
+        0.6577,
+        0.7279,
+        0.7457,
+        0.7973,
+        0.7722,
+        0.7608,
+        0.7536,
+        0.675,
+        0.7242,
+        0.6879,
+        0.7171,
+        0.7103,
+        0.713
+      ]
+    }
+  }
+}
