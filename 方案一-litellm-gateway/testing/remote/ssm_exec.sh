@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 # 通用 SSM 执行器:把本地 bash 脚本整体 base64 后经 SSM RunShellScript 在实例上执行,
 # 轮询到结束并取回 stdout/stderr。
 #

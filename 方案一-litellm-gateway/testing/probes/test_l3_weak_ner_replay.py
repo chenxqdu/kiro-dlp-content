@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """本地回归 — 用实例实测的 Presidio 原始输出做 mock 回放,验证 l3_presidio 弱 NER
 过滤器三条修复语义(不依赖网络/实例,秒级跑完)。
 

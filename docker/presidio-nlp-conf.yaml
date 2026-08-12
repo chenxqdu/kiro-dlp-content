@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
 # Presidio analyzer NLP 配置:en(官方自带 lg)+ zh(SPEC §5-L3 中文识别器)。
 # 经 NLP_CONF_FILE 环境变量注入(presidio-analyzer app.py 支持)。
 nlp_engine_name: spacy

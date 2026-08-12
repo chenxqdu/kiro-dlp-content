@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Amazon.com and Affiliates. -->
+<!-- SPDX-License-Identifier: CC-BY-4.0 -->
 # 方案一测试复现手册（testing/）
 
 本目录汇总 2026-07-30 四阶段实测 + 2026-08-04 阶段5 分层完备测试 + 2026-08-05 阶段5 按当前引擎重跑用到的

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
 # DLP-OFF 对照配置(阶段3):与主配置同上游,但不挂任何 guardrail。
 # 用于分离"上游 Bedrock 延迟"与"DLP hook 成本"。
 model_list:

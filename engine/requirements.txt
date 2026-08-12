@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
 # DLP 引擎运行依赖。
 #
 # 同步链路 L0–L3.5 的核心逻辑只用 Python 标准库:

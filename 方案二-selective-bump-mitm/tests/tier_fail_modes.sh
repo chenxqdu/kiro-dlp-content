@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 #############################################
 # §5 Fail 模式验证（在验证节点 EC2 执行；全程走 9443 临时实例，绝不碰生产 443/8443）
 #

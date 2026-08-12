@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Amazon.com and Affiliates. -->
+<!-- SPDX-License-Identifier: CC-BY-4.0 -->
 # DLP 分层引擎 — 接口契约(SPEC)
 
 > **唯一真源(single source of truth)**。实现模块、fixtures、离线 harness、对抗审计都以本文件为准。

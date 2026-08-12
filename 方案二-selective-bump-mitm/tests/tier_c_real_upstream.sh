@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 #############################################
 # §4 Tier C —— 真实上游交叉核对（在验证节点 EC2 执行，走【生产】443→8443→真实 Kiro）
 #

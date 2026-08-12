@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """通道管控(SPEC §6 egress)—— 套件4。
 
 纯内容扫描对"read-then-exfil / $VAR 解引用 / git push 非白名单 / execute_sql

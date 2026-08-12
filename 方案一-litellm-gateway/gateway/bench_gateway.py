@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """阶段3 压测(03 文档 §5/§6):网关端到端 RTT 开/关 DLP 对比 + 并发吞吐。
 
 设计:

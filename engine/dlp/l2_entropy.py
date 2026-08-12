@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """L2 高熵 + 语境(SPEC §5-L2)—— ~10ms,同步。
 
 高熵串**且**有赋值/密钥语境词 → BLOCK。

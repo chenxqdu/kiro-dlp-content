@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """归一化预处理(SPEC §4)—— 套件3(编码/拆分/混淆规避)的命根子。
 
 铁律:**先扫原文,再扫每个变体**。变体命中时 hit.source 必须标明来源。

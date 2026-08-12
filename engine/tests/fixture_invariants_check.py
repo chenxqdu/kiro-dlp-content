@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """独立不变量交叉校验器(SPEC §7 line 268:"对抗审计据此校验 fixture 正确性")。
 
 **为什么存在 / 它解决什么问题**

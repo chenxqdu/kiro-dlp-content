@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """L3 Presidio(SPEC §5-L3)—— ≤100ms/100token,同步。
 
 调官方 analyzer 容器 HTTP :5002/analyze。中文识别器 + Luhn 信用卡。

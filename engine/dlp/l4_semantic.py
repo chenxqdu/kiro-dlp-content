@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """L4 语义 LLM(SPEC §5-L4)—— 秒级,**仅异步告警**。
 
 后端:Bedrock(us-west-2)Qwen3-32B(主)+ Llama-3.1-8B(对照)。

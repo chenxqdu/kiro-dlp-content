@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """阶段4 —— L4 Bedrock 异步告警标定(03 文档 §6 阶段4)。
 
 对套件6 逐条:

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """诊断探针 A — 取 Presidio 原始 NER 输出(绕过引擎过滤,看 analyzer 到底报了什么)。
 
 用途:当某条 fixture 的 verdict 与期望不符、且命中里有 presidio:* 规则时,先用本

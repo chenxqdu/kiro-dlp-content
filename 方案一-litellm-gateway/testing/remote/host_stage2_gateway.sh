@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 # 阶段2 — LiteLLM 网关集成测(host 端)。本轮 46/46 通过的原始命令。
 # 前提:litellm 容器已 up(compose 见 docker/docker-compose.gateway.yml),
 #       gateway/test_gateway.py 已同步到实例(sync_gateway 或手动 scp/S3)。

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 #############################################
 # 方案二 · 一键测试运行器（在【验证节点 EC2】上经 SSM 执行）
 #

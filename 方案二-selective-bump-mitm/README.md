@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Amazon.com and Affiliates. -->
+<!-- SPDX-License-Identifier: CC-BY-4.0 -->
 # 方案二 · 选择性 bump MITM + VPC 内 DLP 联动
 
 > Kiro（AWS Kiro / Amazon Q AI IDE）推理流量**内容审查**方案。把一台 SNI 透传代理升级为

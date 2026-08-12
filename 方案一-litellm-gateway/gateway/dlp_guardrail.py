@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """CorpDLPGuardrail —— LiteLLM 自定义 guardrail(方案一两个 hook,03 文档 §2/§6 阶段2)。
 
 - mode=pre_call    → async_pre_call_hook:扫出站 prompt(messages 全量,含工具返回值回流

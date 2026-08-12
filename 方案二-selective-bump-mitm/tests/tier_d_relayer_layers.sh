@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 #############################################
 # Tier D —— 逐层探针 · 通过【真实代理链路】重验 L0–L3.5(在验证节点 EC2 上执行)
 #

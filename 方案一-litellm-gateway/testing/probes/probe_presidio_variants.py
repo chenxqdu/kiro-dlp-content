@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """诊断探针 B — 按引擎变体展开(raw/normalized/stripped-sep/decoded:*)逐变体 × 逐语言
 取 Presidio 原始命中,精确归因"误报发生在哪个预处理变体上"。
 

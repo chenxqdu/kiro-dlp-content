@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 #############################################
 # Kiro DLP 验证节点 资源清理
 # 读取本目录 .deploy-state.env，逆序删除本次创建的资源。

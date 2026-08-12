@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Amazon.com and Affiliates. -->
+<!-- SPDX-License-Identifier: CC-BY-4.0 -->
 # 方案二测试文档 —— 选择性 bump MITM + VPC 内 DLP 联动
 
 > 目标：证明「只解密 `runtime.us-east-1.kiro.dev` 推理请求 → 内网 DLP 判定服务裁决 →

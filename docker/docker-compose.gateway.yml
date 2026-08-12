@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
 # 阶段2 网关叠加层:在 kiro-dlp 实例上与 docker-compose.yml 合用 ——
 #   docker compose -f docker-compose.yml -f docker-compose.gateway.yml up -d presidio-analyzer litellm
 # litellm 容器挂 CorpDLPGuardrail;DLP 引擎源码直接挂进容器(纯 stdlib,无需安装)。

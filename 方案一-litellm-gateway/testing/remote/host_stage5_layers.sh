@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 # 阶段5 — 分层完备测试(host 端,经 ssm_exec.sh 投递)。
 # 与阶段1(run_offline 场景矩阵)互补:这里逐层逐规则验正例/豁免/边界。
 #

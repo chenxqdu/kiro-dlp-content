@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """MCP / 嵌套 JSON 展开(SPEC §6)。
 
 把 content 抽成若干【文本单元 (text, field_path)】:

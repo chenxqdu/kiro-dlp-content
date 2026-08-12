@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """DLP 分层引擎编排(SPEC §3 流水 + §2 聚合)。
 
 铁律:

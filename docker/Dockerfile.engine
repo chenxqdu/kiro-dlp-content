@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
 # DLP 引擎镜像(SPEC §9)。
 # 构建:在 jumphost(x86_64,与 kiro-dlp 同架构)上
 #   docker build -f docker/Dockerfile.engine -t kiro-dlp-engine:latest .

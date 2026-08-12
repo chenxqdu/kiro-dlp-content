@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
 # Kiro DLP 判定薄 HTTP 服务 —— 复用现有镜像 kiro-dlp-engine:latest（load+up，不 pull/push）
 #
 # 部署位置：DLP 主机 <TEST_INSTANCE_ID> (us-west-2, 172.31.27.174) 的

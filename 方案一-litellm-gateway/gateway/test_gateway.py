@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """阶段2 网关集成测(03 文档 §6):经 LiteLLM :4000 验证两个 hook + flowback。
 
 用法(在 kiro-dlp 上、或经 SSH 隧道本机跑):

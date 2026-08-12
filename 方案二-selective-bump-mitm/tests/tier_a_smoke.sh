@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 # Tier A 冒烟：直连 DLP 判定服务 /inspect，验证三态裁决 + 脱敏字段不外泄。
 # 在 DLP 主机上执行（curl 私网 172.31.27.174:9000）。
 set -uo pipefail

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """离线单测 harness(SPEC §8)。
 
 - 载入 6 套件 fixtures,逐条 engine.scan(content, injection_point=..., session_window=...)。

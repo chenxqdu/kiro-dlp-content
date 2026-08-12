@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 # 阶段4 — L4 Bedrock 异步告警标定(host 端)。本轮原始命令,分两步:
 #   A. 直连标定:容器内跑 tests/l4_calibration.py(双模型 × 套件6,
 #      断言"L4 开启也不污染同步 verdict")

@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Amazon.com and Affiliates. -->
+<!-- SPDX-License-Identifier: CC-BY-4.0 -->
 # 方案一 · opt-in LiteLLM TLS 终止网关 + VPC 内 DLP 联动
 
 > **前提:客户端能改 `base_url`**(自研 Agent / SDK)。客户端主动把流量交到网关,

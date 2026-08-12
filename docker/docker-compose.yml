@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
 # DLP 运行形态(SPEC §9)——在 kiro-dlp 上 `docker compose up`。
 # 两服务:presidio-analyzer(官方镜像)+ dlp-engine(本工程,Py3.11)。
 #

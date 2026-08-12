@@ -1,3 +1,5 @@
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
 # LiteLLM 网关配置(方案一,03 文档 §1/§6 阶段2)。
 # 上游:Bedrock us-west-2(经实例 IAM 角色,不落长期凭证)。
 # guardrails:CorpDLPGuardrail 两个 hook(pre_call + pre_mcp_call)。

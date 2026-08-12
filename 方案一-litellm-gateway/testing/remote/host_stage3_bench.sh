@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 # 阶段3 — 开/关 DLP 压测 + docker stats CPU 归因(host 端)。本轮原始命令。
 # 前提:litellm(:4000, DLP on)与 litellm-nodlp(:4001, 无 guardrail 对照)都在跑。
 # 输出 JSON 行(bench_gateway.py),stats 采样落 /tmp/bench_stats.txt。

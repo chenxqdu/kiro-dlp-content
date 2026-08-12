@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """生成 56 条 fixture(suite1..6)—— 03 文档 §4 测试矩阵。
 
 设计原则(为何这样写,而非脑推 JSON):

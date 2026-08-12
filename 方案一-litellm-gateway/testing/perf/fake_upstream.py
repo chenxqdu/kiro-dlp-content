@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """
 假上游(§9.3 法1)—— OpenAI /chat/completions 兼容的 echo 端点。
 

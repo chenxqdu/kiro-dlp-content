@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """L0 正则/词表(SPEC §5-L0)—— 亚毫秒,同步。
 
 凭证类 → BLOCK;身份证/手机/邮箱 → REDACT。

@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Amazon.com and Affiliates. -->
+<!-- SPDX-License-Identifier: CC-BY-4.0 -->
 # 企业 AI 数据防泄漏方案（AI 编码工具场景）
 
 研发开始用 AI 写代码之后，数据外泄的形态变了：泄漏不再发生在文件外传或 U 盘拷贝里，

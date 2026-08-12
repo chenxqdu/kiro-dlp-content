@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """分层向量落笔前的 oracle 探针 —— 绝不臆断命中,一切断言以本脚本实测输出为准。
 
 用法: python3 -m tests._probe_layers

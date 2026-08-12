@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """L1 签名(SPEC §5-L1)—— ~10ms,同步。
 
 detect-secrets/gitleaks 风格的前缀+结构签名。

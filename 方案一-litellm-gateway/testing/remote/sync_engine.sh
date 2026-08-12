@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 # 把本地 engine/(dlp 源码 + tests + fixtures)同步到实例 /home/ec2-user/kiro-dlp/engine。
 # SSM 传不动大 payload → 走 S3 presigned URL 中转(实例侧只需 curl,无需 S3 权限)。
 # 用法: ./sync_engine.sh

@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """分层完备单测 harness —— 直接调每层 scan(),不经引擎聚合(与 run_offline.py 的
 场景矩阵互补:那边验"整机裁决",这边验"每层每条规则的正例/豁免/边界")。
 

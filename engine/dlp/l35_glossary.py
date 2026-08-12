@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2026 Amazon.com and Affiliates.
+# SPDX-License-Identifier: Apache-2.0
+#
 """L3.5 术语表/EDM(SPEC §5-L3.5)—— 亚毫秒,同步。
 
 内部术语/项目代号多模式匹配。约束(防撞普通英文,FP-09/L35-13):
