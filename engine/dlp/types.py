@@ -25,18 +25,22 @@ class Layer(str, Enum):
     L1 = "L1"            # detect-secrets/gitleaks 类签名
     L2 = "L2"            # 高熵 + 语境
     L3 = "L3"            # Presidio PII/NER
-    L35 = "L3.5"         # 术语表/EDM (Aho-Corasick)
+    L35 = "L3.5"         # 术语表/EDM (Aho-Corasick) —— 精确串匹配
+    L37 = "L3.7"         # RAG 相似度检索(语义 EDM)—— 与已登记机密的向量近邻;后端 VPC-local
     L4 = "L4"            # 语义 LLM —— 仅异步
 
 
 # 层序:用于 top_layer "最低有效层" 计算(值越小越靠前)。
+# L3.7(RAG 语义 EDM)排在 L3.5(精确 EDM)与 L4(通用 LLM)之间:比精确匹配宽(抓改写),
+# 比 L4 确定(锚定已登记语料)。L3.5 的 BLOCK 仍优先于 L3.7(层序更小)。
 _LAYER_ORDER = {
     Layer.L0: 0,
     Layer.L1: 1,
     Layer.L2: 2,
     Layer.L3: 3,
     Layer.L35: 4,
-    Layer.L4: 5,
+    Layer.L37: 5,
+    Layer.L4: 6,
 }
 
 

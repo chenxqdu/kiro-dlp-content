@@ -70,6 +70,10 @@ def _l3_absent(result) -> bool:
     return any("L3 skipped" in n for n in result.notes)
 
 
+def _l37_absent(result) -> bool:
+    return any("L3.7 skipped" in n for n in result.notes)
+
+
 def _hit_matches(hits, want: dict) -> bool:
     """must_hit / must_not_hit 元素匹配:entity 必匹配;若给了 action 也要匹配。"""
     we, wa = want.get("entity"), want.get("action")
@@ -90,6 +94,11 @@ def evaluate(case: Case, result) -> tuple[str, list[str]]:
     # L3 缺席:仅当该用例期望就是靠 L3 定裁决(top_layer==L3)时豁免
     if exp.get("top_layer") == "L3" and _l3_absent(result) and result.verdict.value == "pass":
         return "skip", ["L3 缺席(离线无 Presidio),按 §9 豁免——需带 Presidio 复跑"]
+
+    # L3.7 缺席:期望靠 RAG 定裁决(top_layer==L3.7)但离线无 embedding 服务时豁免——
+    # 既不判 PASS 也不计漏拦,需连 VPC-local RAG 服务复跑(Phase C)。
+    if exp.get("top_layer") == "L3.7" and _l37_absent(result) and result.verdict.value == "pass":
+        return "skip", ["L3.7 缺席(离线无 RAG embedding 服务),按 §9 豁免——需连 VPC-local RAG 服务复跑"]
 
     if result.verdict.value != exp["verdict"]:
         reasons.append(f"verdict 期望 {exp['verdict']} 实际 {result.verdict.value}")
@@ -113,9 +122,11 @@ def evaluate(case: Case, result) -> tuple[str, list[str]]:
 def run(color: bool = True, only_suite: int | None = None, verbose: bool = False) -> int:
     cfg = EngineConfig()  # 默认 run_l3_on_all_variants=True;离线 Presidio 不可达会走缺席分支
     eng = DLPEngine(cfg)
+    # 套件7(RAG 语义 EDM)专用引擎:仅它开 enable_l37_rag,套件 1–6 用默认引擎、行为字节不变。
+    eng_l37 = DLPEngine(EngineConfig(enable_l37_rag=True))
 
-    # 载入顺序:套件2(误报基线)优先,再套件1(金标准),再 3/4/5/6
-    order = [2, 1, 3, 4, 5, 6]
+    # 载入顺序:套件2(误报基线)优先,再套件1(金标准),再 3/4/5/6/7
+    order = [2, 1, 3, 4, 5, 6, 7]
     if only_suite:
         order = [only_suite]
 
@@ -133,7 +144,8 @@ def run(color: bool = True, only_suite: int | None = None, verbose: bool = False
                                      "fp": 0, "miss": 0})
         for c in cases:
             run_l4 = (s == 6)
-            result = eng.scan(
+            active = eng_l37 if s == 7 else eng   # 套件7 用开了 L3.7 的引擎
+            result = active.scan(
                 c.content, injection_point=c.ip,
                 run_async_l4=run_l4, session_window=c.session_window,
             )

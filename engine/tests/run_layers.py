@@ -56,6 +56,7 @@ from dlp import (  # noqa: E402
     l1_secrets,
     l2_entropy,
     l35_glossary,
+    l37_rag,
     l3_presidio,
     l4_semantic,
     normalize,
@@ -63,8 +64,8 @@ from dlp import (  # noqa: E402
 
 FIXTURE_DIR = _ENGINE_ROOT / "tests" / "fixtures_layers"
 LAYER_FILES = {"L0": "l0.json", "L1": "l1.json", "L2": "l2.json", "L3": "l3.json",
-               "L3.5": "l35.json", "EGRESS": "egress.json", "NORM": "norm.json",
-               "L4": "l4.json"}
+               "L3.5": "l35.json", "L3.7": "l37.json", "EGRESS": "egress.json",
+               "NORM": "norm.json", "L4": "l4.json"}
 
 _C = {"ok": "\033[32m", "bad": "\033[31m", "skip": "\033[33m", "z": "\033[0m"}
 
@@ -76,6 +77,16 @@ def _paint(s: str, key: str, color: bool) -> str:
 def _presidio_up() -> bool:
     """探测 analyzer 是否可达(与 l3_presidio 同一 URL)。"""
     url = l3_presidio.ANALYZER_URL.replace("/analyze", "/health")
+    try:
+        with urllib.request.urlopen(url, timeout=3):
+            return True
+    except (urllib.error.URLError, OSError, ValueError):
+        return False
+
+
+def _rag_up() -> bool:
+    """探测 VPC-local RAG 检索服务是否可达(与 l37_rag 同源 URL 的 /health)。"""
+    url = l37_rag.RAG_SERVICE_URL.rsplit("/", 1)[0] + "/health"
     try:
         with urllib.request.urlopen(url, timeout=3):
             return True
@@ -108,7 +119,7 @@ def _check_hits(hits, vec: dict) -> list[str]:
     return reasons
 
 
-def run_vector(vec: dict, bedrock: bool, presidio: bool) -> tuple[str, list[str], float]:
+def run_vector(vec: dict, bedrock: bool, presidio: bool, rag: bool = False) -> tuple[str, list[str], float]:
     """返回 (status, reasons, latency_ms)。status ∈ {pass, fail, skip}。"""
     layer = vec["layer"]
     req = vec.get("requires")
@@ -116,6 +127,8 @@ def run_vector(vec: dict, bedrock: bool, presidio: bool) -> tuple[str, list[str]
         return "skip", ["需 Presidio(实例上跑)"], 0.0
     if req == "bedrock" and not bedrock:
         return "skip", ["需 --bedrock(数据出 VPC,仅功能验证)"], 0.0
+    if req == "rag" and not rag:
+        return "skip", ["需 RAG embedding 服务(VPC-local,g6 TEI/vLLM)"], 0.0
 
     t0 = time.perf_counter()
     if layer in ("L0", "L1", "L2", "L3.5"):
@@ -131,6 +144,12 @@ def run_vector(vec: dict, bedrock: bool, presidio: bool) -> tuple[str, list[str]
         reasons = _check_hits(hits, vec)
         if status == "partial":
             reasons.append("L3 partial(部分语言失败)——结果不完整,判 fail 以免假绿")
+
+    elif layer == "L3.7":
+        hits, status = l37_rag.scan(vec["text"])
+        if status == "unreachable":
+            return "skip", ["RAG 服务 unreachable"], 0.0
+        reasons = _check_hits(hits, vec)
 
     elif layer == "EGRESS":
         hits = egress.scan_channel(vec.get("tool"), vec.get("args", {}))
@@ -178,6 +197,7 @@ def main() -> int:
     color = not args.no_color
 
     presidio = _presidio_up()
+    rag = _rag_up()
     layers = [args.layer] if args.layer else list(LAYER_FILES)
 
     rows, summary = [], {}
@@ -190,7 +210,7 @@ def main() -> int:
         vectors = json.loads(fp.read_text(encoding="utf-8"))
         agg = summary.setdefault(layer, {"pass": 0, "fail": 0, "skip": 0, "total": 0})
         for vec in vectors:
-            status, reasons, ms = run_vector(vec, args.bedrock, presidio)
+            status, reasons, ms = run_vector(vec, args.bedrock, presidio, rag)
             agg["total"] += 1
             agg[status] += 1
             rows.append((vec["id"], layer, status, reasons, ms, vec.get("note", "")))
@@ -219,7 +239,8 @@ def main() -> int:
     print("-" * 108)
     print(f"  合计: {grand['pass']}/{grand['total']}  fail={grand['fail']} skip={grand['skip']}"
           f"  (presidio={'可达' if presidio else '缺席→L3 skip'},"
-          f" bedrock={'开' if args.bedrock else '关'})")
+          f" bedrock={'开' if args.bedrock else '关'},"
+          f" rag={'可达' if rag else '缺席→L3.7 skip'})")
     if missing:
         print(_paint(f"⚠ 缺向量文件: {', '.join(missing)}", "skip", color))
     return 1 if (grand["fail"] > 0 or missing) else 0

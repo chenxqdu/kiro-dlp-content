@@ -1,0 +1,162 @@
+[
+  {
+    "id": "S7-01",
+    "suite": 7,
+    "injection_point": "prompt",
+    "content": "我们的授信评分把逾期表现按 0.62 加权、额度使用按 0.38 加权，加权和超过 0.75 就拒绝放款",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "block",
+      "top_layer": "L3.7",
+      "must_hit": [{"entity": "PROPRIETARY_SIMILARITY", "action": "block"}],
+      "must_not_hit": [],
+      "async_l4_category": null
+    },
+    "invariants": ["改写强度=同义改写:已登记风控加权公式的同义表述 → L3.7 相似度命中 BLOCK"],
+    "verify_point": "L3.7:同义改写 —— 与登记机密语义近邻,超阈值 BLOCK(离线无服务则 SKIP)",
+    "needs_l3": false,
+    "rewrite_level": "synonym",
+    "notes_expected": []
+  },
+  {
+    "id": "S7-02",
+    "suite": 7,
+    "injection_point": "prompt",
+    "content": "final_score = overdue_factor * 0.62 + credit_factor * 0.38; if final_score >= 0.75: reject_loan()",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "block",
+      "top_layer": "L3.7",
+      "must_hit": [{"entity": "PROPRIETARY_SIMILARITY", "action": "block"}],
+      "must_not_hit": [],
+      "async_l4_category": null
+    },
+    "invariants": ["改写强度=变量改名:同一风控逻辑换变量名/措辞成代码 → L3.7 相似度命中 BLOCK"],
+    "verify_point": "L3.7:变量改名 —— 代码化改写仍与登记机密近邻(离线无服务则 SKIP)",
+    "needs_l3": false,
+    "rewrite_level": "rename",
+    "notes_expected": []
+  },
+  {
+    "id": "S7-03",
+    "suite": 7,
+    "injection_point": "prompt",
+    "content": "风控 risk_score = overdue指标 × 0.62 + quota指标 × 0.38，threshold 0.75 触发 reject",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "block",
+      "top_layer": "L3.7",
+      "must_hit": [{"entity": "PROPRIETARY_SIMILARITY", "action": "block"}],
+      "must_not_hit": [],
+      "async_l4_category": null
+    },
+    "invariants": ["改写强度=中英混排:中英混写同一风控加权阈值逻辑 → L3.7 相似度命中 BLOCK"],
+    "verify_point": "L3.7:中英混排 —— 跨语言表述仍近邻(离线无服务则 SKIP)",
+    "needs_l3": false,
+    "rewrite_level": "mixed",
+    "notes_expected": []
+  },
+  {
+    "id": "S7-04",
+    "suite": 7,
+    "injection_point": "prompt",
+    "content": "下季度渠道扩张的定价打算是：把华东区获客成本压到行业均值六成，同时重排渠道结构",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "block",
+      "top_layer": "L3.7",
+      "must_hit": [{"entity": "PROPRIETARY_SIMILARITY", "action": "block"}],
+      "must_not_hit": [],
+      "async_l4_category": null
+    },
+    "invariants": ["改写强度=结构重排:已登记未公开定价策略换叙述顺序 → L3.7 相似度命中 BLOCK"],
+    "verify_point": "L3.7:结构重排 —— 换句式仍近邻(离线无服务则 SKIP)",
+    "needs_l3": false,
+    "rewrite_level": "restructure",
+    "notes_expected": []
+  },
+  {
+    "id": "S7-05",
+    "suite": 7,
+    "injection_point": "prompt",
+    "content": "一般来说风控模型会对多个指标加权求和，再和一个阈值比较来决定是否通过，这是行业常识",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "pass",
+      "top_layer": null,
+      "must_hit": [],
+      "must_not_hit": [{"entity": "PROPRIETARY_SIMILARITY"}],
+      "async_l4_category": null
+    },
+    "invariants": ["邻近负例:用了相同业务术语但非机密的通用讨论 → 不该命中(同步 PASS)"],
+    "verify_point": "L3.7 邻近负例 —— 相同术语的行业常识不越阈,PASS(灭语义误报)",
+    "needs_l3": false,
+    "rewrite_level": "near-negative",
+    "notes_expected": []
+  },
+  {
+    "id": "S7-06",
+    "suite": 7,
+    "injection_point": "prompt",
+    "content": "很多公司都会通过优化渠道结构来降低获客成本，这是市场营销的通用做法",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "pass",
+      "top_layer": null,
+      "must_hit": [],
+      "must_not_hit": [{"entity": "PROPRIETARY_SIMILARITY"}],
+      "async_l4_category": null
+    },
+    "invariants": ["邻近负例:公开的定价/获客常识,不含已登记机密细节 → 不该命中"],
+    "verify_point": "L3.7 邻近负例 —— 公开常识 PASS",
+    "needs_l3": false,
+    "rewrite_level": "near-negative",
+    "notes_expected": []
+  },
+  {
+    "id": "S7-07",
+    "suite": 7,
+    "injection_point": "prompt",
+    "content": "def quicksort(a):\n    if len(a) <= 1: return a\n    p = a[len(a)//2]\n    return quicksort([x for x in a if x < p]) + [x for x in a if x == p] + quicksort([x for x in a if x > p])",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "pass",
+      "top_layer": null,
+      "must_hit": [],
+      "must_not_hit": [{"entity": "PROPRIETARY_SIMILARITY"}],
+      "async_l4_category": null
+    },
+    "invariants": ["阴性对照:通用开源风格代码(快排),与任何机密语料无关 → 绝不命中"],
+    "verify_point": "L3.7 阴性对照 —— 通用算法 PASS(控告警疲劳)",
+    "needs_l3": false,
+    "rewrite_level": "control",
+    "notes_expected": []
+  },
+  {
+    "id": "S7-08",
+    "suite": 7,
+    "injection_point": "prompt",
+    "content": "今天天气不错，帮我把这段会议纪要润色一下，语气正式些",
+    "content_kind": "text",
+    "session_window": null,
+    "expected": {
+      "verdict": "pass",
+      "top_layer": null,
+      "must_hit": [],
+      "must_not_hit": [{"entity": "PROPRIETARY_SIMILARITY"}],
+      "async_l4_category": null
+    },
+    "invariants": ["阴性对照:纯闲聊,零语义敏感 → 绝不命中"],
+    "verify_point": "L3.7 阴性对照 —— 闲聊 PASS",
+    "needs_l3": false,
+    "rewrite_level": "control",
+    "notes_expected": []
+  }
+]

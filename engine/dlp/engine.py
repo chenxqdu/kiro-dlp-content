@@ -26,6 +26,7 @@ from . import (
     l2_entropy,
     l3_presidio,
     l35_glossary,
+    l37_rag,
     l4_semantic,
     normalize,
 )
@@ -73,6 +74,16 @@ class EngineConfig:
     # 后,尚未完成的唯一变体一律标 partial(→ l3_state.incomplete → 上层 fail-closed 升 BLOCK),
     # 绝不静默当 PASS。保证同步腿 L3 墙钟永不超预算,守住 addon 8s 线。0 = 不设预算(旧行为)。
     l3_budget_s: float = 6.0
+    # ---- L3.7 RAG 相似度检索(语义 EDM,默认关闭)----
+    # 默认 enable_l37_rag=False → 行为与历来完全一致(套件 1–6 字节不变),L3.7 休眠出厂;
+    # 显式置 True 才在 scan() 里调 VPC-local RAG 检索服务(l37_rag.scan,urllib,引擎侧零重依赖)。
+    # ⚠ 红线:RAG embedding 后端必须 VPC-local(自托管 GPU + TEI/vLLM);引擎侧只经 urllib 调独立服务。
+    # 相似度语义无片段可遮蔽 → 默认 action=BLOCK;阈值须经标定(experiments/rag/threshold_sweep.py)。
+    enable_l37_rag: bool = False
+    l37_threshold: float = 0.83            # 命中阈值(标定后回填真实工作点)
+    l37_top_k: int = 5
+    l37_action: Verdict = Verdict.BLOCK
+    l37_timeout: float = 2.0
 
 
 class DLPEngine:
@@ -301,6 +312,52 @@ class DLPEngine:
             l3_state["budget_truncated"] = l3_state.get("budget_truncated", 0) + timed_out
         return self._drop_rot13_pseudo(hits)
 
+    # ---- L3.7 RAG 相似度检索(全局去重 + 每单元仅 normalized 一次,防 embedding 成本爆炸)----
+    def _scan_l37(
+        self,
+        units: list[tuple[str, str | None]],
+        latency: dict[str, float],
+        l37_state: dict,
+    ) -> list[Hit]:
+        """对每个文本单元的 normalized 文本调 VPC-local RAG 服务。
+
+        成本护栏(仿 L3):RAG embedding 昂贵(GPU 推理 + 跨机 HTTP),故
+          1) 只对 normalized 文本 embed —— 不对 raw/base64/hex/rot13/folded 变体
+             (语义相似度对混淆变体是噪声,且成倍放大 embedding 调用);
+          2) 全局去重 —— 相同 normalized 文本只调一次服务。
+        不可达(任一单元)→ l37_state.incomplete/down,由 scan() 标 "L3.7 skipped"。
+        """
+        if not units:
+            return []
+        # normalized 去重(保序,首个 field_path 代表)
+        seen: dict[str, str | None] = {}
+        for text, fp in units:
+            norm = normalize.normalize(text)
+            if norm and norm not in seen:
+                seen[norm] = fp
+
+        hits: list[Hit] = []
+        t = time.perf_counter()
+        for norm, fp in seen.items():
+            h_list, status = l37_rag.scan(
+                norm,
+                source="normalized",
+                threshold=self.cfg.l37_threshold,
+                top_k=self.cfg.l37_top_k,
+                action=self.cfg.l37_action,
+                timeout=self.cfg.l37_timeout,
+            )
+            if status == "unreachable":
+                l37_state["down"] = True
+                l37_state["incomplete"] = True
+            else:
+                l37_state["reached"] = True
+                for h in h_list:
+                    h.field_path = fp
+                    hits.append(h)
+        latency["L3.7"] = latency.get("L3.7", 0.0) + (time.perf_counter() - t) * 1000
+        return hits
+
     # ---- 去重(§3 step4:同 dedup_key 合并,保留最高 confidence)----
     @staticmethod
     def _dedup(hits: list[Hit]) -> list[Hit]:
@@ -397,6 +454,12 @@ class DLPEngine:
         # 3b. L3 全局去重 + 并发扫描(核心性能补丁:替代逐 unit×逐变体串行 Presidio)
         all_hits.extend(self._scan_l3_concurrent(l3_pending, latency, l3_state))
 
+        # 3c. L3.7 RAG 相似度检索(默认关闭;开启时调 VPC-local 服务,像 L3 是网络调用,
+        #     不内联进 _scan_text_unit 的 per-variant 循环——只对 normalized 每单元一次)。
+        l37_state: dict = {}
+        if self.cfg.enable_l37_rag:
+            all_hits.extend(self._scan_l37(units, latency, l37_state))
+
         # 通道管控(套件4):MCP/EGRESS 且 dict 入参
         if injection_point in (InjectionPoint.MCP, InjectionPoint.EGRESS) and isinstance(
             content, dict
@@ -425,6 +488,11 @@ class DLPEngine:
                 )
             else:
                 notes.append("L3 skipped(analyzer 部分语言失败)——覆盖不完整,失败语言的 PII 可能漏检,非真 PASS")
+
+        # L3.7 缺席标注:开启了 RAG 但服务不可达 → 覆盖不完整,标 "L3.7 skipped"
+        # (供 run_offline 的 _l37_absent SKIP、server.py fail-closed marker 匹配)。绝不静默当 PASS。
+        if self.cfg.enable_l37_rag and l37_state.get("down"):
+            notes.append("L3.7 skipped(RAG 检索服务不可达)——非 PASS,离线无 embedding 服务时按 SKIP 处理")
 
         # 4. 去重
         all_hits = self._dedup(all_hits)

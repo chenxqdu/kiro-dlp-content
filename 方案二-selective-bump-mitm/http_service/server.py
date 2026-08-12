@@ -84,6 +84,15 @@ L3_UNAVAILABLE_ACTION = os.environ.get("DLP_L3_UNAVAILABLE_ACTION", "block").low
 # ---- L3 大 body 性能补丁(去重+省扫+并发;默认省扫仅 raw/normalized、并发 16)----
 RUN_L3_ON_ALL = os.environ.get("DLP_RUN_L3_ON_ALL_VARIANTS", "false").lower() in ("1", "true", "yes")
 L3_CONCURRENCY = int(os.environ.get("DLP_L3_CONCURRENCY", "16"))
+# ---- L3.7 RAG 相似度检索(语义 EDM,默认关闭)----
+# DLP_ENABLE_L37 开关;DLP_L37_URL 指向 VPC-local RAG 检索服务(g6 TEI/vLLM),回写进
+# RAG_SERVICE_URL 供 l37_rag 读取(l37_rag 每次调用读 env,无 import 顺序坑)。
+# ⚠ 红线:RAG embedding 后端必须 VPC-local;引擎侧只经 urllib 调独立服务。
+ENABLE_L37 = os.environ.get("DLP_ENABLE_L37", "false").lower() in ("1", "true", "yes")
+L37_THRESHOLD = float(os.environ.get("DLP_L37_THRESHOLD", "0.83"))
+_L37_URL = os.environ.get("DLP_L37_URL", "").strip()
+if _L37_URL:
+    os.environ["RAG_SERVICE_URL"] = _L37_URL
 
 log = logging.getLogger("dlp-http")
 l4log = logging.getLogger("dlp-l4")
@@ -164,6 +173,8 @@ _CFG = EngineConfig(
     l4_sync_block=False,
     run_l3_on_all_variants=RUN_L3_ON_ALL,
     l3_concurrency=L3_CONCURRENCY,
+    enable_l37_rag=ENABLE_L37,          # 默认 False:L3.7 休眠,行为与历来一致
+    l37_threshold=L37_THRESHOLD,
 )
 _pool: "queue.Queue[DLPEngine]" = queue.Queue()
 for _ in range(max(1, POOL_N)):
