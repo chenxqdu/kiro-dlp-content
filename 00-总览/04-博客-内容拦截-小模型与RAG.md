@@ -256,7 +256,53 @@ L0–L3.5 这几层，在测试样本上的检测正确性与延迟结果是漏�
 | **L3 Presidio NER** | **12–15 ms** | **同步链路延迟的绝对主体**（HTTP 调独立 analyzer 容器；冷启首条 ≈180–196ms） |
 | L3.5 术语表/EDM        | 0.01–0.31 ms | 亚毫秒                                                   |
 
-同步阻断链路的延迟预算几乎全花在 L3 Presidio 上，L0、L1、L2、L3.5 四层加起来不到 1ms。后文判断「L3.7 RAG 能不能进同步链路」时，会反复拿这条基线来对标。剩下的 L3.7 和 L4 怎么设计，就是后半篇的事。
+同步阻断链路的延迟预算几乎全花在 L3 Presidio 上，L0、L1、L2、L3.5 四层加起来不到 1ms。后文判断「L3.7 RAG 能不能进同步链路」时，会反复拿这条基线来对标。
+
+### 4.1 规则怎么改：各层定制入口、生效方式与验证闭环
+
+引擎跑起来之后，规则定制就是运营常态：新出现的凭证格式要加签名、新立项的内部代号要进术语表、新登记的机密语料要进向量库、误报要加白名单豁免。先把工程形态说诚实：**当前引擎是「代码即配置」+ env 两层**——检测规则（正则、词表、白名单）硬编码在 [`engine/dlp/`](../engine/dlp/) 各层模块的常量里，运行时开关与阈值走环境变量；**没有规则配置平台、没有热加载**。这对原型和小团队运营完全够用（改规则 = 改几行常量），但要如实知道它不是产品化的规则管理系统（见本节末尾的交接注意）。
+
+按层给出「想改什么 → 改哪里 → 怎么生效」：
+
+| 层 | 客户典型诉求 | 改哪里（真实入口） | 生效方式 |
+|---|---|---|---|
+| L0 | 加一条正则 / 加白名单豁免 | `l0_regex.py`：加编译正则 + 在 `scan()` 里 append 一条 `Hit`；豁免加进 `WHITELIST_TOKENS`（token 白名单）或 `RESERVED_DOMAINS`（保留域，**与 L3 邮箱豁免共用**） | 重启容器¹ |
+| L1 | 加新凭证签名 | `l1_secrets.py`：加编译正则 + `_emit(正则, 规则名, 实体名)` 一行（自动带占位符豁免）；占位符词表在 `_PLACEHOLDER` | 重启容器¹ |
+| L2 | 调熵阈值 / 加语境词 | `l2_entropy.py`：熵阈值（当前 4.0）与语境词表 `_CTX` 都是模块常量，无 env，改代码 | 重启容器¹ |
+| L3 | 启停某 PII 类别 / 改动作 / 调置信度 | `l3_presidio.py`：`_ENTITY_ACTION` 字典增删键即可（**不在字典里的实体直接丢弃**），动作就是键值（REDACT/BLOCK）；置信度阈值 `_SCORE_THRESHOLD`（当前 0.5）；语言集走 env `DLP_PRESIDIO_LANGS`，不可达动作走 env `DLP_L3_UNAVAILABLE_ACTION=block\|keep` | py 改动重启¹；env 改动 `up -d`；**加自定义识别器要动 Presidio 侧配置并重建其镜像** |
+| L3.5 | 登记新术语 / EDM 条目 | `l35_glossary.py`：往 `GLOSSARY` 列表 append 一个四元组 `(短语, 实体名, 动作, 大小写敏感)`；正则类术语（工单号等模式）仿 `_TICKET` 加 | 重启容器¹ |
+| L3.7 | 登记新机密语料 / 调相似度阈值 | 语料：`corpus.jsonl` 加一行 `{"doc_id","chunk_id","text"}`，重启 RAG 服务（启动时全量重算 embedding，**无增量登记 API**）；阈值走 env `DLP_L37_THRESHOLD`——**改阈值前必须先跑 `threshold_sweep.py` 重新标定**（§6.4：阈值是曲线不是点）；开关 `DLP_ENABLE_L37` | 语料 = 重启 RAG 服务；env = `up -d` |
+| L4 | 改类别集合 / prompt 契约 / 三态 / 模型端点 | 类别与输出契约都在 `l4_semantic.py::_CLASSIFIER_PROMPT` **一个常量**里（五类 + none，Bedrock 与 vLLM 后端共用、避免两处漂移）；三态 env `DLP_L4_MODE=off\|async\|sync`、同步阻断置信度门槛 `DLP_L4_BLOCK_MIN_CONFIDENCE`、超时 `DLP_L4_TIMEOUT_MS`；VPC-local 后端 `DLP_L4_BACKEND=vllm` + `DLP_L4_VLLM_URL`/`DLP_L4_VLLM_MODEL` | prompt = 改 py 重启¹；env = `up -d`（完整 env 表见[方案二部署指南](../方案二-selective-bump-mitm/方案二-02-部署指南.md)） |
+| 出口 | 放行内部 git 远端 / SQL 连接 | `egress.py`：`GIT_REMOTE_ALLOWLIST` / `SQL_CONN_ALLOWLIST` 元组加条目 | 重启容器¹ |
+
+> ¹ 两条路径的 compose 都把 `engine/dlp` 以 bind-mount 挂进容器——改 py **不用重建镜像**，`docker compose up -d`（或 restart）让进程重新 import 即生效；代码里没有热加载。
+
+三个最高频的定制，给出到行的示例。**登记一条新术语（L3.5，最常见）**——四元组第 4 位就是大小写敏感开关：
+
+```python
+GLOSSARY.append(("Project Foo", "PROPRIETARY_TERM", Verdict.BLOCK, True))   # True=大小写敏感
+```
+
+**调整 PII 类别（L3）**——停用弱实体 LOCATION、把 CREDIT_CARD 升级为阻断，就是对 `_ENTITY_ACTION` 字典的两行操作：
+
+```python
+_ENTITY_ACTION.pop("LOCATION")                     # 该实体从此直接丢弃,不再产生 REDACT
+_ENTITY_ACTION["CREDIT_CARD"] = Verdict.BLOCK      # 动作从脱敏改为阻断
+```
+
+**登记新机密语料并重标阈值（L3.7）**——语料进库、阈值必须先扫描后下发：
+
+```bash
+echo '{"doc_id":"algo-007","chunk_id":"0","text":"<机密算法源码或描述>"}' >> corpus.jsonl
+# 重启 RAG 服务(全量重建 embedding)后,用评测集重新标定阈值,再改 DLP_L37_THRESHOLD
+RAG_URL=http://<rag-host>:8081/rag/query python3 threshold_sweep.py --eval data/eval.jsonl --out sweep.json
+```
+
+**改完规则不算完——验证闭环才是纪律**（呼应 §8.1 的 oracle 先行）：每加/改一条规则，**同一次提交里配一条分层向量**（正例 + 豁免各一，进 `engine/tests/fixtures_layers/`），重跑 78 条分层测试（`python3 -m tests.run_layers`，跑法见[手动复现指南](03-手动复现指南-逐条三合一.md)）确认新规则命中、旧规则不回归；L3.7 动了语料或阈值就重跑 threshold_sweep；L4 动了 prompt/类别就重跑 suite6 类别命中。没有配套 fixture 的规则改动，等于往引擎里塞了一条没人知道何时失效的规则。
+
+**交接注意（产品化 gap，如实列出）**：规则未外置（无 yaml/API/管理界面）、无热加载、无规则级审计与版本化灰度、Presidio 自定义 pattern recognizer 没有注册入口、L3.7 语料无增量登记。客户若要把这套引擎产品化，规则外置与变更审计是第一批要补的工程——本文范围内它们是已知边界，不是已解决问题。
+
+剩下的 L3.7 和 L4 怎么设计，就是后半篇的事。
 
 ***
 
